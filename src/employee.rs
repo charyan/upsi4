@@ -1,4 +1,7 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    cell::{Ref, RefCell},
+    rc::Rc,
+};
 
 use macroquad::{math::Vec2, rand};
 
@@ -48,6 +51,10 @@ impl Office {
                 self.selected_employee = Some(e.clone());
             }
         }
+    }
+
+    pub fn iter_employees(&self) -> impl Iterator<Item = Ref<'_, Employee>> {
+        self.employees.iter().map(|e| e.borrow())
     }
 
     pub fn tick(&mut self) {
