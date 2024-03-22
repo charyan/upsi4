@@ -11,8 +11,8 @@ pub const GAME_WINDOW_HEIGHT: u32 = 720;
 pub const GLOBAL_STAT_WIDTH: u32 = 50;
 pub const GLOBAL_STAT_HEIGHT: u32 = 20;
 
-pub const PERSONNAL_STAT_WIDTH: u32 = 16;
-pub const PERSONNAL_STAT_HEIGHT: u32 = 9;
+pub const PERSONNAL_STAT_WIDTH: u32 = 1600;
+pub const PERSONNAL_STAT_HEIGHT: u32 = 900;
 
 pub const INFO_WIDTH: u32 = 50;
 pub const INFO_HEIGHT: u32 = 20;
@@ -37,6 +37,11 @@ pub struct Drawing {
     camera_info: Camera2D,
     camera_global_stat: Camera2D,
     camera_personnal_stat: Camera2D,
+    // Displayed
+    displayed_hope: f32,
+    displayed_satiety: f32,
+    displayed_satisfaction: f32,
+    displayed_energy: f32,
 }
 
 impl Drawing {
@@ -110,6 +115,12 @@ impl Drawing {
             camera_info,
             camera_global_stat,
             camera_personnal_stat,
+
+            // displayed
+            displayed_energy: 0.,
+            displayed_hope: 0.,
+            displayed_satiety: 0.,
+            displayed_satisfaction: 0.,
         }
     }
 
@@ -126,62 +137,49 @@ impl Drawing {
         clear_background(WHITE);
     }
 
-    fn draw_personnal_stat(&self, game: &Game) {
+    fn draw_personnal_stat(&mut self, game: &Game) {
         set_camera(&self.camera_personnal_stat);
         clear_background(WHITE);
 
-        let bar_width_max: f32 = 10.;
+        let bar_width_max: f32 = 1000.;
 
         if let Some(selected_employee) = game.get_office().get_selected_employee() {
-            draw_rectangle(1., 1., bar_width_max, 1., LIGHTGRAY);
-            draw_rectangle(1., 3., bar_width_max, 1., LIGHTGRAY);
-            draw_rectangle(1., 5., bar_width_max, 1., LIGHTGRAY);
-            draw_rectangle(1., 7., bar_width_max, 1., LIGHTGRAY);
+            draw_rectangle(100., 100., bar_width_max, 100., LIGHTGRAY);
+            draw_rectangle(100., 300., bar_width_max, 100., LIGHTGRAY);
+            draw_rectangle(100., 500., bar_width_max, 100., LIGHTGRAY);
+            draw_rectangle(100., 700., bar_width_max, 100., LIGHTGRAY);
 
-            draw_rectangle(
-                1.,
-                1.,
-                lerp(
-                    game.get_displayed_satisfaction(),
-                    selected_employee.as_ref().borrow().get_satisfaction() * bar_width_max,
-                    ANIMATION_SPEED,
-                ),
-                1.,
-                RED,
+            self.displayed_satisfaction = lerp(
+                self.displayed_satisfaction,
+                selected_employee.as_ref().borrow().get_satisfaction() * bar_width_max,
+                ANIMATION_SPEED,
             );
-            draw_rectangle(
-                1.,
-                3.,
-                lerp(
-                    game.get_displayed_energy(),
-                    selected_employee.as_ref().borrow().get_energy() * bar_width_max,
-                    ANIMATION_SPEED,
-                ),
-                1.,
-                YELLOW,
+
+            self.displayed_energy = lerp(
+                self.displayed_energy,
+                selected_employee.as_ref().borrow().get_energy() * bar_width_max,
+                ANIMATION_SPEED,
             );
-            draw_rectangle(
-                1.,
-                5.,
-                lerp(
-                    game.get_displayed_satiety(),
-                    selected_employee.as_ref().borrow().get_satiety() * bar_width_max,
-                    ANIMATION_SPEED,
-                ),
-                1.,
-                BLUE,
+
+            self.displayed_hope = lerp(
+                self.displayed_hope,
+                selected_employee.as_ref().borrow().get_hope() * bar_width_max,
+                ANIMATION_SPEED,
             );
-            draw_rectangle(
-                1.,
-                7.,
-                lerp(
-                    game.get_displayed_hope(),
-                    selected_employee.as_ref().borrow().get_hope() * bar_width_max,
-                    ANIMATION_SPEED,
-                ),
-                1.,
-                GREEN,
+
+            self.displayed_satiety = lerp(
+                self.displayed_satisfaction,
+                selected_employee.as_ref().borrow().get_satiety() * bar_width_max,
+                ANIMATION_SPEED,
             );
+
+            draw_rectangle(100., 100., self.displayed_satisfaction, 100., RED);
+
+            draw_rectangle(100., 300., self.displayed_energy, 100., YELLOW);
+
+            draw_rectangle(100., 500., self.displayed_satiety, 100., BLUE);
+
+            draw_rectangle(100., 700., self.displayed_hope, 100., GREEN);
         }
     }
 
@@ -255,7 +253,7 @@ impl Drawing {
         );
     }
 
-    pub fn draw(&self, game: &Game) {
+    pub fn draw(&mut self, game: &Game) {
         self.draw_global_stat();
         self.draw_personnal_stat(game);
         self.draw_office(game);
@@ -302,5 +300,12 @@ impl Drawing {
             ((main_coords.x - x) / width) * OFFICE_WIDTH as f32,
             ((main_coords.y - y) / height) * OFFICE_HEIGHT as f32,
         )
+    }
+
+    pub fn reset_displayed(&mut self) {
+        self.displayed_energy = 0.;
+        self.displayed_hope = 0.;
+        self.displayed_satiety = 0.;
+        self.displayed_satisfaction = 0.;
     }
 }
