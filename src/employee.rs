@@ -59,6 +59,7 @@ impl Office {
 
 const BASE_DECAY_RATE: f32 = 0.0001;
 const EMPLOYEE_RADIUS: f32 = 1.;
+const EMPLOYEE_SPEED: f32 = 0.001;
 
 pub struct Employee {
     satisfaction: f32,
@@ -90,6 +91,40 @@ impl Employee {
         self.hope -= BASE_DECAY_RATE;
         self.energy -= BASE_DECAY_RATE;
         self.satiety -= BASE_DECAY_RATE;
+
+        match self.position.x.total_cmp(&self.spot.x) {
+            std::cmp::Ordering::Less => {
+                if (self.spot.x - self.position.x) <= EMPLOYEE_SPEED {
+                    self.position.x = self.spot.x;
+                } else {
+                    self.position.x += EMPLOYEE_SPEED;
+                }
+            }
+            std::cmp::Ordering::Equal => match self.position.y.total_cmp(&self.spot.y) {
+                std::cmp::Ordering::Less => {
+                    if (self.spot.y - self.position.y) <= EMPLOYEE_SPEED {
+                        self.position.y = self.spot.y;
+                    } else {
+                        self.position.y += EMPLOYEE_SPEED;
+                    }
+                }
+                std::cmp::Ordering::Equal => (),
+                std::cmp::Ordering::Greater => {
+                    if (self.position.y - self.spot.y) <= EMPLOYEE_SPEED {
+                        self.position.y = self.spot.y;
+                    } else {
+                        self.position.y -= EMPLOYEE_SPEED;
+                    }
+                }
+            },
+            std::cmp::Ordering::Greater => {
+                if (self.position.x - self.spot.x) <= EMPLOYEE_SPEED {
+                    self.position.x = self.spot.x;
+                } else {
+                    self.position.x -= EMPLOYEE_SPEED;
+                }
+            }
+        }
     }
 
     pub fn get_satisfaction(&self) -> f32 {
