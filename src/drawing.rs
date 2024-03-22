@@ -17,7 +17,7 @@ pub const PERSONNAL_STAT_HEIGHT: u32 = 9;
 pub const INFO_WIDTH: u32 = 50;
 pub const INFO_HEIGHT: u32 = 20;
 
-pub const ANIMATION_SPEED: f32 = 0.5;
+pub const ANIMATION_SPEED: f32 = 0.1;
 
 fn lerp(start: f32, end: f32, t: f32) -> f32 {
     start.mul_add(1.0 - t, end * t)
@@ -117,12 +117,7 @@ impl Drawing {
         set_camera(&self.camera_office);
         clear_background(WHITE);
         for e in game.get_office().iter_employees() {
-            draw_circle(
-                e.get_pos().x - EMPLOYEE_RADIUS,
-                e.get_pos().y - EMPLOYEE_RADIUS,
-                EMPLOYEE_RADIUS,
-                RED,
-            );
+            draw_circle(e.get_pos().x, e.get_pos().y, EMPLOYEE_RADIUS, RED);
         }
     }
 
@@ -146,48 +141,44 @@ impl Drawing {
             draw_rectangle(
                 1.,
                 1.,
-                bar_width_max
-                    * lerp(
-                        game.get_displayed_satisfaction(),
-                        selected_employee.as_ref().borrow().get_satisfaction(),
-                        ANIMATION_SPEED,
-                    ),
+                lerp(
+                    game.get_displayed_satisfaction(),
+                    selected_employee.as_ref().borrow().get_satisfaction() * bar_width_max,
+                    ANIMATION_SPEED,
+                ),
                 1.,
                 RED,
             );
             draw_rectangle(
                 1.,
                 3.,
-                bar_width_max
-                    * lerp(
-                        game.get_displayed_energy(),
-                        selected_employee.as_ref().borrow().get_energy(),
-                        ANIMATION_SPEED,
-                    ),
+                lerp(
+                    game.get_displayed_energy(),
+                    selected_employee.as_ref().borrow().get_energy() * bar_width_max,
+                    ANIMATION_SPEED,
+                ),
                 1.,
                 YELLOW,
             );
             draw_rectangle(
                 1.,
                 5.,
-                bar_width_max
-                    * lerp(
-                        game.get_displayed_satiety(),
-                        selected_employee.as_ref().borrow().get_satiety(),
-                        ANIMATION_SPEED,
-                    ),
+                lerp(
+                    game.get_displayed_satiety(),
+                    selected_employee.as_ref().borrow().get_satiety() * bar_width_max,
+                    ANIMATION_SPEED,
+                ),
                 1.,
                 BLUE,
             );
             draw_rectangle(
                 1.,
                 7.,
-                bar_width_max
-                    * lerp(
-                        game.get_displayed_hope(),
-                        selected_employee.as_ref().borrow().get_hope(),
-                        ANIMATION_SPEED,
-                    ),
+                lerp(
+                    game.get_displayed_hope(),
+                    selected_employee.as_ref().borrow().get_hope() * bar_width_max,
+                    ANIMATION_SPEED,
+                ),
                 1.,
                 GREEN,
             );

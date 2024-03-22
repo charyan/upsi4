@@ -13,8 +13,8 @@ pub struct Office {
 
 impl Office {
     pub fn new() -> Self {
-        let spot_x = [100., 300., 500., 700.];
-        let spot_y = [100., 200., 400., 500.];
+        let spot_x = [10., 30., 50., 70.];
+        let spot_y = [10., 20., 40., 50.];
 
         let available_spots = spot_x
             .iter()
@@ -95,7 +95,7 @@ impl Office {
 }
 
 const BASE_DECAY_RATE: f32 = 0.0001;
-pub const EMPLOYEE_RADIUS: f32 = 1.;
+pub const EMPLOYEE_RADIUS: f32 = 5.;
 const EMPLOYEE_SPEED: f32 = 0.1;
 
 pub struct Employee {

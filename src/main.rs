@@ -55,6 +55,13 @@ impl Game {
     pub fn get_mut_office(&mut self) -> &mut Office {
         &mut self.office
     }
+
+    pub fn clicked(&mut self) {
+        self.displayed_energy = 0.;
+        self.displayed_hope = 0.;
+        self.displayed_satiety = 0.;
+        self.displayed_satisfaction = 0.;
+    }
 }
 
 const FPS: f32 = 60.;
@@ -62,7 +69,7 @@ const FPS: f32 = 60.;
 fn window_conf() -> Conf {
     Conf {
         window_title: "Game".to_owned(),
-        fullscreen: false,
+        fullscreen: true,
         ..Default::default()
     }
 }
@@ -89,6 +96,7 @@ async fn main() {
                 game.get_mut_office().click(
                     drawing.convert_screen_office(vec2(mouse_position().0, mouse_position().1)),
                 );
+                game.clicked();
             }
         }
 
