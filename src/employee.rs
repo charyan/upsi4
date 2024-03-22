@@ -1,8 +1,11 @@
-use macroquad::math::Vec2;
+use std::{cell::RefCell, rc::Rc};
+
+use macroquad::{math::Vec2, rand};
 
 pub struct Office {
     available_spots: Vec<Vec2>,
-    employees: Vec<Employee>,
+    employees: Vec<Rc<RefCell<Employee>>>,
+    selected_employee: Option<Rc<RefCell<Employee>>>,
 }
 
 impl Office {
@@ -18,14 +21,26 @@ impl Office {
         Self {
             available_spots,
             employees: Vec::new(),
+            selected_employee: None,
         }
     }
 
-    pub fn add_employee(&mut self) {}
+    pub fn add_employee(&mut self) {
+        let spot_index = rand::gen_range(0, self.available_spots.len());
+
+        let employee_spot = self.available_spots.remove(spot_index);
+
+        self.employees
+            .push(Rc::new(RefCell::new(Employee::new(employee_spot))));
+    }
+
+    pub fn get_select_employee(&self) -> &Option<Rc<RefCell<Employee>>> {
+        &self.selected_employee
+    }
 
     pub fn tick(&mut self) {
-        for e in &mut self.employees {
-            e.tick();
+        for e in &self.employees {
+            e.borrow_mut().tick();
         }
     }
 }
@@ -40,6 +55,7 @@ pub struct Employee {
     position: Vec2,
     spot: Vec2,
     rotation: f32,
+    alive: bool,
 }
 
 impl Employee {
@@ -52,6 +68,7 @@ impl Employee {
             position: Vec2::new(0., 0.),
             spot,
             rotation: 0.,
+            alive: true,
         }
     }
 
@@ -60,5 +77,21 @@ impl Employee {
         self.hope -= BASE_DECAY_RATE;
         self.energy -= BASE_DECAY_RATE;
         self.satiety -= BASE_DECAY_RATE;
+    }
+
+    pub fn get_satisfaction(&self) -> f32 {
+        self.satisfaction
+    }
+
+    pub fn get_hope(&self) -> f32 {
+        self.hope
+    }
+
+    pub fn get_energy(&self) -> f32 {
+        self.energy
+    }
+
+    pub fn get_satiety(&self) -> f32 {
+        self.satiety
     }
 }
