@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use drawing::{GAME_WINDOW_HEIGHT, GAME_WINDOW_WIDTH};
 use employee::Office;
-use macroquad::prelude::*;
+use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
 
 struct Game {
     office: Office,
@@ -113,7 +113,7 @@ async fn main() {
         let remaining_time = (1.0 / FPS) - elapsed_time as f32;
 
         if remaining_time > 0.0 {
-            std::thread::sleep(Duration::from_secs_f64(remaining_time as f64));
+            wait_seconds(remaining_time).await;
         }
     }
 }
