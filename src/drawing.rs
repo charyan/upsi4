@@ -2,8 +2,8 @@ use macroquad::prelude::*;
 
 use crate::{employee::EMPLOYEE_RADIUS, Game};
 
-pub const OFFICE_WIDTH: u32 = 160;
-pub const OFFICE_HEIGHT: u32 = 90;
+pub const OFFICE_WIDTH: u32 = 1600;
+pub const OFFICE_HEIGHT: u32 = 900;
 
 pub const GAME_WINDOW_WIDTH: u32 = 1280;
 pub const GAME_WINDOW_HEIGHT: u32 = 720;
@@ -42,10 +42,12 @@ pub struct Drawing {
     displayed_satiety: f32,
     displayed_satisfaction: f32,
     displayed_energy: f32,
+
+    employee_texture: Texture2D,
 }
 
 impl Drawing {
-    pub fn new() -> Self {
+    pub async fn new() -> Self {
         // Main target
         let main_render_target = render_target(GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT);
         main_render_target.texture.set_filter(FilterMode::Nearest);
@@ -102,6 +104,8 @@ impl Drawing {
         ));
         camera_personnal_stat.render_target = Some(render_target_personnal_stat.clone());
 
+        let employee_texture = load_texture("./assets/employee.png").await.unwrap();
+
         Self {
             main_render_target,
             render_target_office,
@@ -121,6 +125,8 @@ impl Drawing {
             displayed_hope: 0.,
             displayed_satiety: 0.,
             displayed_satisfaction: 0.,
+
+            employee_texture,
         }
     }
 
@@ -128,7 +134,18 @@ impl Drawing {
         set_camera(&self.camera_office);
         clear_background(WHITE);
         for e in game.get_office().iter_employees() {
-            draw_circle(e.get_pos().x, e.get_pos().y, EMPLOYEE_RADIUS, RED);
+            draw_texture_ex(
+                &self.employee_texture,
+                e.get_pos().x - EMPLOYEE_RADIUS,
+                e.get_pos().y - EMPLOYEE_RADIUS,
+                WHITE,
+                DrawTextureParams {
+                    source: None,
+                    rotation: e.get_rotation() + 90.,
+                    dest_size: Some(Vec2::new(500.0, 500.0)),
+                    ..Default::default()
+                },
+            );
         }
     }
 
@@ -287,9 +304,7 @@ impl Drawing {
         )
     }
 
-    pub fn convert_screen_office(&self, coords: Vec2) -> Vec2 {
-        let main_coords = self.convert_screen_main(coords);
-
+    pub fn convert_main_office(&self, main_coords: Vec2) -> Vec2 {
         let x = GAME_WINDOW_WIDTH as f32 * 0.3;
         let width = GAME_WINDOW_WIDTH as f32 * 0.69;
 

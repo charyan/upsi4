@@ -1,8 +1,6 @@
 mod drawing;
 mod employee;
 
-use std::time::Duration;
-
 use drawing::{GAME_WINDOW_HEIGHT, GAME_WINDOW_WIDTH};
 use employee::Office;
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
@@ -43,7 +41,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut drawing = drawing::Drawing::new();
+    let mut drawing = drawing::Drawing::new().await;
     let mut game = Game::new();
 
     loop {
@@ -60,9 +58,8 @@ async fn main() {
             );
 
             if rect_office.contains(main_pos) {
-                game.get_mut_office().click(
-                    drawing.convert_screen_office(vec2(mouse_position().0, mouse_position().1)),
-                );
+                game.get_mut_office()
+                    .click(drawing.convert_main_office(main_pos));
                 drawing.reset_displayed();
             }
         }
