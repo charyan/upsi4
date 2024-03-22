@@ -57,9 +57,39 @@ impl Office {
         self.employees.iter().map(|e| e.borrow())
     }
 
+    pub fn employees_count(&self) -> usize {
+        self.employees.len()
+    }
+
     pub fn tick(&mut self) {
-        for e in &self.employees {
-            e.borrow_mut().tick();
+        let mut removed_employees = Vec::new();
+
+        self.employees.retain(|e| {
+            let mut e_borrow = e.borrow_mut();
+
+            e_borrow.tick();
+
+            if e_borrow.cleaned {
+                removed_employees.push(e.clone());
+                false
+            } else {
+                true
+            }
+        });
+
+        // Return spot to available spots
+        for e in &removed_employees {
+            self.available_spots.push(e.borrow().spot);
+        }
+
+        // Deselect dead employee
+        if let Some(selected) = &self.selected_employee {
+            for removed in removed_employees {
+                if Rc::ptr_eq(&removed, &selected) {
+                    self.selected_employee = None;
+                    break;
+                }
+            }
         }
     }
 }
@@ -77,6 +107,7 @@ pub struct Employee {
     spot: Vec2,
     rotation: f32,
     alive: bool,
+    cleaned: bool,
 }
 
 impl Employee {
@@ -90,6 +121,7 @@ impl Employee {
             spot,
             rotation: 0.,
             alive: true,
+            cleaned: false,
         }
     }
 
