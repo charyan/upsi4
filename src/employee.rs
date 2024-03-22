@@ -131,6 +131,11 @@ impl Employee {
         self.energy -= BASE_DECAY_RATE;
         self.satiety -= BASE_DECAY_RATE;
 
+        self.satisfaction = self.satisfaction.clamp(0., 1.);
+        self.hope = self.hope.clamp(0., 1.);
+        self.energy = self.energy.clamp(0., 1.);
+        self.satiety = self.satiety.clamp(0., 1.);
+
         match self.position.x.total_cmp(&self.spot.x) {
             std::cmp::Ordering::Less => {
                 if (self.spot.x - self.position.x) <= EMPLOYEE_SPEED {
