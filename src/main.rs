@@ -1,4 +1,5 @@
 mod drawing;
+mod employee;
 
 use macroquad::prelude::*;
 

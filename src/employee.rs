@@ -10,8 +10,8 @@ pub struct Office {
 
 impl Office {
     pub fn new() -> Self {
-        let spot_x = vec![1., 3., 5., 7.];
-        let spot_y = vec![1., 2., 4., 5.];
+        let spot_x = [1., 3., 5., 7.];
+        let spot_y = [1., 2., 4., 5.];
 
         let available_spots = spot_x
             .iter()
@@ -34,8 +34,20 @@ impl Office {
             .push(Rc::new(RefCell::new(Employee::new(employee_spot))));
     }
 
-    pub fn get_select_employee(&self) -> &Option<Rc<RefCell<Employee>>> {
+    pub fn get_selected_employee(&self) -> &Option<Rc<RefCell<Employee>>> {
         &self.selected_employee
+    }
+
+    pub fn click(&mut self, mouse_pos: Vec2) {
+        self.selected_employee = None;
+
+        for e in &self.employees {
+            let borrowed_e = e.borrow();
+
+            if borrowed_e.position.distance(mouse_pos) < EMPLOYEE_RADIUS {
+                self.selected_employee = Some(e.clone());
+            }
+        }
     }
 
     pub fn tick(&mut self) {
@@ -46,6 +58,7 @@ impl Office {
 }
 
 const BASE_DECAY_RATE: f32 = 0.0001;
+const EMPLOYEE_RADIUS: f32 = 1.;
 
 pub struct Employee {
     satisfaction: f32,
