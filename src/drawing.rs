@@ -17,6 +17,12 @@ const PERSONNAL_STAT_HEIGHT: u32 = 9;
 const INFO_WIDTH: u32 = 50;
 const INFO_HEIGHT: u32 = 20;
 
+const ANIMATION_SPEED: f32 = 0.5;
+
+fn lerp(start: f32, end: f32, t: f32) -> f32 {
+    start.mul_add(1.0 - t, end * t)
+}
+
 pub struct Drawing {
     // Render_target
     main_render_target: RenderTarget,
@@ -110,13 +116,12 @@ impl Drawing {
     fn draw_office(&self) {
         set_camera(&self.camera_office);
         clear_background(WHITE);
-        draw_circle(7., 7., 1., RED);
+        draw_circle(4., 4., 1., RED)
     }
 
     fn draw_info(&self) {
         set_camera(&self.camera_info);
-        clear_background(GREEN);
-        draw_circle(7., 7., 1., RED);
+        clear_background(WHITE);
     }
 
     fn draw_personnal_stat(&self, game: &Game) {
@@ -125,23 +130,66 @@ impl Drawing {
 
         let bar_width_max: f32 = 10.;
 
-        let selected_employee = 0.3;
+        if let Some(selected_employee) = game.get_office().get_select_employee() {
+            draw_rectangle(1., 1., bar_width_max, 1., LIGHTGRAY);
+            draw_rectangle(1., 3., bar_width_max, 1., LIGHTGRAY);
+            draw_rectangle(1., 5., bar_width_max, 1., LIGHTGRAY);
+            draw_rectangle(1., 7., bar_width_max, 1., LIGHTGRAY);
 
-        draw_rectangle(1., 1., bar_width_max, 1., LIGHTGRAY);
-        draw_rectangle(1., 3., bar_width_max, 1., LIGHTGRAY);
-        draw_rectangle(1., 5., bar_width_max, 1., LIGHTGRAY);
-        draw_rectangle(1., 7., bar_width_max, 1., LIGHTGRAY);
-
-        draw_rectangle(1., 1., bar_width_max * selected_employee, 1., RED);
-        draw_rectangle(1., 3., bar_width_max * selected_employee, 1., RED);
-        draw_rectangle(1., 5., bar_width_max * selected_employee, 1., RED);
-        draw_rectangle(1., 7., bar_width_max * selected_employee, 1., RED);
+            draw_rectangle(
+                1.,
+                1.,
+                bar_width_max
+                    * lerp(
+                        game.get_displayed_satisfaction(),
+                        selected_employee.as_ref().borrow().get_satisfaction(),
+                        ANIMATION_SPEED,
+                    ),
+                1.,
+                RED,
+            );
+            draw_rectangle(
+                1.,
+                3.,
+                bar_width_max
+                    * lerp(
+                        game.get_displayed_energy(),
+                        selected_employee.as_ref().borrow().get_energy(),
+                        ANIMATION_SPEED,
+                    ),
+                1.,
+                YELLOW,
+            );
+            draw_rectangle(
+                1.,
+                5.,
+                bar_width_max
+                    * lerp(
+                        game.get_displayed_satiety(),
+                        selected_employee.as_ref().borrow().get_satiety(),
+                        ANIMATION_SPEED,
+                    ),
+                1.,
+                BLUE,
+            );
+            draw_rectangle(
+                1.,
+                7.,
+                bar_width_max
+                    * lerp(
+                        game.get_displayed_hope(),
+                        selected_employee.as_ref().borrow().get_hope(),
+                        ANIMATION_SPEED,
+                    ),
+                1.,
+                GREEN,
+            );
+        }
     }
 
     fn draw_global_stat(&self) {
         set_camera(&self.camera_global_stat);
-        clear_background(YELLOW);
-        draw_circle(7., 7., 1., RED);
+        clear_background(WHITE);
     }
 
     fn draw_game(&self) {
@@ -207,6 +255,7 @@ impl Drawing {
                 ..Default::default()
             },
         );
+        draw_circle(100., 100., 20., GREEN)
     }
 
     pub fn draw(&self, game: &Game) {
@@ -227,10 +276,34 @@ impl Drawing {
             (screen_height() - height) / 2.,
             WHITE,
             DrawTextureParams {
-                dest_size: Some(vec2(screen_width(), screen_width() / 16. * 9.)),
+                dest_size: Some(vec2(screen_width(), height)),
                 flip_y: true,
                 ..Default::default()
             },
         );
+    }
+
+    pub fn convert_screen_main(&self, coords: Vec2) -> Vec2 {
+        let height = screen_width() / 16. * 9.;
+        let y = (screen_height() - height) / 2.;
+        vec2(
+            ((coords.x - 0.) / screen_width()) * GAME_WINDOW_WIDTH as f32,
+            ((coords.y - y) / height) * GAME_WINDOW_HEIGHT as f32,
+        )
+    }
+
+    pub fn convert_screen_office(&self, coords: Vec2) -> Vec2 {
+        let main_coords = self.convert_screen_main(coords);
+
+        let x = GAME_WINDOW_WIDTH as f32 * 0.3;
+        let width = GAME_WINDOW_WIDTH as f32 * 0.69;
+
+        let height = GAME_WINDOW_HEIGHT as f32 * 0.69;
+        let y = GAME_WINDOW_HEIGHT as f32 * 0.3;
+
+        vec2(
+            ((main_coords.x - x) / width) * OFFICE_WIDTH as f32,
+            ((main_coords.y - y) / height) * OFFICE_HEIGHT as f32,
+        )
     }
 }
