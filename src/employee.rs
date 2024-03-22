@@ -95,8 +95,8 @@ impl Office {
 }
 
 const BASE_DECAY_RATE: f32 = 0.0001;
-const EMPLOYEE_RADIUS: f32 = 1.;
-const EMPLOYEE_SPEED: f32 = 0.001;
+pub const EMPLOYEE_RADIUS: f32 = 1.;
+const EMPLOYEE_SPEED: f32 = 0.1;
 
 pub struct Employee {
     satisfaction: f32,
@@ -117,7 +117,7 @@ impl Employee {
             hope: 0.5,
             energy: 0.5,
             satiety: 0.5,
-            position: Vec2::new(0., 0.),
+            position: Vec2::new(10., 45.),
             spot,
             rotation: 0.,
             alive: true,
@@ -185,5 +185,9 @@ impl Employee {
 
     pub fn get_satiety(&self) -> f32 {
         self.satiety
+    }
+
+    pub fn get_pos(&self) -> Vec2 {
+        self.position
     }
 }

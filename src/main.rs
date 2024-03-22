@@ -3,6 +3,7 @@ mod employee;
 
 use std::time::Duration;
 
+use drawing::{GAME_WINDOW_HEIGHT, GAME_WINDOW_WIDTH};
 use employee::Office;
 use macroquad::prelude::*;
 
@@ -51,7 +52,7 @@ impl Game {
         &self.office
     }
 
-    pub fn _get_mut_office(&mut self) -> &mut Office {
+    pub fn get_mut_office(&mut self) -> &mut Office {
         &mut self.office
     }
 }
@@ -75,15 +76,24 @@ async fn main() {
         let start_time = get_time();
 
         if is_mouse_button_pressed(MouseButton::Left) {
-            println!(
-                "Office : {:?}",
-                drawing.convert_screen_office(vec2(mouse_position().0, mouse_position().1))
+            let main_pos =
+                drawing.convert_screen_main(vec2(mouse_position().0, mouse_position().1));
+            let rect_office = Rect::new(
+                GAME_WINDOW_WIDTH as f32 * 0.3,
+                GAME_WINDOW_HEIGHT as f32 * 0.3,
+                GAME_WINDOW_WIDTH as f32 * 0.69,
+                GAME_WINDOW_HEIGHT as f32 * 0.69,
             );
 
-            println!(
-                "Game : {:?}",
-                drawing.convert_screen_main(vec2(mouse_position().0, mouse_position().1))
-            );
+            if rect_office.contains(main_pos) {
+                game.get_mut_office().click(
+                    drawing.convert_screen_office(vec2(mouse_position().0, mouse_position().1)),
+                );
+            }
+        }
+
+        if is_key_pressed(KeyCode::Space) {
+            game.get_mut_office().add_employee();
         }
 
         game.tick();

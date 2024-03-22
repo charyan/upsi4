@@ -1,23 +1,23 @@
 use macroquad::prelude::*;
 
-use crate::Game;
+use crate::{employee::EMPLOYEE_RADIUS, Game};
 
-const OFFICE_WIDTH: u32 = 16;
-const OFFICE_HEIGHT: u32 = 9;
+pub const OFFICE_WIDTH: u32 = 160;
+pub const OFFICE_HEIGHT: u32 = 90;
 
-const GAME_WINDOW_WIDTH: u32 = 1280;
-const GAME_WINDOW_HEIGHT: u32 = 720;
+pub const GAME_WINDOW_WIDTH: u32 = 1280;
+pub const GAME_WINDOW_HEIGHT: u32 = 720;
 
-const GLOBAL_STAT_WIDTH: u32 = 50;
-const GLOBAL_STAT_HEIGHT: u32 = 20;
+pub const GLOBAL_STAT_WIDTH: u32 = 50;
+pub const GLOBAL_STAT_HEIGHT: u32 = 20;
 
-const PERSONNAL_STAT_WIDTH: u32 = 16;
-const PERSONNAL_STAT_HEIGHT: u32 = 9;
+pub const PERSONNAL_STAT_WIDTH: u32 = 16;
+pub const PERSONNAL_STAT_HEIGHT: u32 = 9;
 
-const INFO_WIDTH: u32 = 50;
-const INFO_HEIGHT: u32 = 20;
+pub const INFO_WIDTH: u32 = 50;
+pub const INFO_HEIGHT: u32 = 20;
 
-const ANIMATION_SPEED: f32 = 0.5;
+pub const ANIMATION_SPEED: f32 = 0.5;
 
 fn lerp(start: f32, end: f32, t: f32) -> f32 {
     start.mul_add(1.0 - t, end * t)
@@ -113,10 +113,17 @@ impl Drawing {
         }
     }
 
-    fn draw_office(&self) {
+    fn draw_office(&self, game: &Game) {
         set_camera(&self.camera_office);
         clear_background(WHITE);
-        draw_circle(4., 4., 1., RED)
+        for e in game.get_office().iter_employees() {
+            draw_circle(
+                e.get_pos().x - EMPLOYEE_RADIUS,
+                e.get_pos().y - EMPLOYEE_RADIUS,
+                EMPLOYEE_RADIUS,
+                RED,
+            );
+        }
     }
 
     fn draw_info(&self) {
@@ -130,7 +137,7 @@ impl Drawing {
 
         let bar_width_max: f32 = 10.;
 
-        if let Some(selected_employee) = game.get_office().get_select_employee() {
+        if let Some(selected_employee) = game.get_office().get_selected_employee() {
             draw_rectangle(1., 1., bar_width_max, 1., LIGHTGRAY);
             draw_rectangle(1., 3., bar_width_max, 1., LIGHTGRAY);
             draw_rectangle(1., 5., bar_width_max, 1., LIGHTGRAY);
@@ -255,13 +262,12 @@ impl Drawing {
                 ..Default::default()
             },
         );
-        draw_circle(100., 100., 20., GREEN)
     }
 
     pub fn draw(&self, game: &Game) {
         self.draw_global_stat();
         self.draw_personnal_stat(game);
-        self.draw_office();
+        self.draw_office(game);
         self.draw_info();
         self.draw_game();
 
