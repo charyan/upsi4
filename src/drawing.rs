@@ -1,5 +1,7 @@
 use macroquad::prelude::*;
 
+use crate::Game;
+
 const OFFICE_WIDTH: u32 = 16;
 const OFFICE_HEIGHT: u32 = 9;
 
@@ -9,8 +11,8 @@ const GAME_WINDOW_HEIGHT: u32 = 720;
 const GLOBAL_STAT_WIDTH: u32 = 50;
 const GLOBAL_STAT_HEIGHT: u32 = 20;
 
-const PERSONNAL_STAT_WIDTH: u32 = 50;
-const PERSONNAL_STAT_HEIGHT: u32 = 20;
+const PERSONNAL_STAT_WIDTH: u32 = 16;
+const PERSONNAL_STAT_HEIGHT: u32 = 9;
 
 const INFO_WIDTH: u32 = 50;
 const INFO_HEIGHT: u32 = 20;
@@ -117,10 +119,23 @@ impl Drawing {
         draw_circle(7., 7., 1., RED);
     }
 
-    fn draw_personnal_stat(&self) {
+    fn draw_personnal_stat(&self, game: &Game) {
         set_camera(&self.camera_personnal_stat);
-        clear_background(BLUE);
-        draw_circle(7., 7., 1., RED);
+        clear_background(WHITE);
+
+        let bar_width_max: f32 = 10.;
+
+        let selected_employee = 0.3;
+
+        draw_rectangle(1., 1., bar_width_max, 1., LIGHTGRAY);
+        draw_rectangle(1., 3., bar_width_max, 1., LIGHTGRAY);
+        draw_rectangle(1., 5., bar_width_max, 1., LIGHTGRAY);
+        draw_rectangle(1., 7., bar_width_max, 1., LIGHTGRAY);
+
+        draw_rectangle(1., 1., bar_width_max * selected_employee, 1., RED);
+        draw_rectangle(1., 3., bar_width_max * selected_employee, 1., RED);
+        draw_rectangle(1., 5., bar_width_max * selected_employee, 1., RED);
+        draw_rectangle(1., 7., bar_width_max * selected_employee, 1., RED);
     }
 
     fn draw_global_stat(&self) {
@@ -194,9 +209,9 @@ impl Drawing {
         );
     }
 
-    pub fn draw(&self) {
+    pub fn draw(&self, game: &Game) {
         self.draw_global_stat();
-        self.draw_personnal_stat();
+        self.draw_personnal_stat(game);
         self.draw_office();
         self.draw_info();
         self.draw_game();
