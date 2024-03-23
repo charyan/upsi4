@@ -330,6 +330,10 @@ impl Employee {
 
     #[must_use]
     pub fn tick(&mut self) -> i64 {
+        if let EmployeeState::Clean = self.state {
+            return 0;
+        }
+
         self.satisfaction -= BASE_DECAY_RATE * self.satisfaction_factor;
         self.hope -= BASE_DECAY_RATE * self.hope_factor;
         self.energy -= BASE_DECAY_RATE * self.energy_factor;

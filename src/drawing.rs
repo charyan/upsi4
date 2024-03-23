@@ -699,6 +699,7 @@ impl Drawing {
                         EmployeeState::Dead => {
                             let stat_pos = Self::convert_main_personnal_stat(main_pos);
                             if self.button_personnal_satisfaction.contains(stat_pos) {
+                                self.draw_frame();
                                 for (i, text) in DESCRIPTION_BUTTON_CLEAN.split("\n").enumerate() {
                                     draw_text_ex(
                                         text,
