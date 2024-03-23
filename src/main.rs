@@ -4,7 +4,7 @@ mod drawing;
 mod employee;
 
 use drawing::Drawing;
-use employee::Office;
+use employee::{EmployeeAction, Office};
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
 
 struct Game {
@@ -64,14 +64,34 @@ async fn main() {
             } else if drawing.get_rect_personnal_stat().contains(main_pos) {
                 let pos = drawing.convert_main_personnal_stat(main_pos);
 
-                if drawing.get_button_energy().contains(pos) {
-                    println!("button energy")
-                } else if drawing.get_button_hope().contains(pos) {
-                    println!("button hope")
-                } else if drawing.get_button_satiety().contains(pos) {
-                    println!("button satiety")
-                } else if drawing.get_button_satisfaction().contains(pos) {
-                    println!("button satisfaction")
+                if let Some(employee) = game.get_office().get_selected_employee() {
+                    let mut employee = employee.as_ref().borrow_mut();
+
+                    if drawing.get_button_energy().contains(pos) {
+                        if let EmployeeAction::Sleep = employee.action {
+                            employee.action = EmployeeAction::None;
+                        } else {
+                            employee.action = EmployeeAction::Sleep;
+                        }
+                    } else if drawing.get_button_hope().contains(pos) {
+                        if let EmployeeAction::FamilyCall = employee.action {
+                            employee.action = EmployeeAction::None;
+                        } else {
+                            employee.action = EmployeeAction::FamilyCall;
+                        }
+                    } else if drawing.get_button_satiety().contains(pos) {
+                        if let EmployeeAction::Eat = employee.action {
+                            employee.action = EmployeeAction::None;
+                        } else {
+                            employee.action = EmployeeAction::Eat;
+                        }
+                    } else if drawing.get_button_satisfaction().contains(pos) {
+                        if let EmployeeAction::Break = employee.action {
+                            employee.action = EmployeeAction::None;
+                        } else {
+                            employee.action = EmployeeAction::Break;
+                        }
+                    }
                 }
             }
         }

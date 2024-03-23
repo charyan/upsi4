@@ -1,6 +1,9 @@
 use macroquad::prelude::*;
 
-use crate::{employee::EMPLOYEE_RADIUS, Game};
+use crate::{
+    employee::{EmployeeAction, EMPLOYEE_RADIUS},
+    main, Game,
+};
 
 pub const OFFICE_WIDTH: u32 = 1280;
 pub const OFFICE_HEIGHT: u32 = 720;
@@ -19,10 +22,14 @@ pub const INFO_HEIGHT: u32 = 1000;
 
 pub const ANIMATION_SPEED: f32 = 0.1;
 
-const DESCRIPTION_BUTTON_HOPE: &str = "This is the description of the hope button";
-const DESCRIPTION_BUTTON_ENERGY: &str = "This is the description of the energy button";
-const DESCRIPTION_BUTTON_SATISFACTION: &str = "This is the description of the satisfaction button";
-const DESCRIPTION_BUTTON_SATIETY: &str = "This is the description of the satiety button";
+const DESCRIPTION_BUTTON_HOPE: &str = "Laissez votre employée faire un appel vidéo avec sa famille";
+const DESCRIPTION_BUTTON_ENERGY: &str = "Laissez votre employée dormir";
+const DESCRIPTION_BUTTON_SATISFACTION: &str = "Laissez votre employée faire une pause";
+const DESCRIPTION_BUTTON_SATIETY: &str = "Laissez votre employée manger";
+
+const DESCRIPTION_BUTTON_DOOR: &str = "Ouvrez la porte à vos employée";
+const DESCRIPTION_BUTTON_METH: &str = "Donnez un coup de pouce à vos employée";
+const DESCRIPTION_BUTTON_RH: &str = "Recrutez un employée utile";
 
 fn lerp(start: f32, end: f32, t: f32) -> f32 {
     start.mul_add(1.0 - t, end * t)
@@ -48,11 +55,16 @@ pub struct Drawing {
     displayed_satisfaction: f32,
     displayed_energy: f32,
 
-    // Button
+    // Button personnal
     button_personnal_hope: Rect,
     button_personnal_satiety: Rect,
     button_personnal_energy: Rect,
     button_personnal_satisfaction: Rect,
+
+    // Button global
+    button_global_door: Rect,
+    button_global_meth: Rect,
+    button_global_rh: Rect,
 
     // Rect render
     rect_office: Rect,
@@ -153,11 +165,16 @@ impl Drawing {
             displayed_satiety: 0.,
             displayed_satisfaction: 0.,
 
-            // Button
+            // Button personnal
             button_personnal_satisfaction: Rect::new(1200., 75., 300., 150.),
             button_personnal_energy: Rect::new(1200., 275., 300., 150.),
             button_personnal_satiety: Rect::new(1200., 475., 300., 150.),
             button_personnal_hope: Rect::new(1200., 675., 300., 150.),
+
+            // Button global
+            button_global_door: Rect::new(50., 400., 200., 200.),
+            button_global_meth: Rect::new(350., 400., 200., 200.),
+            button_global_rh: Rect::new(650., 400., 200., 200.),
 
             //Render rect
             rect_office: Rect::new(
@@ -271,6 +288,17 @@ impl Drawing {
                 }
             }
         }
+
+        if self.rect_global_stat.contains(main_pos) {
+            let global_pos = self.convert_main_global_stat(main_pos);
+            if self.button_global_door.contains(global_pos) {
+                draw_text(DESCRIPTION_BUTTON_DOOR, 100., 100., 50., BLACK);
+            } else if self.button_global_meth.contains(global_pos) {
+                draw_text(DESCRIPTION_BUTTON_METH, 100., 100., 50., BLACK);
+            } else if self.button_global_rh.contains(global_pos) {
+                draw_text(DESCRIPTION_BUTTON_RH, 100., 100., 50., BLACK);
+            }
+        }
     }
 
     fn draw_personnal_stat(&mut self, game: &Game) {
@@ -304,7 +332,7 @@ impl Drawing {
             );
 
             self.displayed_satiety = lerp(
-                self.displayed_satisfaction,
+                self.displayed_satiety,
                 selected_employee.as_ref().borrow().get_satiety() * bar_width_max,
                 ANIMATION_SPEED,
             );
@@ -322,28 +350,44 @@ impl Drawing {
                 self.button_personnal_satiety.y,
                 self.button_personnal_satiety.w,
                 self.button_personnal_satiety.h,
-                GREEN,
+                if let EmployeeAction::Eat = selected_employee.borrow().action {
+                    RED
+                } else {
+                    GREEN
+                },
             );
             draw_rectangle(
                 self.button_personnal_energy.x,
                 self.button_personnal_energy.y,
                 self.button_personnal_energy.w,
                 self.button_personnal_energy.h,
-                GREEN,
+                if let EmployeeAction::Sleep = selected_employee.borrow().action {
+                    RED
+                } else {
+                    GREEN
+                },
             );
             draw_rectangle(
                 self.button_personnal_satisfaction.x,
                 self.button_personnal_satisfaction.y,
                 self.button_personnal_satisfaction.w,
                 self.button_personnal_satisfaction.h,
-                GREEN,
+                if let EmployeeAction::Break = selected_employee.borrow().action {
+                    RED
+                } else {
+                    GREEN
+                },
             );
             draw_rectangle(
                 self.button_personnal_hope.x,
                 self.button_personnal_hope.y,
                 self.button_personnal_hope.w,
                 self.button_personnal_hope.h,
-                GREEN,
+                if let EmployeeAction::FamilyCall = selected_employee.borrow().action {
+                    RED
+                } else {
+                    GREEN
+                },
             );
         }
     }
@@ -367,7 +411,29 @@ impl Drawing {
             200.,
             100.,
             BLACK,
-        )
+        );
+
+        draw_rectangle(
+            self.button_global_door.x,
+            self.button_global_door.y,
+            self.button_global_door.w,
+            self.button_global_door.h,
+            GREEN,
+        );
+        draw_rectangle(
+            self.button_global_meth.x,
+            self.button_global_meth.y,
+            self.button_global_meth.w,
+            self.button_global_meth.h,
+            GREEN,
+        );
+        draw_rectangle(
+            self.button_global_rh.x,
+            self.button_global_rh.y,
+            self.button_global_rh.w,
+            self.button_global_rh.h,
+            GREEN,
+        );
     }
 
     fn draw_game(&self) {
