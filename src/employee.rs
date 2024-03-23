@@ -231,6 +231,10 @@ pub struct Employee {
     hope: f32,
     energy: f32,
     satiety: f32,
+    satisfaction_factor: f32,
+    hope_factor: f32,
+    energy_factor: f32,
+    satiety_factor: f32,
     position: Vec2,
     computer: Rc<RefCell<Computer>>,
     rotation: f32,
@@ -265,10 +269,14 @@ impl Employee {
 
         Self {
             name,
-            satisfaction: 0.5,
-            hope: 0.5,
-            energy: 0.5,
-            satiety: 0.5,
+            satisfaction: rand::gen_range(0.3, 0.7),
+            hope: rand::gen_range(0.3, 0.7),
+            energy: rand::gen_range(0.3, 0.7),
+            satiety: rand::gen_range(0.3, 0.7),
+            satisfaction_factor: rand::gen_range(0.7, 1.3),
+            hope_factor: rand::gen_range(0.7, 1.3),
+            energy_factor: rand::gen_range(0.7, 1.3),
+            satiety_factor: rand::gen_range(0.7, 1.3),
             position: Vec2::new(300., 350.),
             computer,
             rotation: 0.,
@@ -280,10 +288,10 @@ impl Employee {
 
     #[must_use]
     pub fn tick(&mut self) -> i64 {
-        self.satisfaction -= BASE_DECAY_RATE;
-        self.hope -= BASE_DECAY_RATE;
-        self.energy -= BASE_DECAY_RATE;
-        self.satiety -= BASE_DECAY_RATE;
+        self.satisfaction -= BASE_DECAY_RATE * self.satisfaction_factor;
+        self.hope -= BASE_DECAY_RATE * self.hope_factor;
+        self.energy -= BASE_DECAY_RATE * self.energy_factor;
+        self.satiety -= BASE_DECAY_RATE * self.satiety_factor;
 
         match self.action {
             EmployeeAction::None => (),

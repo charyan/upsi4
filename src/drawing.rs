@@ -607,8 +607,8 @@ impl Drawing {
                                 for (i, text) in DESCRIPTION_BUTTON_CLEAN.split("\n").enumerate() {
                                     draw_text_ex(
                                         text,
-                                        FONT_SIZE_INFO + 10.,
-                                        100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
                                         TextParams {
                                             font: Some(&assets::FONT),
                                             font_size: FONT_SIZE_INFO as u16,
