@@ -228,6 +228,10 @@ impl Game {
                 self.in_game_event_handling();
 
                 self.drawing.clone().borrow_mut().draw(&self);
+
+                if self.office.is_game_over() {
+                    self.game_state = GameState::GameOver;
+                }
             }
             GameState::GameOver => (),
             GameState::MyLittleOfficeMenu => (),
