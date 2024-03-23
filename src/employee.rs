@@ -21,11 +21,21 @@ use crate::assets;
 
 use crate::qte::QteEffect;
 
+pub enum DoorState {
+    /// The door is open
+    Open,
+    /// The door is closed
+    Closed,
+    /// The door is broken
+    Broken,
+}
+
 pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
     selected_employee: Option<Rc<RefCell<Employee>>>,
     money: i64,
+    door_state: DoorState,
 }
 
 impl Office {
@@ -50,6 +60,7 @@ impl Office {
             employees: Vec::new(),
             selected_employee: None,
             money: 100,
+            door_state: DoorState::Open,
         }
     }
 

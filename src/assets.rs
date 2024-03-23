@@ -44,4 +44,12 @@ lazy_static! {
         include_bytes!("../assets/gui/icon_rh.png"),
         Some(ImageFormat::Png)
     );
+    pub static ref DOOR_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/door.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref WINDOW_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/window.png"),
+        Some(ImageFormat::Png),
+    );
 }

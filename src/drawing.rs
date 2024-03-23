@@ -1,4 +1,4 @@
-use macroquad::prelude::*;
+use macroquad::{miniquad::TextureParams, prelude::*};
 
 use crate::{
     assets,
@@ -182,9 +182,9 @@ impl Drawing {
             button_personnal_hope: Rect::new(1200., 675., 300., 150.),
 
             // Button global
-            button_global_door: Rect::new(120., 150., 100., 100.),
-            button_global_meth: Rect::new(270., 150., 100., 100.),
-            button_global_rh: Rect::new(420., 150., 100., 100.),
+            button_global_door: Rect::new(120., 100., 125., 125.),
+            button_global_meth: Rect::new(270., 100., 125., 125.),
+            button_global_rh: Rect::new(420., 100., 125., 125.),
 
             // Button qte
             button_choice_1: Rect::new(300., 1950., 450., 200.),
@@ -933,6 +933,25 @@ impl Drawing {
             self.button_global_door.h,
             GREEN,
         );
+        draw_texture_ex(
+            &assets::ICON_DOOR,
+            self.button_global_door.x,
+            self.button_global_door.y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(self.button_global_door.w, self.button_global_door.h)),
+                ..Default::default()
+            },
+        );
+        draw_rectangle_lines(
+            self.button_global_door.x,
+            self.button_global_door.y,
+            self.button_global_door.w,
+            self.button_global_door.h,
+            10.,
+            BLACK,
+        );
+
         draw_rectangle(
             self.button_global_meth.x,
             self.button_global_meth.y,
@@ -940,12 +959,49 @@ impl Drawing {
             self.button_global_meth.h,
             GREEN,
         );
+        draw_texture_ex(
+            &assets::ICON_METH,
+            self.button_global_meth.x,
+            self.button_global_meth.y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(self.button_global_meth.w, self.button_global_meth.h)),
+                ..Default::default()
+            },
+        );
+        draw_rectangle_lines(
+            self.button_global_meth.x,
+            self.button_global_meth.y,
+            self.button_global_meth.w,
+            self.button_global_meth.h,
+            10.,
+            BLACK,
+        );
+
         draw_rectangle(
             self.button_global_rh.x,
             self.button_global_rh.y,
             self.button_global_rh.w,
             self.button_global_rh.h,
             GREEN,
+        );
+        draw_texture_ex(
+            &assets::ICON_RH,
+            self.button_global_rh.x,
+            self.button_global_rh.y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(self.button_global_rh.w, self.button_global_rh.h)),
+                ..Default::default()
+            },
+        );
+        draw_rectangle_lines(
+            self.button_global_rh.x,
+            self.button_global_rh.y,
+            self.button_global_rh.w,
+            self.button_global_rh.h,
+            10.,
+            BLACK,
         );
     }
 
