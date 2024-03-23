@@ -8,8 +8,8 @@ pub const OFFICE_HEIGHT: u32 = 900;
 pub const GAME_WINDOW_WIDTH: u32 = 1280;
 pub const GAME_WINDOW_HEIGHT: u32 = 720;
 
-pub const GLOBAL_STAT_WIDTH: u32 = 50;
-pub const GLOBAL_STAT_HEIGHT: u32 = 20;
+pub const GLOBAL_STAT_WIDTH: u32 = 1600;
+pub const GLOBAL_STAT_HEIGHT: u32 = 900;
 
 pub const PERSONNAL_STAT_WIDTH: u32 = 1600;
 pub const PERSONNAL_STAT_HEIGHT: u32 = 900;
@@ -43,6 +43,19 @@ pub struct Drawing {
     displayed_satisfaction: f32,
     displayed_energy: f32,
 
+    // Button
+    button_personnal_hope: Rect,
+    button_personnal_satiety: Rect,
+    button_personnal_energy: Rect,
+    button_personnal_satisfaction: Rect,
+
+    // Rect render
+    rect_office: Rect,
+    rect_info: Rect,
+    rect_personnal_stat: Rect,
+    rect_global_stat: Rect,
+
+    // Texture
     employee_texture: Texture2D,
 }
 
@@ -129,8 +142,72 @@ impl Drawing {
             displayed_satiety: 0.,
             displayed_satisfaction: 0.,
 
+            // Button
+            button_personnal_satisfaction: Rect::new(1200., 75., 300., 150.),
+            button_personnal_energy: Rect::new(1200., 275., 300., 150.),
+            button_personnal_satiety: Rect::new(1200., 475., 300., 150.),
+            button_personnal_hope: Rect::new(1200., 675., 300., 150.),
+
+            //Render rect
+            rect_office: Rect::new(
+                GAME_WINDOW_WIDTH as f32 * 0.3,
+                GAME_WINDOW_HEIGHT as f32 * 0.3,
+                GAME_WINDOW_WIDTH as f32 * 0.69,
+                GAME_WINDOW_HEIGHT as f32 * 0.69,
+            ),
+            rect_info: Rect::new(
+                GAME_WINDOW_WIDTH as f32 * 0.01,
+                GAME_WINDOW_HEIGHT as f32 * 0.3,
+                GAME_WINDOW_WIDTH as f32 * 0.28,
+                GAME_WINDOW_HEIGHT as f32 * 0.69,
+            ),
+            rect_personnal_stat: Rect::new(
+                GAME_WINDOW_WIDTH as f32 * 0.01,
+                GAME_WINDOW_HEIGHT as f32 * 0.01,
+                GAME_WINDOW_WIDTH as f32 * 0.28,
+                GAME_WINDOW_HEIGHT as f32 * 0.28,
+            ),
+            rect_global_stat: Rect::new(
+                GAME_WINDOW_WIDTH as f32 * 0.3,
+                GAME_WINDOW_HEIGHT as f32 * 0.01,
+                GAME_WINDOW_WIDTH as f32 * 0.69,
+                GAME_WINDOW_HEIGHT as f32 * 0.28,
+            ),
+
             employee_texture,
         }
+    }
+
+    pub fn get_rect_office(&self) -> &Rect {
+        &self.rect_office
+    }
+
+    pub fn get_rect_global_stat(&self) -> &Rect {
+        &self.rect_global_stat
+    }
+
+    pub fn get_rect_personnal_stat(&self) -> &Rect {
+        &self.rect_personnal_stat
+    }
+
+    pub fn get_rect_info(&self) -> &Rect {
+        &self.rect_info
+    }
+
+    pub fn get_button_hope(&self) -> &Rect {
+        &self.button_personnal_hope
+    }
+
+    pub fn get_button_satiety(&self) -> &Rect {
+        &self.button_personnal_satiety
+    }
+
+    pub fn get_button_energy(&self) -> &Rect {
+        &self.button_personnal_energy
+    }
+
+    pub fn get_button_satisfaction(&self) -> &Rect {
+        &self.button_personnal_satisfaction
     }
 
     fn draw_office(&self, game: &Game) {
@@ -144,7 +221,7 @@ impl Drawing {
                 WHITE,
                 DrawTextureParams {
                     source: None,
-                    rotation: e.get_rotation() + 90.,
+                    rotation: e.get_rotation(),
                     dest_size: Some(Vec2::new(500.0, 500.0)),
                     ..Default::default()
                 },
@@ -200,12 +277,58 @@ impl Drawing {
             draw_rectangle(100., 500., self.displayed_satiety, 100., BLUE);
 
             draw_rectangle(100., 700., self.displayed_hope, 100., GREEN);
+
+            draw_rectangle(
+                self.button_personnal_satiety.x,
+                self.button_personnal_satiety.y,
+                self.button_personnal_satiety.w,
+                self.button_personnal_satiety.h,
+                GREEN,
+            );
+            draw_rectangle(
+                self.button_personnal_energy.x,
+                self.button_personnal_energy.y,
+                self.button_personnal_energy.w,
+                self.button_personnal_energy.h,
+                GREEN,
+            );
+            draw_rectangle(
+                self.button_personnal_satisfaction.x,
+                self.button_personnal_satisfaction.y,
+                self.button_personnal_satisfaction.w,
+                self.button_personnal_satisfaction.h,
+                GREEN,
+            );
+            draw_rectangle(
+                self.button_personnal_hope.x,
+                self.button_personnal_hope.y,
+                self.button_personnal_hope.w,
+                self.button_personnal_hope.h,
+                GREEN,
+            );
         }
     }
 
-    fn draw_global_stat(&self) {
+    fn draw_global_stat(&self, game: &Game) {
         set_camera(&self.camera_global_stat);
         clear_background(WHITE);
+        draw_text(
+            &format!(
+                "Employees : {}",
+                game.get_office().employees_count().to_string()
+            ),
+            50.,
+            100.,
+            100.,
+            BLACK,
+        );
+        draw_text(
+            &format!("Money : {}", game.get_office().get_money()),
+            50.,
+            200.,
+            100.,
+            BLACK,
+        )
     }
 
     fn draw_game(&self) {
@@ -274,7 +397,7 @@ impl Drawing {
     }
 
     pub fn draw(&mut self, game: &Game) {
-        self.draw_global_stat();
+        self.draw_global_stat(game);
         self.draw_personnal_stat(game);
         self.draw_office(game);
         self.draw_info();

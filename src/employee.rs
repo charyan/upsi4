@@ -99,6 +99,10 @@ impl Office {
             }
         }
     }
+
+    pub fn get_money(&self) -> u64 {
+        self.money
+    }
 }
 
 const BASE_DECAY_RATE: f32 = 0.0001;
