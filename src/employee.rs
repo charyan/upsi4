@@ -4,10 +4,15 @@ use std::{
     rc::Rc,
 };
 
+const NAMES: &[&str] = &[
+    "Baptiste", "Yannis", "Valentin", "Cynthia", "Alain", "Valérie", "Yves", "Cédric", "Marcello",
+    "Edsger", "Stephano", "Olivier", "Mathieu", "Valérie", "Roland", "Tom",
+];
+
 use macroquad::{math::Vec2, rand};
 
 pub struct Office {
-    available_spots: Vec<Vec2>,
+    available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
     selected_employee: Option<Rc<RefCell<Employee>>>,
     money: u64,
@@ -18,13 +23,20 @@ impl Office {
         let spot_x = [450., 600., 720., 860.];
         let spot_y = [175., 265., 435., 530.];
 
-        let available_spots = spot_x
+        let available_computers = spot_x
             .iter()
-            .flat_map(|&x| spot_y.iter().map(move |&y| Vec2::new(x, y)))
-            .collect::<Vec<Vec2>>();
+            .flat_map(|&x| {
+                spot_y.iter().map(move |&y| {
+                    Rc::new(RefCell::new(Computer::new(
+                        Vec2::new(0., 0.),
+                        Vec2::new(x, y),
+                    )))
+                })
+            })
+            .collect::<Vec<Rc<RefCell<Computer>>>>();
 
         Self {
-            available_spots,
+            available_computers,
             employees: Vec::new(),
             selected_employee: None,
             money: 100,
@@ -32,9 +44,9 @@ impl Office {
     }
 
     pub fn add_employee(&mut self) {
-        let spot_index = rand::gen_range(0, self.available_spots.len());
+        let spot_index = rand::gen_range(0, self.available_computers.len());
 
-        let employee_spot = self.available_spots.remove(spot_index);
+        let employee_spot = self.available_computers.remove(spot_index);
 
         self.employees
             .push(Rc::new(RefCell::new(Employee::new(employee_spot))));
@@ -86,7 +98,7 @@ impl Office {
 
         // Return spot to available spots
         for e in &removed_employees {
-            self.available_spots.push(e.borrow().spot);
+            self.available_computers.push(e.borrow().computer.clone());
         }
 
         // Deselect dead employee
@@ -110,6 +122,22 @@ const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
 pub const EMPLOYEE_RADIUS: f32 = 50.;
 const EMPLOYEE_SPEED: f32 = 1.;
+
+pub struct Computer {
+    position: Vec2,
+    brocken: bool,
+    spot: Vec2,
+}
+
+impl Computer {
+    pub fn new(position: Vec2, spot: Vec2) -> Self {
+        Self {
+            position,
+            brocken: false,
+            spot,
+        }
+    }
+}
 
 #[derive(Clone, Copy)]
 pub enum EmployeeState {
@@ -142,21 +170,21 @@ pub struct Employee {
     energy: f32,
     satiety: f32,
     position: Vec2,
-    spot: Vec2,
+    computer: Rc<RefCell<Computer>>,
     rotation: f32,
     state: EmployeeState,
     pub action: EmployeeAction,
 }
 
 impl Employee {
-    pub fn new(spot: Vec2) -> Self {
+    pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
         Self {
             satisfaction: 0.5,
             hope: 0.5,
             energy: 0.5,
             satiety: 0.5,
             position: Vec2::new(300., 350.),
-            spot,
+            computer,
             rotation: 0.,
             state: EmployeeState::Alive,
             action: EmployeeAction::None,
@@ -191,19 +219,21 @@ impl Employee {
             self.state = EmployeeState::Dead
         }
 
-        match self.position.x.total_cmp(&self.spot.x) {
+        let spot = self.computer.borrow().spot;
+
+        match self.position.x.total_cmp(&spot.x) {
             std::cmp::Ordering::Less => {
-                if (self.spot.x - self.position.x) <= EMPLOYEE_SPEED {
-                    self.position.x = self.spot.x;
+                if (spot.x - self.position.x) <= EMPLOYEE_SPEED {
+                    self.position.x = spot.x;
                 } else {
                     self.position.x += EMPLOYEE_SPEED;
                     self.rotation = 0.;
                 }
             }
-            std::cmp::Ordering::Equal => match self.position.y.total_cmp(&self.spot.y) {
+            std::cmp::Ordering::Equal => match self.position.y.total_cmp(&spot.y) {
                 std::cmp::Ordering::Less => {
-                    if (self.spot.y - self.position.y) <= EMPLOYEE_SPEED {
-                        self.position.y = self.spot.y;
+                    if (spot.y - self.position.y) <= EMPLOYEE_SPEED {
+                        self.position.y = spot.y;
                     } else {
                         self.position.y += EMPLOYEE_SPEED;
                         self.rotation = PI / 2.;
@@ -211,8 +241,8 @@ impl Employee {
                 }
                 std::cmp::Ordering::Equal => (),
                 std::cmp::Ordering::Greater => {
-                    if (self.position.y - self.spot.y) <= EMPLOYEE_SPEED {
-                        self.position.y = self.spot.y;
+                    if (self.position.y - spot.y) <= EMPLOYEE_SPEED {
+                        self.position.y = spot.y;
                     } else {
                         self.position.y -= EMPLOYEE_SPEED;
                         self.rotation = 3. * PI / 2.;
@@ -220,8 +250,8 @@ impl Employee {
                 }
             },
             std::cmp::Ordering::Greater => {
-                if (self.position.x - self.spot.x) <= EMPLOYEE_SPEED {
-                    self.position.x = self.spot.x;
+                if (self.position.x - spot.x) <= EMPLOYEE_SPEED {
+                    self.position.x = spot.x;
                 } else {
                     self.position.x -= EMPLOYEE_SPEED;
                     self.rotation = PI;
