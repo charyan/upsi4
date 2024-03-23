@@ -416,6 +416,10 @@ impl Drawing {
                 let x = e.get_pos().x;
                 let y = e.get_pos().y;
                 e.z_emitter.draw(vec2(x, y));
+            } else if matches!(e.get_state(), EmployeeState::Suicide) {
+                let x = e.get_pos().x;
+                let y = e.get_pos().y;
+                e.cry_emitter.draw(vec2(x, y));
             }
         }
 
