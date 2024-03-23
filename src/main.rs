@@ -54,7 +54,7 @@ impl Game {
                 "Non".to_owned(),
                 "Vous êtes con".to_owned(),
                 "Bravo".to_owned(),
-                3.,
+                2.,
             ),
             QTE::new(
                 "Voulez vous recevoir\nun super bonus ?".to_owned(),
@@ -64,7 +64,7 @@ impl Game {
                 "Non".to_owned(),
                 "Bravo".to_owned(),
                 "Tant pis".to_owned(),
-                3.,
+                6.,
             ),
             QTE::new(
                 "Voulez vous ?".to_owned(),
@@ -74,7 +74,7 @@ impl Game {
                 "Non".to_owned(),
                 "Ah".to_owned(),
                 "Oh".to_owned(),
-                3.,
+                1.,
             ),
         ];
 

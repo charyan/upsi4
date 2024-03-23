@@ -6,7 +6,7 @@ use crate::{
     Game,
 };
 
-const TRANSPARENT: Color = Color::new(255., 255., 255., 0.);
+const _TRANSPARENT: Color = Color::new(255., 255., 255., 0.);
 
 pub const OFFICE_WIDTH: u32 = 1280;
 pub const OFFICE_HEIGHT: u32 = 720;
@@ -14,18 +14,19 @@ pub const OFFICE_HEIGHT: u32 = 720;
 pub const GAME_WINDOW_WIDTH: u32 = 1280;
 pub const GAME_WINDOW_HEIGHT: u32 = 720;
 
-pub const GLOBAL_STAT_WIDTH: u32 = 1600;
-pub const GLOBAL_STAT_HEIGHT: u32 = 900;
+pub const GLOBAL_STAT_WIDTH: u32 = 1120;
+pub const GLOBAL_STAT_HEIGHT: u32 = 270;
 
 pub const PERSONNAL_STAT_WIDTH: u32 = 1600;
 pub const PERSONNAL_STAT_HEIGHT: u32 = 900;
 
-pub const INFO_WIDTH: u32 = 500;
-pub const INFO_HEIGHT: u32 = 1000;
+pub const INFO_WIDTH: u32 = 1890;
+pub const INFO_HEIGHT: u32 = 2480;
 
 pub const ANIMATION_SPEED: f32 = 0.1;
 
-const FONT_SIZE_INFO: f32 = 35.;
+const FONT_SIZE_INFO: f32 = 150.;
+const FONT_SIZE_GLOBAL: f32 = 50.;
 
 const DESCRIPTION_BUTTON_HOPE: &str = "Laissez votre employée\nfaire un appel vidéo\navec sa famille.\n\nMais attention !\nLes relations sociales\nne participe pas\nà l'avancement du \nprojet.";
 const DESCRIPTION_BUTTON_ENERGY: &str =
@@ -179,13 +180,13 @@ impl Drawing {
             button_personnal_hope: Rect::new(1200., 675., 300., 150.),
 
             // Button global
-            button_global_door: Rect::new(50., 400., 200., 200.),
-            button_global_meth: Rect::new(350., 400., 200., 200.),
-            button_global_rh: Rect::new(650., 400., 200., 200.),
+            button_global_door: Rect::new(120., 150., 100., 100.),
+            button_global_meth: Rect::new(270., 150., 100., 100.),
+            button_global_rh: Rect::new(420., 150., 100., 100.),
 
             // Button qte
-            button_choice_1: Rect::new(50., 700., 175., 100.),
-            button_choice_2: Rect::new(275., 700., 175., 100.),
+            button_choice_1: Rect::new(300., 1950., 450., 200.),
+            button_choice_2: Rect::new(1150., 1950., 450., 200.),
 
             //Bar stats
             bar_satisfaction: Rect::new(100., 100., 1000., 100.),
@@ -355,8 +356,8 @@ impl Drawing {
             for (i, text) in qte.get_text().split("\n").enumerate() {
                 draw_text_ex(
                     text,
-                    FONT_SIZE_INFO + 10.,
-                    100. + i as f32 * FONT_SIZE_INFO + 10.,
+                    FONT_SIZE_INFO + 50.,
+                    300. + i as f32 * FONT_SIZE_INFO + 10.,
                     TextParams {
                         font: Some(&assets::FONT),
                         font_size: FONT_SIZE_INFO as u16,
@@ -387,7 +388,7 @@ impl Drawing {
                     + self.button_choice_1.x
                     + FONT_SIZE_INFO / 2.,
                 self.button_choice_1.y + (self.button_choice_1.h / 2.) - FONT_SIZE_INFO / 2.
-                    + FONT_SIZE_INFO / 2.,
+                    + FONT_SIZE_INFO,
                 TextParams {
                     font: Some(&assets::FONT),
                     font_size: FONT_SIZE_INFO as u16,
@@ -402,7 +403,7 @@ impl Drawing {
                     + self.button_choice_2.x
                     + FONT_SIZE_INFO / 2.,
                 self.button_choice_2.y + (self.button_choice_2.h / 2.) - FONT_SIZE_INFO / 2.
-                    + FONT_SIZE_INFO / 2.,
+                    + FONT_SIZE_INFO,
                 TextParams {
                     font: Some(&assets::FONT),
                     font_size: FONT_SIZE_INFO as u16,
@@ -411,24 +412,31 @@ impl Drawing {
                 },
             );
 
-            draw_rectangle(50., 825., 400., 50., WHITE);
+            let color = Color::new(
+                (get_time() as f32 - game.starting_time_qte) / qte.get_time(),
+                0.,
+                1. - (get_time() as f32 - game.starting_time_qte) / qte.get_time(),
+                1.,
+            );
+
+            draw_rectangle(300., 2200., 1350., 100., color);
             draw_rectangle(
-                50. + (get_time() as f32 - game.starting_time_qte) / qte.get_time() * 400.,
-                825.,
-                400. - (get_time() as f32 - game.starting_time_qte) / qte.get_time() * 400.,
-                50.,
+                300. + (get_time() as f32 - game.starting_time_qte) / qte.get_time() * 1350.,
+                2200.,
+                1350. - (get_time() as f32 - game.starting_time_qte) / qte.get_time() * 1350.,
+                100.,
                 LIGHTGRAY,
             );
 
-            draw_rectangle_lines(50., 825., 400., 50., 12., BLACK);
+            draw_rectangle_lines(300., 2200., 1350., 100., 50., BLACK);
         } else if let Some(answer) = game.get_answer() {
             self.draw_frame();
 
             for (i, text) in answer.split("\n").enumerate() {
                 draw_text_ex(
                     text,
-                    FONT_SIZE_INFO + 10.,
-                    100. + i as f32 * FONT_SIZE_INFO + 10.,
+                    FONT_SIZE_INFO + 50.,
+                    300. + i as f32 * FONT_SIZE_INFO + 10.,
                     TextParams {
                         font: Some(&assets::FONT),
                         font_size: FONT_SIZE_INFO as u16,
@@ -447,8 +455,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -463,8 +471,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_BUTTON_HOPE.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -479,8 +487,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_BUTTON_SATIETY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -495,8 +503,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -511,8 +519,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_ENERGY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -527,8 +535,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_HOPE.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -543,8 +551,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_SATIETY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -559,8 +567,8 @@ impl Drawing {
                         for (i, text) in DESCRIPTION_SATISFACTION.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
-                                FONT_SIZE_INFO + 10.,
-                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                FONT_SIZE_INFO + 50.,
+                                300. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
                                     font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
@@ -581,8 +589,8 @@ impl Drawing {
                     for (i, text) in DESCRIPTION_BUTTON_DOOR.split("\n").enumerate() {
                         draw_text_ex(
                             text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            FONT_SIZE_INFO + 50.,
+                            300. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
                                 font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
@@ -597,8 +605,8 @@ impl Drawing {
                     for (i, text) in DESCRIPTION_BUTTON_METH.split("\n").enumerate() {
                         draw_text_ex(
                             text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            FONT_SIZE_INFO + 50.,
+                            300. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
                                 font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
@@ -613,8 +621,8 @@ impl Drawing {
                     for (i, text) in DESCRIPTION_BUTTON_RH.split("\n").enumerate() {
                         draw_text_ex(
                             text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            FONT_SIZE_INFO + 50.,
+                            300. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
                                 font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
@@ -828,11 +836,11 @@ impl Drawing {
                 "Employees : {}",
                 game.get_office().employees_count().to_string()
             ),
+            700.,
             50.,
-            100.,
             TextParams {
                 font: Some(&assets::FONT),
-                font_size: 100 as u16,
+                font_size: FONT_SIZE_GLOBAL as u16,
                 color: BLACK,
                 ..Default::default()
             },
@@ -840,11 +848,11 @@ impl Drawing {
 
         draw_text_ex(
             &format!("Money : {}", game.get_office().get_money()),
-            50.,
-            200.,
+            700.,
+            100.,
             TextParams {
                 font: Some(&assets::FONT),
-                font_size: 100 as u16,
+                font_size: FONT_SIZE_GLOBAL as u16,
                 color: BLACK,
                 ..Default::default()
             },
