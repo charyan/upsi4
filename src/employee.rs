@@ -347,7 +347,8 @@ pub struct Employee {
     state: EmployeeState,
     movment_step: usize,
     pub action: EmployeeAction,
-    pub emitter: Emitter,
+    pub z_emitter: Emitter,
+    pub cry_emitter: Emitter,
 }
 
 fn sleep_particles() -> particles::EmitterConfig {
@@ -366,9 +367,15 @@ fn sleep_particles() -> particles::EmitterConfig {
 
 impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
-        let emitter = Emitter::new(EmitterConfig {
+        let mut z_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::Z_TEXTURE.clone()),
+            ..sleep_particles()
+        });
+
+        let mut cry_emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: Some(assets::CRY_TEXTURE.clone()),
             ..sleep_particles()
         });
 
@@ -390,7 +397,8 @@ impl Employee {
             state: EmployeeState::Alive,
             movment_step: 0,
             action: EmployeeAction::None,
-            emitter,
+            z_emitter,
+            cry_emitter,
         }
     }
 

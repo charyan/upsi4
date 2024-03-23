@@ -400,30 +400,22 @@ impl Drawing {
                 },
             );
 
-            match e.get_state() {
-                crate::employee::EmployeeState::Dead => {
-                    draw_texture_ex(
-                        &assets::X_TEXTURE,
-                        e.get_pos().x - EMPLOYEE_RADIUS / 2.,
-                        e.get_pos().y - EMPLOYEE_RADIUS / 2.,
-                        WHITE,
-                        DrawTextureParams {
-                            rotation: e.get_rotation(),
-                            dest_size: Some(Vec2::new(EMPLOYEE_RADIUS, EMPLOYEE_RADIUS)),
-                            ..Default::default()
-                        },
-                    );
-                }
-                _ => {
-                    (match e.action {
-                        EmployeeAction::Sleep => {
-                            let x = e.get_pos().x;
-                            let y = e.get_pos().y;
-                            e.emitter.draw(vec2(x, y));
-                        }
-                        _ => (),
-                    });
-                }
+            if matches!(e.get_state(), EmployeeState::Dead) {
+                draw_texture_ex(
+                    &assets::X_TEXTURE,
+                    e.get_pos().x - EMPLOYEE_RADIUS / 2.,
+                    e.get_pos().y - EMPLOYEE_RADIUS / 2.,
+                    WHITE,
+                    DrawTextureParams {
+                        rotation: e.get_rotation(),
+                        dest_size: Some(Vec2::new(EMPLOYEE_RADIUS, EMPLOYEE_RADIUS)),
+                        ..Default::default()
+                    },
+                );
+            } else if matches!(e.action, EmployeeAction::Sleep) {
+                let x = e.get_pos().x;
+                let y = e.get_pos().y;
+                e.z_emitter.draw(vec2(x, y));
             }
         }
 
