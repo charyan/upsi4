@@ -28,4 +28,16 @@ lazy_static! {
         include_bytes!("../assets/gui/x.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref ICON_DOOR: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_door.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref ICON_METH: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_meth.png"),
+        Some(ImageFormat::Png)
+    );
+    pub static ref ICON_RH: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_rh.png"),
+        Some(ImageFormat::Png)
+    );
 }
