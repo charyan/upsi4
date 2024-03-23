@@ -2,8 +2,8 @@ use macroquad::prelude::*;
 
 use crate::{employee::EMPLOYEE_RADIUS, Game};
 
-pub const OFFICE_WIDTH: u32 = 1600;
-pub const OFFICE_HEIGHT: u32 = 900;
+pub const OFFICE_WIDTH: u32 = 1280;
+pub const OFFICE_HEIGHT: u32 = 720;
 
 pub const GAME_WINDOW_WIDTH: u32 = 1280;
 pub const GAME_WINDOW_HEIGHT: u32 = 720;
@@ -57,6 +57,7 @@ pub struct Drawing {
 
     // Texture
     employee_texture: Texture2D,
+    office_texture: Texture2D,
 }
 
 impl Drawing {
@@ -118,7 +119,12 @@ impl Drawing {
         camera_personnal_stat.render_target = Some(render_target_personnal_stat.clone());
 
         let employee_texture = Texture2D::from_file_with_format(
-            include_bytes!("assets/employee.png"),
+            include_bytes!("../assets/employees/employee0_normal.png"),
+            Some(ImageFormat::Png),
+        );
+
+        let office_texture = Texture2D::from_file_with_format(
+            include_bytes!("../assets/office/office.png"),
             Some(ImageFormat::Png),
         );
 
@@ -175,6 +181,7 @@ impl Drawing {
             ),
 
             employee_texture,
+            office_texture,
         }
     }
 
@@ -213,6 +220,18 @@ impl Drawing {
     fn draw_office(&self, game: &Game) {
         set_camera(&self.camera_office);
         clear_background(WHITE);
+        draw_texture_ex(
+            &self.office_texture,
+            0.,
+            0.,
+            WHITE,
+            DrawTextureParams {
+                source: None,
+                rotation: 0.0,
+                dest_size: Some(Vec2::new(1280.0, 720.0)),
+                ..Default::default()
+            },
+        );
         for e in game.get_office().iter_employees() {
             draw_texture_ex(
                 &self.employee_texture,
