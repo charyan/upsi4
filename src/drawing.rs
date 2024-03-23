@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use macroquad::{miniquad::TextureParams, prelude::*};
+use macroquad::prelude::*;
 
 use crate::{
     assets,
@@ -774,6 +774,20 @@ impl Drawing {
         }
     }
 
+    fn draw_button(rect: Rect, color: Color, texture: &Texture2D) {
+        draw_rectangle(rect.x, rect.y, rect.w, rect.h, color);
+        draw_texture_ex(
+            texture,
+            rect.x,
+            rect.y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(rect.w, rect.h)),
+                ..Default::default()
+            },
+        );
+    }
+
     fn draw_personnal_stat(&mut self, game: &Game) {
         set_camera(&self.camera_personnal_stat);
         clear_background(WHITE);
@@ -810,12 +824,10 @@ impl Drawing {
                         LIGHTGRAY,
                     );
 
-                    draw_rectangle(
-                        self.button_personnal_satisfaction.x,
-                        self.button_personnal_satisfaction.y,
-                        self.button_personnal_satisfaction.w,
-                        self.button_personnal_satisfaction.h,
+                    Drawing::draw_button(
+                        self.button_personnal_satisfaction,
                         GREEN,
+                        &assets::ICON_CLEAN,
                     );
 
                     return;
@@ -916,49 +928,44 @@ impl Drawing {
                         BLACK,
                     );
 
-                    draw_rectangle(
-                        self.button_personnal_satiety.x,
-                        self.button_personnal_satiety.y,
-                        self.button_personnal_satiety.w,
-                        self.button_personnal_satiety.h,
+                    Drawing::draw_button(
+                        self.button_personnal_satiety,
                         if let EmployeeAction::Eat = selected_employee.borrow().action {
                             RED
                         } else {
                             GREEN
                         },
+                        &assets::ICON_SATIETY,
                     );
-                    draw_rectangle(
-                        self.button_personnal_energy.x,
-                        self.button_personnal_energy.y,
-                        self.button_personnal_energy.w,
-                        self.button_personnal_energy.h,
+
+                    Drawing::draw_button(
+                        self.button_personnal_energy,
                         if let EmployeeAction::Sleep = selected_employee.borrow().action {
                             RED
                         } else {
                             GREEN
                         },
+                        &assets::ICON_ENERGY,
                     );
-                    draw_rectangle(
-                        self.button_personnal_satisfaction.x,
-                        self.button_personnal_satisfaction.y,
-                        self.button_personnal_satisfaction.w,
-                        self.button_personnal_satisfaction.h,
+
+                    Drawing::draw_button(
+                        self.button_personnal_satisfaction,
                         if let EmployeeAction::Break = selected_employee.borrow().action {
                             RED
                         } else {
                             GREEN
                         },
+                        &assets::ICON_SATISFACTION,
                     );
-                    draw_rectangle(
-                        self.button_personnal_hope.x,
-                        self.button_personnal_hope.y,
-                        self.button_personnal_hope.w,
-                        self.button_personnal_hope.h,
+
+                    Drawing::draw_button(
+                        self.button_personnal_hope,
                         if let EmployeeAction::FamilyCall = selected_employee.borrow().action {
                             RED
                         } else {
                             GREEN
                         },
+                        &assets::ICON_HOPE,
                     );
                 }
                 EmployeeState::Falling => {

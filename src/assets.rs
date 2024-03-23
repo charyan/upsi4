@@ -44,6 +44,26 @@ lazy_static! {
         include_bytes!("../assets/gui/icon_rh.png"),
         Some(ImageFormat::Png)
     );
+    pub static ref ICON_SATISFACTION: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_satisfaction.png"),
+        Some(ImageFormat::Png)
+    );
+    pub static ref ICON_ENERGY: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_energy.png"),
+        Some(ImageFormat::Png)
+    );
+    pub static ref ICON_SATIETY: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_satiety.png"),
+        Some(ImageFormat::Png)
+    );
+    pub static ref ICON_HOPE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_hope.png"),
+        Some(ImageFormat::Png)
+    );
+    pub static ref ICON_CLEAN: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/icon_broom.png"),
+        Some(ImageFormat::Png)
+    );
     pub static ref DOOR_TEXTURE: Texture2D = Texture2D::from_file_with_format(
         include_bytes!("../assets/office/door.png"),
         Some(ImageFormat::Png),
