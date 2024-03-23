@@ -1,6 +1,11 @@
+#![warn(clippy::pedantic, clippy::nursery)]
+#![allow(
+    clippy::cast_precision_loss,
+    clippy::too_many_arguments,
+    clippy::cast_possible_truncation
+)]
+
 mod assets;
-#[warn(clippy::pedantic, clippy::nursery)]
-#[allow(clippy::cast_precision_loss)]
 mod drawing;
 mod employee;
 mod qte;
@@ -70,8 +75,8 @@ impl Game {
     pub fn launch_qte(&self) -> Option<QTE> {
         Some(QTE::new(
             "Voulez vous tuer\nun employée ?".to_owned(),
-            QteEffect::new(0., 0., 0., 0., 0., -1.),
-            QteEffect::new(0., 0., 0., 0., 1., 0.),
+            QteEffect::new(0., 0., 0., 0., 0, -1),
+            QteEffect::new(0., 0., 0., 0., 1, 0),
             "Oui".to_owned(),
             "Non".to_owned(),
             "Il est mort".to_owned(),

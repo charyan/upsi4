@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use macroquad_particles::{self as particles, AtlasConfig, BlendMode, Emitter, EmitterConfig};
+use macroquad_particles::{self as particles, BlendMode, Emitter, EmitterConfig};
 
 use std::{
     cell::{Ref, RefCell, RefMut},
@@ -25,7 +25,7 @@ pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
     selected_employee: Option<Rc<RefCell<Employee>>>,
-    money: u64,
+    money: i64,
 }
 
 impl Office {
@@ -54,12 +54,14 @@ impl Office {
     }
 
     pub fn add_employee(&mut self) {
-        let spot_index = rand::gen_range(0, self.available_computers.len());
+        if self.available_computers.len() > 0 {
+            let spot_index = rand::gen_range(0, self.available_computers.len());
 
-        let employee_spot = self.available_computers.remove(spot_index);
+            let employee_spot = self.available_computers.remove(spot_index);
 
-        self.employees
-            .push(Rc::new(RefCell::new(Employee::new(employee_spot))));
+            self.employees
+                .push(Rc::new(RefCell::new(Employee::new(employee_spot))));
+        }
     }
 
     pub fn get_selected_employee(&self) -> &Option<Rc<RefCell<Employee>>> {
@@ -78,9 +80,35 @@ impl Office {
         }
     }
 
+    pub fn kill_random_employee(&mut self) {
+        if self.employees.len() > 0 {
+            self.employees[rand::gen_range(0, self.employees.len())]
+                .borrow_mut()
+                .state = EmployeeState::Dead;
+        }
+    }
+
     pub fn apply_qte_effect(&mut self, effect: &QteEffect) {
-        println!("Effect applied !");
-        //TODO
+        self.money += effect.money_delta;
+
+        for mut e in self.iter_employees_mut() {
+            e.energy += effect.energy_delta;
+            e.satisfaction += effect.satisfaction_delta;
+            e.satiety += effect.satiety_delta;
+            e.hope += effect.hope_delta;
+        }
+
+        if effect.employee_delta > 0 {
+            for _ in 0..effect.employee_delta {
+                self.add_employee()
+            }
+        }
+
+        if effect.employee_delta < 0 {
+            for _ in 0..(-effect.employee_delta) {
+                self.kill_random_employee()
+            }
+        }
     }
 
     pub fn iter_employees(&self) -> impl Iterator<Item = Ref<'_, Employee>> {
@@ -138,7 +166,7 @@ impl Office {
         }
     }
 
-    pub fn get_money(&self) -> u64 {
+    pub fn get_money(&self) -> i64 {
         self.money
     }
 }
@@ -244,7 +272,7 @@ impl Employee {
     }
 
     #[must_use]
-    pub fn tick(&mut self) -> u64 {
+    pub fn tick(&mut self) -> i64 {
         self.satisfaction -= BASE_DECAY_RATE;
         self.hope -= BASE_DECAY_RATE;
         self.energy -= BASE_DECAY_RATE;
