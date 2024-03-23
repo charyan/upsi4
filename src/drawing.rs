@@ -14,10 +14,15 @@ pub const GLOBAL_STAT_HEIGHT: u32 = 900;
 pub const PERSONNAL_STAT_WIDTH: u32 = 1600;
 pub const PERSONNAL_STAT_HEIGHT: u32 = 900;
 
-pub const INFO_WIDTH: u32 = 50;
-pub const INFO_HEIGHT: u32 = 20;
+pub const INFO_WIDTH: u32 = 500;
+pub const INFO_HEIGHT: u32 = 1000;
 
 pub const ANIMATION_SPEED: f32 = 0.1;
+
+const DESCRIPTION_BUTTON_HOPE: &str = "This is the description of the hope button";
+const DESCRIPTION_BUTTON_ENERGY: &str = "This is the description of the energy button";
+const DESCRIPTION_BUTTON_SATISFACTION: &str = "This is the description of the satisfaction button";
+const DESCRIPTION_BUTTON_SATIETY: &str = "This is the description of the satiety button";
 
 fn lerp(start: f32, end: f32, t: f32) -> f32 {
     start.mul_add(1.0 - t, end * t)
@@ -248,9 +253,24 @@ impl Drawing {
         }
     }
 
-    fn draw_info(&self) {
+    fn draw_info(&self, game: &Game) {
         set_camera(&self.camera_info);
         clear_background(WHITE);
+        let main_pos = Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
+        if let Some(_) = game.get_office().get_selected_employee() {
+            if self.rect_personnal_stat.contains(main_pos) {
+                let stat_pos = self.convert_main_personnal_stat(main_pos);
+                if self.button_personnal_energy.contains(stat_pos) {
+                    draw_text(DESCRIPTION_BUTTON_ENERGY, 100., 100., 50., BLACK);
+                } else if self.button_personnal_hope.contains(stat_pos) {
+                    draw_text(DESCRIPTION_BUTTON_HOPE, 100., 100., 50., BLACK);
+                } else if self.button_personnal_satiety.contains(stat_pos) {
+                    draw_text(DESCRIPTION_BUTTON_SATIETY, 100., 100., 50., BLACK);
+                } else if self.button_personnal_satisfaction.contains(stat_pos) {
+                    draw_text(DESCRIPTION_BUTTON_SATISFACTION, 100., 100., 50., BLACK);
+                }
+            }
+        }
     }
 
     fn draw_personnal_stat(&mut self, game: &Game) {
@@ -419,7 +439,7 @@ impl Drawing {
         self.draw_global_stat(game);
         self.draw_personnal_stat(game);
         self.draw_office(game);
-        self.draw_info();
+        self.draw_info(game);
         self.draw_game();
 
         set_default_camera();
