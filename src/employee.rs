@@ -493,7 +493,7 @@ impl Employee {
             hope_factor: rand::gen_range(0.7, 1.3),
             energy_factor: rand::gen_range(0.7, 1.3),
             satiety_factor: rand::gen_range(0.7, 1.3),
-            position: Vec2::new(220., 712.),
+            position: Vec2::new(220., 750.),
             computer,
             rotation: 0.,
             state: EmployeeState::Arriving,

@@ -430,14 +430,30 @@ impl Drawing {
                     },
                 );
             } else if matches!(e.action, EmployeeAction::Sleep) {
+                e.z_emitter.draw(pos)
+            }
+
+            if e.get_satiety() < 0.1 {
+            } else if e.get_satiety() > 0.9 {
                 e.z_emitter.draw(pos);
-            } else if matches!(e.get_state(), EmployeeState::Suicide) {
+            }
+
+            if e.get_energy() < 0.1 {
+                e.z_emitter.draw(pos);
+            } else if e.get_energy() > 0.9 {
+                e.z_emitter.draw(pos);
+            }
+
+            if e.get_hope() < 0.1 {
                 e.cry_emitter.draw(pos);
-            } else if e.is_happy() {
-                e.happy_emitter.draw(pos);
-            } else if e.is_mad() {
+            } else if e.get_hope() > 0.9 {
+            }
+
+            if e.get_satisfaction() < 0.1 {
                 e.mad1_emitter.draw(pos);
                 e.mad2_emitter.draw(pos);
+            } else if e.get_satisfaction() > 0.9 {
+                e.happy_emitter.draw(pos);
             }
         }
 
