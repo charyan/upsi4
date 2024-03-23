@@ -19,6 +19,8 @@ use macroquad::{
 
 use crate::assets;
 
+use crate::qte::QteEffect;
+
 pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
@@ -74,6 +76,11 @@ impl Office {
                 self.selected_employee = Some(e.clone());
             }
         }
+    }
+
+    pub fn apply_qte_effect(&mut self, effect: &QteEffect) {
+        println!("Effect applied !");
+        //TODO
     }
 
     pub fn iter_employees(&self) -> impl Iterator<Item = Ref<'_, Employee>> {

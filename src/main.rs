@@ -3,24 +3,60 @@ mod assets;
 #[allow(clippy::cast_precision_loss)]
 mod drawing;
 mod employee;
+mod qte;
 
 use drawing::Drawing;
 use employee::{EmployeeAction, Office};
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
+use qte::{QteEffect, QTE};
+
+const MIN_PERIOD_WITHOUT_QTE: f32 = 4.;
+const MAX_PERIOD_WITHOUT_QTE: f32 = 6.;
 
 struct Game {
     office: Office,
+    qte_ongoing: Option<QTE>,
+    starting_time_qte: f32,
+    waiting_time_qte: f32,
+    next_time_qte: f32,
 }
 
 impl Game {
     pub fn new() -> Self {
         let mut new_office = Office::new();
         new_office.add_employee();
-        Self { office: new_office }
+        Self {
+            office: new_office,
+            qte_ongoing: None,
+            starting_time_qte: 0.,
+            waiting_time_qte: 0.,
+            next_time_qte: MAX_PERIOD_WITHOUT_QTE,
+        }
     }
 
     pub fn tick(&mut self) {
         self.office.tick();
+
+        if let Some(qte) = self.qte_ongoing.as_mut() {
+            self.waiting_time_qte = 0.;
+            if get_time() as f32 - self.starting_time_qte > qte.get_time() {
+                self.office.apply_qte_effect(qte.get_effect_1());
+                self.qte_ongoing = None;
+                self.next_time_qte =
+                    rand::gen_range(MIN_PERIOD_WITHOUT_QTE, MAX_PERIOD_WITHOUT_QTE);
+            }
+        } else {
+            self.waiting_time_qte += 1.0 / FPS;
+        }
+
+        if self.waiting_time_qte > self.next_time_qte {
+            self.starting_time_qte = get_time() as f32;
+            self.qte_ongoing = self.launch_qte();
+        }
+    }
+
+    pub fn get_qte_ongoing(&self) -> &Option<QTE> {
+        &self.qte_ongoing
     }
 
     pub fn get_office(&self) -> &Office {
@@ -29,6 +65,19 @@ impl Game {
 
     pub fn get_mut_office(&mut self) -> &mut Office {
         &mut self.office
+    }
+
+    pub fn launch_qte(&self) -> Option<QTE> {
+        Some(QTE::new(
+            "Voulez vous tuer\nun employée ?".to_owned(),
+            QteEffect::new(0., 0., 0., 0., 0., -1.),
+            QteEffect::new(0., 0., 0., 0., 1., 0.),
+            "Oui".to_owned(),
+            "Non".to_owned(),
+            "Il est mort".to_owned(),
+            "Il est pas mort".to_owned(),
+            3.,
+        ))
     }
 }
 

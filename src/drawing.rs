@@ -6,6 +6,8 @@ use crate::{
     Game,
 };
 
+const TRANSPARENT: Color = Color::new(255., 255., 255., 0.);
+
 pub const OFFICE_WIDTH: u32 = 1280;
 pub const OFFICE_HEIGHT: u32 = 720;
 
@@ -74,6 +76,10 @@ pub struct Drawing {
     button_global_door: Rect,
     button_global_meth: Rect,
     button_global_rh: Rect,
+
+    // Button qte
+    button_choice_1: Rect,
+    button_choice_2: Rect,
 
     // Rect render
     rect_office: Rect,
@@ -176,6 +182,10 @@ impl Drawing {
             button_global_door: Rect::new(50., 400., 200., 200.),
             button_global_meth: Rect::new(350., 400., 200., 200.),
             button_global_rh: Rect::new(650., 400., 200., 200.),
+
+            // Button qte
+            button_choice_1: Rect::new(50., 700., 175., 100.),
+            button_choice_2: Rect::new(275., 700., 175., 100.),
 
             //Bar stats
             bar_satisfaction: Rect::new(100., 100., 1000., 100.),
@@ -311,173 +321,232 @@ impl Drawing {
 
     fn draw_info(&self, game: &Game) {
         set_camera(&self.camera_info);
-        clear_background(WHITE);
+        clear_background(TRANSPARENT);
         let main_pos = Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
 
         self.draw_frame();
 
-        if let Some(_) = game.get_office().get_selected_employee() {
-            if self.rect_personnal_stat.contains(main_pos) {
-                let stat_pos = self.convert_main_personnal_stat(main_pos);
-                if self.button_personnal_energy.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
-                    }
-                } else if self.button_personnal_hope.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_BUTTON_HOPE.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
-                    }
-                } else if self.button_personnal_satiety.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_BUTTON_SATIETY.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
-                    }
-                } else if self.button_personnal_satisfaction.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
-                    }
-                } else if self.bar_energy.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_ENERGY.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
-                    }
-                } else if self.bar_hope.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_HOPE.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
-                    }
-                } else if self.bar_satiety.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_SATIETY.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
-                    }
-                } else if self.bar_satisfaction.contains(stat_pos) {
-                    for (i, text) in DESCRIPTION_SATISFACTION.split("\n").enumerate() {
-                        draw_text_ex(
-                            text,
-                            FONT_SIZE_INFO + 10.,
-                            100. + i as f32 * FONT_SIZE_INFO + 10.,
-                            TextParams {
-                                font: Some(&assets::FONT),
-                                font_size: FONT_SIZE_INFO as u16,
-                                color: BLACK,
-                                ..Default::default()
-                            },
-                        );
+        if let Some(qte) = game.get_qte_ongoing() {
+            for (i, text) in qte.get_text().split("\n").enumerate() {
+                draw_text_ex(
+                    text,
+                    FONT_SIZE_INFO + 10.,
+                    100. + i as f32 * FONT_SIZE_INFO + 10.,
+                    TextParams {
+                        font: Some(&self.font),
+                        font_size: FONT_SIZE_INFO as u16,
+                        color: BLACK,
+                        ..Default::default()
+                    },
+                );
+            }
+
+            draw_rectangle(
+                self.button_choice_1.x,
+                self.button_choice_1.y,
+                self.button_choice_1.w,
+                self.button_choice_1.h,
+                GREEN,
+            );
+            draw_rectangle(
+                self.button_choice_2.x,
+                self.button_choice_2.y,
+                self.button_choice_2.w,
+                self.button_choice_2.h,
+                GREEN,
+            );
+
+            draw_text_ex(
+                qte.get_choice1(),
+                (self.button_choice_1.w - FONT_SIZE_INFO * qte.get_choice1().len() as f32) / 2.
+                    + self.button_choice_1.x
+                    + FONT_SIZE_INFO as f32,
+                self.button_choice_1.y + (self.button_choice_1.h / 2.) - FONT_SIZE_INFO / 2.
+                    + FONT_SIZE_INFO as f32,
+                TextParams {
+                    font: Some(&self.font),
+                    font_size: FONT_SIZE_INFO as u16,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+
+            draw_text_ex(
+                qte.get_choice2(),
+                (self.button_choice_2.w - FONT_SIZE_INFO * qte.get_choice2().len() as f32) / 2.
+                    + self.button_choice_2.x,
+                self.button_choice_2.y + (self.button_choice_2.h / 2.) - FONT_SIZE_INFO / 2.,
+                TextParams {
+                    font: Some(&self.font),
+                    font_size: FONT_SIZE_INFO as u16,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+        } else {
+            if let Some(_) = game.get_office().get_selected_employee() {
+                if self.rect_personnal_stat.contains(main_pos) {
+                    let stat_pos = self.convert_main_personnal_stat(main_pos);
+                    if self.button_personnal_energy.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                    } else if self.button_personnal_hope.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_BUTTON_HOPE.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                    } else if self.button_personnal_satiety.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_BUTTON_SATIETY.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                    } else if self.button_personnal_satisfaction.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                    } else if self.bar_energy.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_ENERGY.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                    } else if self.bar_hope.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_HOPE.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                    } else if self.bar_satiety.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_SATIETY.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                    } else if self.bar_satisfaction.contains(stat_pos) {
+                        for (i, text) in DESCRIPTION_SATISFACTION.split("\n").enumerate() {
+                            draw_text_ex(
+                                text,
+                                FONT_SIZE_INFO + 10.,
+                                100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                TextParams {
+                                    font: Some(&self.font),
+                                    font_size: FONT_SIZE_INFO as u16,
+                                    color: BLACK,
+                                    ..Default::default()
+                                },
+                            );
+                        }
                     }
                 }
             }
-        }
 
-        if self.rect_global_stat.contains(main_pos) {
-            let global_pos = self.convert_main_global_stat(main_pos);
-            if self.button_global_door.contains(global_pos) {
-                for (i, text) in DESCRIPTION_BUTTON_DOOR.split("\n").enumerate() {
-                    draw_text_ex(
-                        text,
-                        FONT_SIZE_INFO + 10.,
-                        100. + i as f32 * FONT_SIZE_INFO + 10.,
-                        TextParams {
-                            font: Some(&assets::FONT),
-                            font_size: FONT_SIZE_INFO as u16,
-                            color: BLACK,
-                            ..Default::default()
-                        },
-                    );
-                }
-            } else if self.button_global_meth.contains(global_pos) {
-                for (i, text) in DESCRIPTION_BUTTON_METH.split("\n").enumerate() {
-                    draw_text_ex(
-                        text,
-                        FONT_SIZE_INFO + 10.,
-                        100. + i as f32 * FONT_SIZE_INFO + 10.,
-                        TextParams {
-                            font: Some(&assets::FONT),
-                            font_size: FONT_SIZE_INFO as u16,
-                            color: BLACK,
-                            ..Default::default()
-                        },
-                    );
-                }
-            } else if self.button_global_rh.contains(global_pos) {
-                for (i, text) in DESCRIPTION_BUTTON_RH.split("\n").enumerate() {
-                    draw_text_ex(
-                        text,
-                        FONT_SIZE_INFO + 10.,
-                        100. + i as f32 * FONT_SIZE_INFO + 10.,
-                        TextParams {
-                            font: Some(&assets::FONT),
-                            font_size: FONT_SIZE_INFO as u16,
-                            color: BLACK,
-                            ..Default::default()
-                        },
-                    );
+            if self.rect_global_stat.contains(main_pos) {
+                let global_pos = self.convert_main_global_stat(main_pos);
+                if self.button_global_door.contains(global_pos) {
+                    for (i, text) in DESCRIPTION_BUTTON_DOOR.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                } else if self.button_global_meth.contains(global_pos) {
+                    for (i, text) in DESCRIPTION_BUTTON_METH.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                } else if self.button_global_rh.contains(global_pos) {
+                    for (i, text) in DESCRIPTION_BUTTON_RH.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
                 }
             }
         }
