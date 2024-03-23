@@ -106,19 +106,24 @@ impl Office {
 }
 
 const BASE_DECAY_RATE: f32 = 0.0001;
+const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
+
 pub const EMPLOYEE_RADIUS: f32 = 150.;
 const EMPLOYEE_SPEED: f32 = 1.;
 
+#[derive(Clone, Copy)]
 pub enum EmployeeState {
     /// Normal employee state
     Alive,
-    // Dead state with option to reanimate or dispose of
+    /// Dead state with option to reanimate or dispose of employee
     Dead,
+    /// Employee thrown out of window
     Falling,
     /// Internal state for when the entity can be removed from the world
     Remove,
 }
 
+#[derive(Clone, Copy)]
 pub enum EmployeeAction {
     None,
     /// Satisfaction
@@ -164,6 +169,14 @@ impl Employee {
         self.hope -= BASE_DECAY_RATE;
         self.energy -= BASE_DECAY_RATE;
         self.satiety -= BASE_DECAY_RATE;
+
+        match self.action {
+            EmployeeAction::None => (),
+            EmployeeAction::Break => self.satisfaction += REPLENISH_RATE,
+            EmployeeAction::Eat => self.satiety += REPLENISH_RATE,
+            EmployeeAction::Sleep => self.energy += REPLENISH_RATE,
+            EmployeeAction::FamilyCall => self.hope += REPLENISH_RATE,
+        }
 
         self.satisfaction = self.satisfaction.clamp(0., 1.);
         self.hope = self.hope.clamp(0., 1.);
@@ -237,5 +250,9 @@ impl Employee {
 
     pub fn get_rotation(&self) -> f32 {
         self.rotation
+    }
+
+    pub fn get_state(&self) -> EmployeeState {
+        self.state
     }
 }
