@@ -429,30 +429,30 @@ impl Drawing {
                         ..Default::default()
                     },
                 );
-            } else if matches!(e.action, EmployeeAction::Sleep) {
-                e.z_emitter.draw(pos)
             }
 
-            if e.get_satiety() < 0.1 {
-            } else if e.get_satiety() > 0.9 {
+            if e.get_satiety() < 0.2 {
+                e.hungry_emitter.draw(pos);
+            } else if e.get_satiety() > 0.8 {
                 e.z_emitter.draw(pos);
             }
 
-            if e.get_energy() < 0.1 {
+            if e.get_energy() < 0.2 {
                 e.z_emitter.draw(pos);
-            } else if e.get_energy() > 0.9 {
-                e.z_emitter.draw(pos);
+            } else if e.get_energy() > 0.8 {
+                e.lightning_emitter.draw(pos);
             }
 
-            if e.get_hope() < 0.1 {
+            if e.get_hope() < 0.2 {
                 e.cry_emitter.draw(pos);
-            } else if e.get_hope() > 0.9 {
+            } else if e.get_hope() > 0.8 {
+                e.heart_emitter.draw(pos);
             }
 
-            if e.get_satisfaction() < 0.1 {
+            if e.get_satisfaction() < 0.2 {
                 e.mad1_emitter.draw(pos);
                 e.mad2_emitter.draw(pos);
-            } else if e.get_satisfaction() > 0.9 {
+            } else if e.get_satisfaction() > 0.8 {
                 e.happy_emitter.draw(pos);
             }
         }

@@ -278,7 +278,7 @@ impl Office {
     }
 }
 
-const BASE_DECAY_RATE: f32 = 0.0001;
+const BASE_DECAY_RATE: f32 = 0.0003;
 const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
 pub const EMPLOYEE_RADIUS: f32 = 50.;
@@ -377,6 +377,9 @@ pub struct Employee {
     pub happy_emitter: Emitter,
     pub mad1_emitter: Emitter,
     pub mad2_emitter: Emitter,
+    pub hungry_emitter: Emitter,
+    pub lightning_emitter: Emitter,
+    pub heart_emitter: Emitter,
 }
 
 fn sleep_particles() -> particles::EmitterConfig {
@@ -388,6 +391,34 @@ fn sleep_particles() -> particles::EmitterConfig {
         initial_velocity: 30.0,
         atlas: None,
         size: 15.0,
+        blend_mode: BlendMode::Alpha,
+        ..Default::default()
+    }
+}
+
+fn hungry_paricles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 2.,
+        lifetime_randomness: 0.1,
+        amount: 5,
+        initial_direction_spread: 2. * PI,
+        initial_velocity: 20.0,
+        atlas: None,
+        size: 10.0,
+        blend_mode: BlendMode::Alpha,
+        ..Default::default()
+    }
+}
+
+fn heart_paricles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 2.,
+        lifetime_randomness: 0.1,
+        amount: 5,
+        initial_direction_spread: 2. * PI,
+        initial_velocity: 20.0,
+        atlas: None,
+        size: 10.0,
         blend_mode: BlendMode::Alpha,
         ..Default::default()
     }
@@ -411,9 +442,23 @@ fn happy_particles() -> particles::EmitterConfig {
     particles::EmitterConfig {
         lifetime: 2.,
         lifetime_randomness: 0.1,
-        amount: 3,
+        amount: 5,
         initial_direction_spread: 2. * PI,
         initial_velocity: 20.0,
+        atlas: None,
+        size: 10.0,
+        blend_mode: BlendMode::Alpha,
+        ..Default::default()
+    }
+}
+
+fn lightning_particles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 2.,
+        lifetime_randomness: 0.1,
+        amount: 6,
+        initial_direction_spread: 2. * PI,
+        initial_velocity: 50.0,
         atlas: None,
         size: 10.0,
         blend_mode: BlendMode::Alpha,
@@ -430,7 +475,7 @@ fn mad1_particles() -> particles::EmitterConfig {
         initial_velocity: 20.0,
         atlas: None,
         size: 10.0,
-        blend_mode: BlendMode::Additive,
+        blend_mode: BlendMode::Alpha,
         ..Default::default()
     }
 }
@@ -444,7 +489,7 @@ fn mad2_particles() -> particles::EmitterConfig {
         initial_velocity: 20.0,
         atlas: None,
         size: 10.0,
-        blend_mode: BlendMode::Additive,
+        blend_mode: BlendMode::Alpha,
         ..Default::default()
     }
 }
@@ -455,6 +500,12 @@ impl Employee {
             local_coords: false,
             texture: Some(assets::Z_TEXTURE.clone()),
             ..sleep_particles()
+        });
+
+        let hungry_emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: Some(assets::HUNGRY_TEXTURE.clone()),
+            ..hungry_paricles()
         });
 
         let cry_emitter = Emitter::new(EmitterConfig {
@@ -469,6 +520,12 @@ impl Employee {
             ..happy_particles()
         });
 
+        let lightning_emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: Some(assets::LIGHTNING_TEXTURE.clone()),
+            ..lightning_particles()
+        });
+
         let mad1_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::MAD1_TEXTURE.clone()),
@@ -479,6 +536,12 @@ impl Employee {
             local_coords: false,
             texture: Some(assets::MAD2_TEXTURE.clone()),
             ..mad2_particles()
+        });
+
+        let heart_emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: Some(assets::HEART_TEXTURE.clone()),
+            ..heart_paricles()
         });
 
         let name = NAMES[gen_range(0, NAMES.len())].to_owned();
@@ -504,6 +567,9 @@ impl Employee {
             happy_emitter,
             mad1_emitter,
             mad2_emitter,
+            hungry_emitter,
+            lightning_emitter,
+            heart_emitter,
         }
     }
 
@@ -547,7 +613,7 @@ impl Employee {
             }
         }
 
-        if self.satisfaction == 0. && self.movment_step == 3 {
+        if (self.satisfaction == 0. || self.energy == 1.) && self.movment_step == 3 {
             self.computer.borrow_mut().broken = true;
         }
 

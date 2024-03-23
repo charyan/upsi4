@@ -100,4 +100,16 @@ lazy_static! {
         include_bytes!("../assets/office/mad2.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref HUNGRY_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/hungry.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref LIGHTNING_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/lightning.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref HEART_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/heart.png"),
+        Some(ImageFormat::Png),
+    );
 }
