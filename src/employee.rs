@@ -106,6 +106,14 @@ impl Office {
         }
     }
 
+    pub fn update_door(&mut self) {
+        if let DoorState::Open = self.door_state {
+            self.door_state = DoorState::Closed;
+        } else if let DoorState::Closed = self.door_state {
+            self.door_state = DoorState::Open;
+        }
+    }
+
     pub fn apply_qte_effect(&mut self, effect: &QteEffect) {
         self.money += effect.money_delta;
 
@@ -182,6 +190,10 @@ impl Office {
                 }
             }
         }
+    }
+
+    pub fn get_door_state(&self) -> &DoorState {
+        &self.door_state
     }
 
     pub fn get_money(&self) -> i64 {

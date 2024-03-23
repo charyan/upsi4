@@ -1,8 +1,10 @@
+use std::f32::consts::PI;
+
 use macroquad::{miniquad::TextureParams, prelude::*};
 
 use crate::{
     assets,
-    employee::{EmployeeAction, EmployeeState, EMPLOYEE_RADIUS},
+    employee::{DoorState, EmployeeAction, EmployeeState, EMPLOYEE_RADIUS},
     Game,
 };
 
@@ -24,6 +26,7 @@ pub const INFO_WIDTH: u32 = 1890;
 pub const INFO_HEIGHT: u32 = 2480;
 
 pub const ANIMATION_SPEED: f32 = 0.1;
+const DOOR_SPEED: f32 = 0.3;
 
 const FONT_SIZE_INFO: f32 = 150.;
 const FONT_SIZE_GLOBAL: f32 = 50.;
@@ -63,11 +66,13 @@ pub struct Drawing {
     camera_info: Camera2D,
     camera_global_stat: Camera2D,
     camera_personnal_stat: Camera2D,
+
     // Displayed
     displayed_hope: f32,
     displayed_satiety: f32,
     displayed_satisfaction: f32,
     displayed_energy: f32,
+    door_rotation: f32,
 
     // Button personnal
     button_personnal_hope: Rect,
@@ -174,6 +179,7 @@ impl Drawing {
             displayed_hope: 0.,
             displayed_satiety: 0.,
             displayed_satisfaction: 0.,
+            door_rotation: 0.,
 
             // Button personnal
             button_personnal_satisfaction: Rect::new(1200., 75., 300., 150.),
@@ -276,7 +282,7 @@ impl Drawing {
         &self.button_choice_2
     }
 
-    fn draw_office(&self, game: &Game) {
+    fn draw_office(&mut self, game: &Game) {
         set_camera(&self.camera_office);
         clear_background(WHITE);
         draw_texture_ex(
@@ -291,6 +297,34 @@ impl Drawing {
                 ..Default::default()
             },
         );
+
+        if let DoorState::Open = game.get_office().get_door_state() {
+            if self.door_rotation < 0.0 {
+                self.door_rotation += DOOR_SPEED
+            } else {
+                self.door_rotation = 0.0
+            }
+        } else if let DoorState::Closed = game.get_office().get_door_state() {
+            if self.door_rotation > -PI / 2. {
+                self.door_rotation -= DOOR_SPEED
+            } else {
+                self.door_rotation = -PI / 2.
+            }
+        }
+
+        draw_texture_ex(
+            &assets::DOOR_TEXTURE,
+            340.,
+            320.,
+            WHITE,
+            DrawTextureParams {
+                rotation: self.door_rotation,
+                dest_size: Some(vec2(16., 85.)),
+                pivot: Some(vec2(348., 400.)),
+                ..Default::default()
+            },
+        );
+
         for mut e in game.get_office().iter_employees_mut() {
             draw_texture_ex(
                 &assets::EMPLOYEE_TEXTURE,

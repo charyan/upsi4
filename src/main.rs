@@ -173,6 +173,7 @@ async fn main() {
                 println!("Office pos : {:?}", pos);
             } else if drawing.get_rect_info().contains(main_pos) {
                 let pos = Drawing::convert_main_info(main_pos);
+                println!("Info pos : {:?}", pos);
 
                 if let Some(qte) = game.get_qte_ongoing().clone() {
                     if drawing.get_button_choice_1().contains(pos) {
@@ -183,13 +184,12 @@ async fn main() {
                         game.quit_qte(qte.get_explication2().to_string());
                     }
                 }
-                println!("Info pos : {:?}", pos);
             } else if drawing.get_rect_global_stat().contains(main_pos) {
                 let pos = Drawing::convert_main_global_stat(main_pos);
                 println!("Drawing pos : {:?}", pos);
 
                 if drawing.get_button_door().contains(pos) {
-                    println!("Button door pressed");
+                    game.get_mut_office().update_door();
                 } else if drawing.get_button_meth().contains(pos) {
                     println!("Button meth pressed");
                 } else if drawing.get_button_rh().contains(pos) {
