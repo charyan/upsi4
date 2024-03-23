@@ -27,7 +27,7 @@ pub enum DoorState {
     /// The door is closed
     Closed,
     /// The door is broken
-    Broken,
+    _Broken,
 }
 
 pub struct Office {
@@ -36,6 +36,7 @@ pub struct Office {
     selected_employee: Option<Rc<RefCell<Employee>>>,
     money: i64,
     door_state: DoorState,
+    window_open: bool,
 }
 
 impl Office {
@@ -61,6 +62,7 @@ impl Office {
             selected_employee: None,
             money: 100,
             door_state: DoorState::Open,
+            window_open: false,
         }
     }
 
@@ -112,6 +114,10 @@ impl Office {
         } else if let DoorState::Closed = self.door_state {
             self.door_state = DoorState::Open;
         }
+    }
+
+    pub fn update_window(&mut self) {
+        self.window_open = !self.window_open
     }
 
     pub fn apply_qte_effect(&mut self, effect: &QteEffect) {
@@ -190,6 +196,10 @@ impl Office {
                 }
             }
         }
+    }
+
+    pub fn window_is_open(&self) -> bool {
+        self.window_open
     }
 
     pub fn get_door_state(&self) -> &DoorState {

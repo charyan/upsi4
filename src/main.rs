@@ -245,6 +245,10 @@ async fn main() {
             game.get_mut_office().add_employee();
         }
 
+        if is_key_pressed(KeyCode::W) {
+            game.get_mut_office().update_window();
+        }
+
         game.tick();
         drawing.draw(&game);
 

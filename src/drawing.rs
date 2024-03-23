@@ -27,6 +27,7 @@ pub const INFO_HEIGHT: u32 = 2480;
 
 pub const ANIMATION_SPEED: f32 = 0.1;
 const DOOR_SPEED: f32 = 0.3;
+const WINDOW_SPEED: f32 = 0.05;
 
 const FONT_SIZE_INFO: f32 = 150.;
 const FONT_SIZE_GLOBAL: f32 = 50.;
@@ -73,6 +74,7 @@ pub struct Drawing {
     displayed_satisfaction: f32,
     displayed_energy: f32,
     door_rotation: f32,
+    window_rotation: f32,
 
     // Button personnal
     button_personnal_hope: Rect,
@@ -180,6 +182,7 @@ impl Drawing {
             displayed_satiety: 0.,
             displayed_satisfaction: 0.,
             door_rotation: 0.,
+            window_rotation: 0.,
 
             // Button personnal
             button_personnal_satisfaction: Rect::new(1200., 75., 300., 150.),
@@ -321,6 +324,42 @@ impl Drawing {
                 rotation: self.door_rotation,
                 dest_size: Some(vec2(16., 85.)),
                 pivot: Some(vec2(348., 400.)),
+                ..Default::default()
+            },
+        );
+
+        self.window_rotation = lerp(
+            self.window_rotation,
+            if game.get_office().window_is_open() {
+                0.
+            } else {
+                PI / 2.
+            },
+            WINDOW_SPEED,
+        );
+
+        draw_texture_ex(
+            &assets::WINDOW_TEXTURE,
+            1070.,
+            270.,
+            WHITE,
+            DrawTextureParams {
+                rotation: -self.window_rotation,
+                dest_size: Some(vec2(16., 85.)),
+                pivot: Some(vec2(1078., 270.)),
+                ..Default::default()
+            },
+        );
+
+        draw_texture_ex(
+            &assets::WINDOW_TEXTURE,
+            1070.,
+            430.,
+            WHITE,
+            DrawTextureParams {
+                rotation: self.window_rotation + PI,
+                dest_size: Some(vec2(16., 85.)),
+                pivot: Some(vec2(1078., 430.)),
                 ..Default::default()
             },
         );
