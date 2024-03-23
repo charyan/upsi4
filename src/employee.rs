@@ -365,6 +365,20 @@ fn sleep_particles() -> particles::EmitterConfig {
     }
 }
 
+fn cry_particles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 1.,
+        lifetime_randomness: 0.1,
+        amount: 5,
+        initial_direction_spread: 2.,
+        initial_velocity: -50.0,
+        atlas: None,
+        size: 10.0,
+        blend_mode: BlendMode::Alpha,
+        ..Default::default()
+    }
+}
+
 impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
         let mut z_emitter = Emitter::new(EmitterConfig {
@@ -376,15 +390,15 @@ impl Employee {
         let mut cry_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::CRY_TEXTURE.clone()),
-            ..sleep_particles()
+            ..cry_particles()
         });
 
         let name = NAMES[gen_range(0, NAMES.len())].to_owned();
 
         Self {
             name,
-            satisfaction: rand::gen_range(0.3, 0.7),
-            hope: rand::gen_range(0.3, 0.7),
+            satisfaction: 0., // rand::gen_range(0.3, 0.7),
+            hope: 0.,         //rand::gen_range(0.3, 0.7),
             energy: rand::gen_range(0.3, 0.7),
             satiety: rand::gen_range(0.3, 0.7),
             satisfaction_factor: rand::gen_range(0.7, 1.3),
