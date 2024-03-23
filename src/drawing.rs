@@ -1,8 +1,7 @@
-use std::os::linux::raw::stat;
-
 use macroquad::prelude::*;
 
 use crate::{
+    assets,
     employee::{EmployeeAction, EMPLOYEE_RADIUS},
     Game,
 };
@@ -87,12 +86,6 @@ pub struct Drawing {
     bar_energy: Rect,
     bar_satiety: Rect,
     bar_hope: Rect,
-
-    // Texture
-    employee_texture: Texture2D,
-    office_texture: Texture2D,
-    frame_texture: Texture2D,
-    font: Font,
 }
 
 impl Drawing {
@@ -152,24 +145,6 @@ impl Drawing {
             PERSONNAL_STAT_HEIGHT as f32,
         ));
         camera_personnal_stat.render_target = Some(render_target_personnal_stat.clone());
-
-        let employee_texture = Texture2D::from_file_with_format(
-            include_bytes!("../assets/employees/employee0_normal.png"),
-            Some(ImageFormat::Png),
-        );
-
-        let office_texture = Texture2D::from_file_with_format(
-            include_bytes!("../assets/office/office.png"),
-            Some(ImageFormat::Png),
-        );
-
-        let frame_texture = Texture2D::from_file_with_format(
-            include_bytes!("../assets/gui/qte_frame.png"),
-            Some(ImageFormat::Png),
-        );
-
-        let font =
-            load_ttf_font_from_bytes(include_bytes!("../assets/gui/OpenSans-Medium.ttf")).unwrap();
 
         Self {
             main_render_target,
@@ -233,11 +208,6 @@ impl Drawing {
                 GAME_WINDOW_WIDTH as f32 * 0.69,
                 GAME_WINDOW_HEIGHT as f32 * 0.28,
             ),
-
-            employee_texture,
-            office_texture,
-            frame_texture,
-            font,
         }
     }
 
@@ -289,7 +259,7 @@ impl Drawing {
         set_camera(&self.camera_office);
         clear_background(WHITE);
         draw_texture_ex(
-            &self.office_texture,
+            &assets::OFFICE_TEXTURE,
             0.,
             0.,
             WHITE,
@@ -302,7 +272,7 @@ impl Drawing {
         );
         for e in game.get_office().iter_employees() {
             draw_texture_ex(
-                &self.employee_texture,
+                &assets::EMPLOYEE_TEXTURE,
                 e.get_pos().x - EMPLOYEE_RADIUS,
                 e.get_pos().y - EMPLOYEE_RADIUS,
                 WHITE,
@@ -317,7 +287,7 @@ impl Drawing {
 
     fn draw_frame(&self) {
         draw_texture_ex(
-            &self.frame_texture,
+            &assets::FRAME_TEXTURE,
             0.,
             0.,
             WHITE,
@@ -347,7 +317,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -361,7 +331,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -375,7 +345,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -389,7 +359,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -403,7 +373,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -417,7 +387,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -431,7 +401,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -445,7 +415,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -465,7 +435,7 @@ impl Drawing {
                         FONT_SIZE_INFO + 10.,
                         100. + i as f32 * FONT_SIZE_INFO + 10.,
                         TextParams {
-                            font: Some(&self.font),
+                            font: Some(&assets::FONT),
                             font_size: FONT_SIZE_INFO as u16,
                             color: BLACK,
                             ..Default::default()
@@ -479,7 +449,7 @@ impl Drawing {
                         FONT_SIZE_INFO + 10.,
                         100. + i as f32 * FONT_SIZE_INFO + 10.,
                         TextParams {
-                            font: Some(&self.font),
+                            font: Some(&assets::FONT),
                             font_size: FONT_SIZE_INFO as u16,
                             color: BLACK,
                             ..Default::default()
@@ -493,7 +463,7 @@ impl Drawing {
                         FONT_SIZE_INFO + 10.,
                         100. + i as f32 * FONT_SIZE_INFO + 10.,
                         TextParams {
-                            font: Some(&self.font),
+                            font: Some(&assets::FONT),
                             font_size: FONT_SIZE_INFO as u16,
                             color: BLACK,
                             ..Default::default()
@@ -628,7 +598,7 @@ impl Drawing {
             50.,
             100.,
             TextParams {
-                font: Some(&self.font),
+                font: Some(&assets::FONT),
                 font_size: 100 as u16,
                 color: BLACK,
                 ..Default::default()
@@ -640,7 +610,7 @@ impl Drawing {
             50.,
             200.,
             TextParams {
-                font: Some(&self.font),
+                font: Some(&assets::FONT),
                 font_size: 100 as u16,
                 color: BLACK,
                 ..Default::default()
