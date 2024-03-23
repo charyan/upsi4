@@ -38,7 +38,6 @@ pub struct QTE {
     explication1: String,
     explication2: String,
     time: f32,
-    answer: Option<QteEffect>,
 }
 
 impl QTE {
@@ -61,7 +60,6 @@ impl QTE {
             explication1,
             explication2,
             time,
-            answer: None,
         }
     }
 

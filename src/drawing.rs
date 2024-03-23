@@ -65,7 +65,6 @@ pub struct Drawing {
     displayed_satiety: f32,
     displayed_satisfaction: f32,
     displayed_energy: f32,
-    displayed_qte_time: f32,
 
     // Button personnal
     button_personnal_hope: Rect,
@@ -172,7 +171,6 @@ impl Drawing {
             displayed_hope: 0.,
             displayed_satiety: 0.,
             displayed_satisfaction: 0.,
-            displayed_qte_time: 0.,
 
             // Button personnal
             button_personnal_satisfaction: Rect::new(1200., 75., 300., 150.),
@@ -423,6 +421,20 @@ impl Drawing {
             );
 
             draw_rectangle_lines(50., 825., 400., 50., 12., BLACK);
+        } else if let Some(answer) = game.get_answer() {
+            for (i, text) in answer.split("\n").enumerate() {
+                draw_text_ex(
+                    text,
+                    FONT_SIZE_INFO + 10.,
+                    100. + i as f32 * FONT_SIZE_INFO + 10.,
+                    TextParams {
+                        font: Some(&assets::FONT),
+                        font_size: FONT_SIZE_INFO as u16,
+                        color: BLACK,
+                        ..Default::default()
+                    },
+                );
+            }
         } else {
             if let Some(_) = game.get_office().get_selected_employee() {
                 if self.rect_personnal_stat.contains(main_pos) {

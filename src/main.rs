@@ -18,12 +18,16 @@ use qte::{QteEffect, QTE};
 const MIN_PERIOD_WITHOUT_QTE: f32 = 4.;
 const MAX_PERIOD_WITHOUT_QTE: f32 = 6.;
 
+const DISPLAY_ANSWER_TIME: f32 = 2.5;
+
 struct Game {
     office: Office,
     qte_ongoing: Option<QTE>,
     starting_time_qte: f32,
     waiting_time_qte: f32,
     next_time_qte: f32,
+    answer: Option<String>,
+    starting_time_answer: f32,
 }
 
 impl Game {
@@ -35,27 +39,30 @@ impl Game {
             qte_ongoing: None,
             starting_time_qte: 0.,
             waiting_time_qte: 0.,
+            starting_time_answer: 0.,
             next_time_qte: MAX_PERIOD_WITHOUT_QTE,
+            answer: None,
         }
     }
 
     pub fn tick(&mut self) {
         self.office.tick();
 
-        if let Some(qte) = self.qte_ongoing.as_mut() {
+        if let Some(qte) = &self.qte_ongoing {
             self.waiting_time_qte = 0.;
             if get_time() as f32 - self.starting_time_qte > qte.get_time() {
                 self.office.apply_qte_effect(qte.get_effect_1());
-                self.qte_ongoing = None;
-                self.next_time_qte =
-                    rand::gen_range(MIN_PERIOD_WITHOUT_QTE, MAX_PERIOD_WITHOUT_QTE);
+                self.quit_qte(qte.get_explication1().to_string());
+            }
+        } else if let Some(_) = &self.answer {
+            if get_time() as f32 - self.starting_time_answer > DISPLAY_ANSWER_TIME {
+                self.answer = None;
             }
         } else {
             self.waiting_time_qte += 1.0 / FPS;
         }
 
         if self.waiting_time_qte > self.next_time_qte {
-            self.starting_time_qte = get_time() as f32;
             self.qte_ongoing = self.launch_qte();
         }
     }
@@ -72,7 +79,13 @@ impl Game {
         &mut self.office
     }
 
-    pub fn launch_qte(&self) -> Option<QTE> {
+    pub fn get_answer(&self) -> &Option<String> {
+        &self.answer
+    }
+
+    pub fn launch_qte(&mut self) -> Option<QTE> {
+        self.starting_time_qte = get_time() as f32;
+
         Some(QTE::new(
             "Voulez vous tuer\nun employée ?".to_owned(),
             QteEffect::new(0., 0., 0., 0., 0, -1),
@@ -83,6 +96,13 @@ impl Game {
             "Il est pas mort".to_owned(),
             3.,
         ))
+    }
+
+    pub fn quit_qte(&mut self, answer: String) {
+        self.qte_ongoing = None;
+        self.answer = Some(answer);
+        self.starting_time_answer = get_time() as f32;
+        self.next_time_qte = rand::gen_range(MIN_PERIOD_WITHOUT_QTE, MAX_PERIOD_WITHOUT_QTE);
     }
 }
 
@@ -120,8 +140,10 @@ async fn main() {
                 if let Some(qte) = game.get_qte_ongoing().clone() {
                     if drawing.get_button_choice_1().contains(pos) {
                         game.get_mut_office().apply_qte_effect(qte.get_effect_1());
+                        game.quit_qte(qte.get_explication1().to_string());
                     } else if drawing.get_button_choice_2().contains(pos) {
                         game.get_mut_office().apply_qte_effect(qte.get_effect_2());
+                        game.quit_qte(qte.get_explication2().to_string());
                     }
                 }
                 println!("Info pos : {:?}", pos);
