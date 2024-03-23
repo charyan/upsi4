@@ -9,6 +9,7 @@ pub struct Office {
     available_spots: Vec<Vec2>,
     employees: Vec<Rc<RefCell<Employee>>>,
     selected_employee: Option<Rc<RefCell<Employee>>>,
+    money: u64,
 }
 
 impl Office {
@@ -25,6 +26,7 @@ impl Office {
             available_spots,
             employees: Vec::new(),
             selected_employee: None,
+            money: 100,
         }
     }
 
@@ -64,10 +66,12 @@ impl Office {
     pub fn tick(&mut self) {
         let mut removed_employees = Vec::new();
 
+        let mut generated_money = 0;
+
         self.employees.retain(|e| {
             let mut e_borrow = e.borrow_mut();
 
-            e_borrow.tick();
+            generated_money += e_borrow.tick();
 
             if e_borrow.cleaned {
                 removed_employees.push(e.clone());
@@ -76,6 +80,8 @@ impl Office {
                 true
             }
         });
+
+        self.money += generated_money;
 
         // Return spot to available spots
         for e in &removed_employees {
@@ -125,7 +131,8 @@ impl Employee {
         }
     }
 
-    pub fn tick(&mut self) {
+    #[must_use]
+    pub fn tick(&mut self) -> u64 {
         self.satisfaction -= BASE_DECAY_RATE;
         self.hope -= BASE_DECAY_RATE;
         self.energy -= BASE_DECAY_RATE;
@@ -169,6 +176,8 @@ impl Employee {
                 }
             }
         }
+
+        1 // TODO ! return generated amount of money
     }
 
     pub fn get_satisfaction(&self) -> f32 {
