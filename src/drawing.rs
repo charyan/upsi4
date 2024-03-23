@@ -19,8 +19,8 @@ pub const GAME_WINDOW_HEIGHT: u32 = 720;
 pub const GLOBAL_STAT_WIDTH: u32 = 1120;
 pub const GLOBAL_STAT_HEIGHT: u32 = 270;
 
-pub const PERSONNAL_STAT_WIDTH: u32 = 16000;
-pub const PERSONNAL_STAT_HEIGHT: u32 = 9000;
+pub const PERSONNAL_STAT_WIDTH: u32 = 1600;
+pub const PERSONNAL_STAT_HEIGHT: u32 = 900;
 
 pub const INFO_WIDTH: u32 = 1890;
 pub const INFO_HEIGHT: u32 = 2480;
@@ -32,6 +32,9 @@ const WINDOW_SPEED: f32 = 0.05;
 const FONT_SIZE_INFO: f32 = 150.;
 const FONT_SIZE_GLOBAL: f32 = 50.;
 const FONT_SIZE_PERSONNAL: f32 = 100.;
+const FONT_SIZE_BAR: u16 = 75;
+
+const PERSONNAL_LINES_THICKNES: f32 = 35.;
 
 const DESCRIPTION_BUTTON_HOPE: &str = "Laissez votre employée\nfaire un appel vidéo\navec sa famille.\n\nMais attention !\nLes relations sociales\nne participe pas\nà l'avancement du \nprojet.";
 const DESCRIPTION_BUTTON_ENERGY: &str =
@@ -816,7 +819,14 @@ impl Drawing {
     fn draw_personnal_stat(&mut self, game: &Game) {
         fn draw_bar(rect: Rect) {
             draw_rectangle(rect.x, rect.y, rect.w, rect.h, LIGHTGRAY);
-            draw_rectangle_lines(rect.x, rect.y, rect.w, rect.h, 35., BLACK);
+            draw_rectangle_lines(
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                PERSONNAL_LINES_THICKNES,
+                BLACK,
+            );
         }
 
         set_camera(&self.camera_personnal_stat);
@@ -844,45 +854,45 @@ impl Drawing {
             );
 
             draw_text_ex(
-                "Satisfaction",
-                0.,
+                "Joie",
+                10.,
                 self.bar_satisfaction.y + self.bar_satisfaction.h / 2.,
                 TextParams {
                     font: Some(&assets::FONT),
-                    font_size: 50,
+                    font_size: FONT_SIZE_BAR,
                     color: BLACK,
                     ..Default::default()
                 },
             );
             draw_text_ex(
                 "Sasiété",
-                0.,
-                self.bar_satisfaction.y + self.bar_satisfaction.h / 2.,
+                10.,
+                self.bar_satiety.y + self.bar_satiety.h / 2.,
                 TextParams {
                     font: Some(&assets::FONT),
-                    font_size: 50,
+                    font_size: FONT_SIZE_BAR,
                     color: BLACK,
                     ..Default::default()
                 },
             );
             draw_text_ex(
                 "Energie",
-                0.,
+                10.,
                 self.bar_energy.y + self.bar_energy.h / 2.,
                 TextParams {
                     font: Some(&assets::FONT),
-                    font_size: 50,
+                    font_size: FONT_SIZE_BAR,
                     color: BLACK,
                     ..Default::default()
                 },
             );
             draw_text_ex(
                 "Espoir",
-                0.,
-                self.bar_hope.y + self.bar_energy.h / 2.,
+                10.,
+                self.bar_hope.y + self.bar_hope.h / 2.,
                 TextParams {
                     font: Some(&assets::FONT),
-                    font_size: 50,
+                    font_size: FONT_SIZE_BAR,
                     color: BLACK,
                     ..Default::default()
                 },
@@ -912,37 +922,62 @@ impl Drawing {
                     self.displayed_satisfaction = lerp(
                         self.displayed_satisfaction,
                         selected_employee.as_ref().borrow().get_satisfaction()
-                            * (self.bar_satisfaction.w - 35.),
+                            * (self.bar_satisfaction.w - PERSONNAL_LINES_THICKNES),
                         ANIMATION_SPEED,
                     );
 
                     self.displayed_energy = lerp(
                         self.displayed_energy,
                         selected_employee.as_ref().borrow().get_energy()
-                            * (self.bar_energy.w - 35.),
+                            * (self.bar_energy.w - PERSONNAL_LINES_THICKNES),
                         ANIMATION_SPEED,
                     );
 
                     self.displayed_hope = lerp(
                         self.displayed_hope,
-                        selected_employee.as_ref().borrow().get_hope() * (self.bar_hope.w - 35.),
+                        selected_employee.as_ref().borrow().get_hope()
+                            * (self.bar_hope.w - PERSONNAL_LINES_THICKNES),
                         ANIMATION_SPEED,
                     );
 
                     self.displayed_satiety = lerp(
                         self.displayed_satiety,
                         selected_employee.as_ref().borrow().get_satiety()
-                            * (self.bar_satiety.w - 35.),
+                            * (self.bar_satiety.w - PERSONNAL_LINES_THICKNES),
                         ANIMATION_SPEED,
                     );
 
-                    draw_rectangle(317.5, 177.5, self.displayed_satisfaction, 65., RED);
+                    draw_rectangle(
+                        self.bar_satisfaction.x + PERSONNAL_LINES_THICKNES / 2.,
+                        self.bar_satisfaction.y + PERSONNAL_LINES_THICKNES / 2.,
+                        self.displayed_satisfaction,
+                        self.bar_satisfaction.h - PERSONNAL_LINES_THICKNES,
+                        RED,
+                    );
 
-                    draw_rectangle(317.5, 377.5, self.displayed_energy, 65., YELLOW);
+                    draw_rectangle(
+                        self.bar_energy.x + PERSONNAL_LINES_THICKNES / 2.,
+                        self.bar_energy.y + PERSONNAL_LINES_THICKNES / 2.,
+                        self.displayed_energy,
+                        self.bar_energy.h - PERSONNAL_LINES_THICKNES,
+                        YELLOW,
+                    );
 
-                    draw_rectangle(317.5, 577.5, self.displayed_satiety, 65., BLUE);
+                    draw_rectangle(
+                        self.bar_satiety.x + PERSONNAL_LINES_THICKNES / 2.,
+                        self.bar_satiety.y + PERSONNAL_LINES_THICKNES / 2.,
+                        self.displayed_satiety,
+                        self.bar_satiety.h - PERSONNAL_LINES_THICKNES,
+                        BLUE,
+                    );
 
-                    draw_rectangle(317.5, 777.5, self.displayed_hope, 65., GREEN);
+                    draw_rectangle(
+                        self.bar_hope.x + PERSONNAL_LINES_THICKNES / 2.,
+                        self.bar_hope.y + PERSONNAL_LINES_THICKNES / 2.,
+                        self.displayed_hope,
+                        self.bar_hope.h - PERSONNAL_LINES_THICKNES,
+                        GREEN,
+                    );
 
                     Drawing::draw_button(
                         self.button_personnal_satiety,
