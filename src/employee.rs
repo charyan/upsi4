@@ -597,7 +597,7 @@ impl Employee {
                             self.position.y -= EMPLOYEE_SPEED;
                             self.rotation = -PI / 2.;
                         } else {
-                            self.position.y = spot.y;
+                            self.position.y = MIDDLE_LANE;
                             self.movment_step += 1;
                         }
                     }
@@ -608,7 +608,7 @@ impl Employee {
                         self.rotation = 0.
                     } else {
                         self.position.x = WINDOW_X;
-                        self.movment_step += 1;
+                        self.state = EmployeeState::Falling;
                     }
                 }
                 _ => (),
