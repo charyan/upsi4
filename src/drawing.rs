@@ -740,9 +740,10 @@ impl Drawing {
                                 }
                             }
                         }
-                        EmployeeState::Falling | EmployeeState::Clean | EmployeeState::Suicide => {
-                            ()
-                        }
+                        EmployeeState::Falling
+                        | EmployeeState::Clean
+                        | EmployeeState::Suicide
+                        | EmployeeState::Arriving => (),
                     }
                 }
             }
@@ -816,6 +817,53 @@ impl Drawing {
         );
     }
 
+    fn draw_bar_name(&self) {
+        draw_text_ex(
+            "Joie",
+            10.,
+            self.bar_satisfaction.y + self.bar_satisfaction.h / 2.,
+            TextParams {
+                font: Some(&assets::FONT),
+                font_size: FONT_SIZE_BAR,
+                color: BLACK,
+                ..Default::default()
+            },
+        );
+        draw_text_ex(
+            "Sasiété",
+            10.,
+            self.bar_satiety.y + self.bar_satiety.h / 2.,
+            TextParams {
+                font: Some(&assets::FONT),
+                font_size: FONT_SIZE_BAR,
+                color: BLACK,
+                ..Default::default()
+            },
+        );
+        draw_text_ex(
+            "Energie",
+            10.,
+            self.bar_energy.y + self.bar_energy.h / 2.,
+            TextParams {
+                font: Some(&assets::FONT),
+                font_size: FONT_SIZE_BAR,
+                color: BLACK,
+                ..Default::default()
+            },
+        );
+        draw_text_ex(
+            "Espoir",
+            10.,
+            self.bar_hope.y + self.bar_hope.h / 2.,
+            TextParams {
+                font: Some(&assets::FONT),
+                font_size: FONT_SIZE_BAR,
+                color: BLACK,
+                ..Default::default()
+            },
+        );
+    }
+
     fn draw_personnal_stat(&mut self, game: &Game) {
         fn draw_bar(rect: Rect) {
             draw_rectangle(rect.x, rect.y, rect.w, rect.h, LIGHTGRAY);
@@ -853,57 +901,14 @@ impl Drawing {
                 BLACK,
             );
 
-            draw_text_ex(
-                "Joie",
-                10.,
-                self.bar_satisfaction.y + self.bar_satisfaction.h / 2.,
-                TextParams {
-                    font: Some(&assets::FONT),
-                    font_size: FONT_SIZE_BAR,
-                    color: BLACK,
-                    ..Default::default()
-                },
-            );
-            draw_text_ex(
-                "Sasiété",
-                10.,
-                self.bar_satiety.y + self.bar_satiety.h / 2.,
-                TextParams {
-                    font: Some(&assets::FONT),
-                    font_size: FONT_SIZE_BAR,
-                    color: BLACK,
-                    ..Default::default()
-                },
-            );
-            draw_text_ex(
-                "Energie",
-                10.,
-                self.bar_energy.y + self.bar_energy.h / 2.,
-                TextParams {
-                    font: Some(&assets::FONT),
-                    font_size: FONT_SIZE_BAR,
-                    color: BLACK,
-                    ..Default::default()
-                },
-            );
-            draw_text_ex(
-                "Espoir",
-                10.,
-                self.bar_hope.y + self.bar_hope.h / 2.,
-                TextParams {
-                    font: Some(&assets::FONT),
-                    font_size: FONT_SIZE_BAR,
-                    color: BLACK,
-                    ..Default::default()
-                },
-            );
-
             match selected_employee.borrow().get_state() {
                 EmployeeState::Dead => {
                     draw_bar(self.bar_satisfaction);
                     draw_bar(self.bar_energy);
                     draw_bar(self.bar_hope);
                     draw_bar(self.bar_satiety);
+
+                    self.draw_bar_name();
 
                     Drawing::draw_button(
                         self.button_personnal_satisfaction,
@@ -918,6 +923,8 @@ impl Drawing {
                     draw_bar(self.bar_energy);
                     draw_bar(self.bar_hope);
                     draw_bar(self.bar_satiety);
+
+                    self.draw_bar_name();
 
                     self.displayed_satisfaction = lerp(
                         self.displayed_satisfaction,
@@ -1023,7 +1030,7 @@ impl Drawing {
                     draw_text_ex(
                         "Falling",
                         100.,
-                        100.,
+                        300.,
                         TextParams {
                             font: Some(&assets::FONT),
                             font_size: 100 as u16,
@@ -1036,7 +1043,7 @@ impl Drawing {
                     draw_text_ex(
                         "Removed",
                         100.,
-                        100.,
+                        300.,
                         TextParams {
                             font: Some(&assets::FONT),
                             font_size: 100 as u16,
@@ -1049,7 +1056,20 @@ impl Drawing {
                     draw_text_ex(
                         "Killing himself",
                         100.,
+                        300.,
+                        TextParams {
+                            font: Some(&assets::FONT),
+                            font_size: 100 as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
+                EmployeeState::Arriving => {
+                    draw_text_ex(
+                        "Arriving",
                         100.,
+                        300.,
                         TextParams {
                             font: Some(&assets::FONT),
                             font_size: 100 as u16,

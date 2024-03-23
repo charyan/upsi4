@@ -12,7 +12,7 @@ const NAMES: &[&str] = &[
     "Edsger", "Stephano", "Olivier", "Mathieu", "Valérie", "Roland", "Tom",
 ];
 
-const BONUS_RH_COST: f32 = 1000.;
+const BONUS_RH_COST: f32 = 200.;
 
 use macroquad::{
     math::Vec2,
@@ -29,7 +29,8 @@ const SPOT_Y: [f32; 4] = [175., 265., 472., 551.];
 pub const MIDDLE_LANE: f32 = 350.;
 const WINDOW_X: f32 = 1090.;
 const OPEN_WINDOW_X: f32 = 1000.;
-const DOOR_X: f32 = 370.;
+const DOOR_X_INSIDE: f32 = 370.;
+const DOOR_X_OUTSIDE: f32 = 300.;
 const SPEED_FALL: f32 = 10.;
 
 #[derive(Clone, Copy, Debug)]
@@ -338,6 +339,8 @@ pub enum EmployeeState {
     Suicide,
     /// Internal state for when the entity can be removed from the world
     Clean,
+    /// State for when the employee arrive
+    Arriving,
 }
 
 #[derive(Clone, Copy)]
@@ -448,31 +451,31 @@ fn mad2_particles() -> particles::EmitterConfig {
 
 impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
-        let mut z_emitter = Emitter::new(EmitterConfig {
+        let z_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::Z_TEXTURE.clone()),
             ..sleep_particles()
         });
 
-        let mut cry_emitter = Emitter::new(EmitterConfig {
+        let cry_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::CRY_TEXTURE.clone()),
             ..cry_particles()
         });
 
-        let mut happy_emitter = Emitter::new(EmitterConfig {
+        let happy_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::HAPPY_TEXTURE.clone()),
             ..happy_particles()
         });
 
-        let mut mad1_emitter = Emitter::new(EmitterConfig {
+        let mad1_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::MAD1_TEXTURE.clone()),
             ..mad1_particles()
         });
 
-        let mut mad2_emitter = Emitter::new(EmitterConfig {
+        let mad2_emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::MAD2_TEXTURE.clone()),
             ..mad2_particles()
@@ -490,10 +493,10 @@ impl Employee {
             hope_factor: rand::gen_range(0.7, 1.3),
             energy_factor: rand::gen_range(0.7, 1.3),
             satiety_factor: rand::gen_range(0.7, 1.3),
-            position: Vec2::new(300., MIDDLE_LANE),
+            position: Vec2::new(220., 712.),
             computer,
             rotation: 0.,
-            state: EmployeeState::Alive,
+            state: EmployeeState::Arriving,
             movment_step: 0,
             action: EmployeeAction::None,
             z_emitter,
@@ -645,7 +648,7 @@ impl Employee {
                     }
                 }
                 6 => {
-                    if self.position.x > DOOR_X {
+                    if self.position.x > DOOR_X_INSIDE {
                         self.position.x -= EMPLOYEE_RUNNING_SPEED;
                         self.rotation = PI
                     } else if let DoorState::Open = door_state {
@@ -653,7 +656,7 @@ impl Employee {
                     } else if self.hope < 0.9 && self.satisfaction > 0.1 {
                         self.movment_step = 0
                     } else {
-                        self.position.x = DOOR_X;
+                        self.position.x = DOOR_X_INSIDE;
                     }
                 }
                 7 => {
@@ -731,6 +734,37 @@ impl Employee {
                 self.position += vec2(21., 84.) / SPEED_FALL;
             } else {
                 self.clean();
+            }
+        } else if let EmployeeState::Arriving = self.state {
+            match self.movment_step {
+                0 => {
+                    if self.position.y > MIDDLE_LANE {
+                        self.position.y -= EMPLOYEE_RUNNING_SPEED;
+                        self.rotation = -PI / 2.;
+                    } else {
+                        self.movment_step += 1;
+                    }
+                }
+                1 => {
+                    if self.position.x < DOOR_X_OUTSIDE {
+                        self.position.x += EMPLOYEE_RUNNING_SPEED;
+                        self.rotation = 0.0;
+                    } else if let DoorState::Open = door_state {
+                        self.movment_step += 1;
+                    } else {
+                        self.position.x = DOOR_X_OUTSIDE;
+                    }
+                }
+                2 => {
+                    if self.position.x < DOOR_X_INSIDE {
+                        self.position.x += EMPLOYEE_RUNNING_SPEED;
+                    } else {
+                        self.position.x = DOOR_X_INSIDE;
+                        self.movment_step = 0;
+                        self.state = EmployeeState::Alive;
+                    }
+                }
+                _ => (),
             }
         }
 

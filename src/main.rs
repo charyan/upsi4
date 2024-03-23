@@ -204,7 +204,8 @@ impl Game {
                         }
                         employee::EmployeeState::Falling
                         | employee::EmployeeState::Clean
-                        | employee::EmployeeState::Suicide => (),
+                        | employee::EmployeeState::Suicide
+                        | employee::EmployeeState::Arriving => (),
                     }
                 }
             }
