@@ -12,6 +12,8 @@ const NAMES: &[&str] = &[
     "Edsger", "Stephano", "Olivier", "Mathieu", "Valérie", "Roland", "Tom",
 ];
 
+const BONUS_RH_COST: i64 = 1000;
+
 use macroquad::{
     math::Vec2,
     rand::{self, gen_range},
@@ -223,6 +225,11 @@ impl Office {
 
     pub fn get_money(&self) -> i64 {
         self.money
+    }
+
+    pub fn bonus_rh(&mut self) {
+        self.money -= BONUS_RH_COST;
+        self.add_employee();
     }
 }
 

@@ -193,7 +193,7 @@ async fn main() {
                 } else if drawing.get_button_meth().contains(pos) {
                     println!("Button meth pressed");
                 } else if drawing.get_button_rh().contains(pos) {
-                    println!("Button rh pressed");
+                    game.get_mut_office().bonus_rh();
                 }
             } else if drawing.get_rect_personnal_stat().contains(main_pos) {
                 let pos = Drawing::convert_main_personnal_stat(main_pos);
