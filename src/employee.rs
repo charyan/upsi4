@@ -96,7 +96,6 @@ impl Office {
             .iter()
             .cloned()
             .chain(self.employees.iter().map(|e| e.borrow().computer.clone()))
-            .map(|c| c)
     }
 
     pub fn employees_count(&self) -> usize {
@@ -318,6 +317,10 @@ impl Employee {
         } else {
             0
         }
+    }
+
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
 
     pub fn get_satisfaction(&self) -> f32 {
