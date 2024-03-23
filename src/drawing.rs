@@ -19,8 +19,8 @@ pub const GAME_WINDOW_HEIGHT: u32 = 720;
 pub const GLOBAL_STAT_WIDTH: u32 = 1120;
 pub const GLOBAL_STAT_HEIGHT: u32 = 270;
 
-pub const PERSONNAL_STAT_WIDTH: u32 = 1600;
-pub const PERSONNAL_STAT_HEIGHT: u32 = 900;
+pub const PERSONNAL_STAT_WIDTH: u32 = 16000;
+pub const PERSONNAL_STAT_HEIGHT: u32 = 9000;
 
 pub const INFO_WIDTH: u32 = 1890;
 pub const INFO_HEIGHT: u32 = 2480;
@@ -31,6 +31,7 @@ const WINDOW_SPEED: f32 = 0.05;
 
 const FONT_SIZE_INFO: f32 = 150.;
 const FONT_SIZE_GLOBAL: f32 = 50.;
+const FONT_SIZE_PERSONNAL: f32 = 100.;
 
 const DESCRIPTION_BUTTON_HOPE: &str = "Laissez votre employée\nfaire un appel vidéo\navec sa famille.\n\nMais attention !\nLes relations sociales\nne participe pas\nà l'avancement du \nprojet.";
 const DESCRIPTION_BUTTON_ENERGY: &str =
@@ -185,10 +186,10 @@ impl Drawing {
             window_rotation: 0.,
 
             // Button personnal
-            button_personnal_satisfaction: Rect::new(1200., 75., 300., 150.),
-            button_personnal_energy: Rect::new(1200., 275., 300., 150.),
-            button_personnal_satiety: Rect::new(1200., 475., 300., 150.),
-            button_personnal_hope: Rect::new(1200., 675., 300., 150.),
+            button_personnal_satisfaction: Rect::new(1325., 135., 250., 150.),
+            button_personnal_energy: Rect::new(1325., 335., 250., 150.),
+            button_personnal_satiety: Rect::new(1325., 535., 250., 150.),
+            button_personnal_hope: Rect::new(1325., 735., 250., 150.),
 
             // Button global
             button_global_door: Rect::new(120., 100., 125., 125.),
@@ -200,10 +201,10 @@ impl Drawing {
             button_choice_2: Rect::new(1150., 1950., 450., 200.),
 
             //Bar stats
-            bar_satisfaction: Rect::new(100., 100., 1000., 100.),
-            bar_energy: Rect::new(100., 300., 1000., 100.),
-            bar_satiety: Rect::new(100., 500., 1000., 100.),
-            bar_hope: Rect::new(100., 700., 1000., 100.),
+            bar_satisfaction: Rect::new(300., 160., 1000., 100.),
+            bar_energy: Rect::new(300., 360., 1000., 100.),
+            bar_satiety: Rect::new(300., 560., 1000., 100.),
+            bar_hope: Rect::new(300., 760., 1000., 100.),
 
             //Render rect
             rect_office: Rect::new(
@@ -813,72 +814,86 @@ impl Drawing {
     }
 
     fn draw_personnal_stat(&mut self, game: &Game) {
+        fn draw_bar(rect: Rect) {
+            draw_rectangle(rect.x, rect.y, rect.w, rect.h, LIGHTGRAY);
+            draw_rectangle_lines(rect.x, rect.y, rect.w, rect.h, 35., BLACK);
+        }
+
         set_camera(&self.camera_personnal_stat);
         clear_background(WHITE);
 
         if let Some(selected_employee) = game.get_office().get_selected_employee() {
+            draw_text_ex(
+                selected_employee.borrow().get_name(),
+                0.,
+                FONT_SIZE_PERSONNAL,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: FONT_SIZE_PERSONNAL as u16,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+            draw_line(
+                5.,
+                FONT_SIZE_PERSONNAL + 20.,
+                60. * selected_employee.borrow().get_name().len() as f32,
+                FONT_SIZE_PERSONNAL + 20.,
+                10.,
+                BLACK,
+            );
+
+            draw_text_ex(
+                "Satisfaction",
+                0.,
+                self.bar_satisfaction.y + self.bar_satisfaction.h / 2.,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: 50,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+            draw_text_ex(
+                "Sasiété",
+                0.,
+                self.bar_satisfaction.y + self.bar_satisfaction.h / 2.,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: 50,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+            draw_text_ex(
+                "Energie",
+                0.,
+                self.bar_energy.y + self.bar_energy.h / 2.,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: 50,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+            draw_text_ex(
+                "Espoir",
+                0.,
+                self.bar_hope.y + self.bar_energy.h / 2.,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: 50,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+
             match selected_employee.borrow().get_state() {
                 EmployeeState::Dead => {
-                    draw_rectangle(
-                        self.bar_satisfaction.x,
-                        self.bar_satisfaction.y,
-                        self.bar_satisfaction.w,
-                        self.bar_satisfaction.h,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle_lines(
-                        self.bar_satisfaction.x,
-                        self.bar_satisfaction.y,
-                        self.bar_satisfaction.w,
-                        self.bar_satisfaction.h,
-                        35.,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle(
-                        self.bar_energy.x,
-                        self.bar_energy.y,
-                        self.bar_energy.w,
-                        self.bar_energy.h,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle_lines(
-                        self.bar_energy.x,
-                        self.bar_energy.y,
-                        self.bar_energy.w,
-                        self.bar_energy.h,
-                        35.,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle(
-                        self.bar_satiety.x,
-                        self.bar_satiety.y,
-                        self.bar_satiety.w,
-                        self.bar_satiety.h,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle_lines(
-                        self.bar_satiety.x,
-                        self.bar_satiety.y,
-                        self.bar_satiety.w,
-                        self.bar_satiety.h,
-                        35.,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle(
-                        self.bar_hope.x,
-                        self.bar_hope.y,
-                        self.bar_hope.w,
-                        self.bar_hope.h,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle_lines(
-                        self.bar_hope.x,
-                        self.bar_hope.y,
-                        self.bar_hope.w,
-                        self.bar_hope.h,
-                        35.,
-                        LIGHTGRAY,
-                    );
+                    draw_bar(self.bar_satisfaction);
+                    draw_bar(self.bar_energy);
+                    draw_bar(self.bar_hope);
+                    draw_bar(self.bar_satiety);
 
                     Drawing::draw_button(
                         self.button_personnal_satisfaction,
@@ -889,100 +904,45 @@ impl Drawing {
                     return;
                 }
                 EmployeeState::Alive => {
-                    draw_rectangle(
-                        self.bar_satisfaction.x,
-                        self.bar_satisfaction.y,
-                        self.bar_satisfaction.w,
-                        self.bar_satisfaction.h,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle(
-                        self.bar_energy.x,
-                        self.bar_energy.y,
-                        self.bar_energy.w,
-                        self.bar_energy.h,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle(
-                        self.bar_satiety.x,
-                        self.bar_satiety.y,
-                        self.bar_satiety.w,
-                        self.bar_satiety.h,
-                        LIGHTGRAY,
-                    );
-                    draw_rectangle(
-                        self.bar_hope.x,
-                        self.bar_hope.y,
-                        self.bar_hope.w,
-                        self.bar_hope.h,
-                        LIGHTGRAY,
-                    );
+                    draw_bar(self.bar_satisfaction);
+                    draw_bar(self.bar_energy);
+                    draw_bar(self.bar_hope);
+                    draw_bar(self.bar_satiety);
 
                     self.displayed_satisfaction = lerp(
                         self.displayed_satisfaction,
                         selected_employee.as_ref().borrow().get_satisfaction()
-                            * self.bar_satisfaction.w,
+                            * (self.bar_satisfaction.w - 35.),
                         ANIMATION_SPEED,
                     );
 
                     self.displayed_energy = lerp(
                         self.displayed_energy,
-                        selected_employee.as_ref().borrow().get_energy() * self.bar_energy.w,
+                        selected_employee.as_ref().borrow().get_energy()
+                            * (self.bar_energy.w - 35.),
                         ANIMATION_SPEED,
                     );
 
                     self.displayed_hope = lerp(
                         self.displayed_hope,
-                        selected_employee.as_ref().borrow().get_hope() * self.bar_hope.w,
+                        selected_employee.as_ref().borrow().get_hope() * (self.bar_hope.w - 35.),
                         ANIMATION_SPEED,
                     );
 
                     self.displayed_satiety = lerp(
                         self.displayed_satiety,
-                        selected_employee.as_ref().borrow().get_satiety() * self.bar_satiety.w,
+                        selected_employee.as_ref().borrow().get_satiety()
+                            * (self.bar_satiety.w - 35.),
                         ANIMATION_SPEED,
                     );
 
-                    draw_rectangle(100., 100., self.displayed_satisfaction, 100., RED);
+                    draw_rectangle(317.5, 177.5, self.displayed_satisfaction, 65., RED);
 
-                    draw_rectangle(100., 300., self.displayed_energy, 100., YELLOW);
+                    draw_rectangle(317.5, 377.5, self.displayed_energy, 65., YELLOW);
 
-                    draw_rectangle(100., 500., self.displayed_satiety, 100., BLUE);
+                    draw_rectangle(317.5, 577.5, self.displayed_satiety, 65., BLUE);
 
-                    draw_rectangle(100., 700., self.displayed_hope, 100., GREEN);
-
-                    draw_rectangle_lines(
-                        self.bar_satisfaction.x,
-                        self.bar_satisfaction.y,
-                        self.bar_satisfaction.w,
-                        self.bar_satisfaction.h,
-                        35.,
-                        BLACK,
-                    );
-                    draw_rectangle_lines(
-                        self.bar_energy.x,
-                        self.bar_energy.y,
-                        self.bar_energy.w,
-                        self.bar_energy.h,
-                        35.,
-                        BLACK,
-                    );
-                    draw_rectangle_lines(
-                        self.bar_satiety.x,
-                        self.bar_satiety.y,
-                        self.bar_satiety.w,
-                        self.bar_satiety.h,
-                        35.,
-                        BLACK,
-                    );
-                    draw_rectangle_lines(
-                        self.bar_hope.x,
-                        self.bar_hope.y,
-                        self.bar_hope.w,
-                        self.bar_hope.h,
-                        35.,
-                        BLACK,
-                    );
+                    draw_rectangle(317.5, 777.5, self.displayed_hope, 65., GREEN);
 
                     Drawing::draw_button(
                         self.button_personnal_satiety,
