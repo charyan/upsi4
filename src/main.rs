@@ -54,13 +54,22 @@ async fn main() {
                 Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
 
             if drawing.get_rect_office().contains(main_pos) {
-                game.get_mut_office()
-                    .click(Drawing::convert_main_office(main_pos));
+                let pos = Drawing::convert_main_office(main_pos);
+                game.get_mut_office().click(pos);
                 drawing.reset_displayed();
+
+                println!("{:?}", pos);
             } else if drawing.get_rect_info().contains(main_pos) {
                 println!("{:?}", drawing.convert_main_info(main_pos))
             } else if drawing.get_rect_global_stat().contains(main_pos) {
-                println!("{:?}", drawing.convert_main_global_stat(main_pos))
+                let pos = drawing.convert_main_global_stat(main_pos);
+                if drawing.get_button_door().contains(pos) {
+                    println!("Button door pressed");
+                } else if drawing.get_button_meth().contains(pos) {
+                    println!("Button meth pressed");
+                } else if drawing.get_button_rh().contains(pos) {
+                    println!("Button rh pressed");
+                }
             } else if drawing.get_rect_personnal_stat().contains(main_pos) {
                 let pos = drawing.convert_main_personnal_stat(main_pos);
 

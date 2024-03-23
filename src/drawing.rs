@@ -2,7 +2,7 @@ use macroquad::prelude::*;
 
 use crate::{
     employee::{EmployeeAction, EMPLOYEE_RADIUS},
-    main, Game,
+    Game,
 };
 
 pub const OFFICE_WIDTH: u32 = 1280;
@@ -246,6 +246,18 @@ impl Drawing {
         &self.button_personnal_satisfaction
     }
 
+    pub fn get_button_rh(&self) -> &Rect {
+        &self.button_global_rh
+    }
+
+    pub fn get_button_meth(&self) -> &Rect {
+        &self.button_global_meth
+    }
+
+    pub fn get_button_door(&self) -> &Rect {
+        &self.button_global_door
+    }
+
     fn draw_office(&self, game: &Game) {
         set_camera(&self.camera_office);
         clear_background(WHITE);
@@ -268,9 +280,8 @@ impl Drawing {
                 e.get_pos().y - EMPLOYEE_RADIUS,
                 WHITE,
                 DrawTextureParams {
-                    source: None,
                     rotation: e.get_rotation(),
-                    dest_size: Some(Vec2::new(500.0, 500.0)),
+                    dest_size: Some(Vec2::new(100.0, 100.0)),
                     ..Default::default()
                 },
             );

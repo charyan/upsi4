@@ -15,8 +15,8 @@ pub struct Office {
 
 impl Office {
     pub fn new() -> Self {
-        let spot_x = [100., 300., 500., 700.];
-        let spot_y = [100., 200., 400., 500.];
+        let spot_x = [450., 600., 720., 860.];
+        let spot_y = [175., 265., 435., 530.];
 
         let available_spots = spot_x
             .iter()
@@ -108,7 +108,7 @@ impl Office {
 const BASE_DECAY_RATE: f32 = 0.0001;
 const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
-pub const EMPLOYEE_RADIUS: f32 = 150.;
+pub const EMPLOYEE_RADIUS: f32 = 50.;
 const EMPLOYEE_SPEED: f32 = 1.;
 
 #[derive(Clone, Copy)]
@@ -155,7 +155,7 @@ impl Employee {
             hope: 0.5,
             energy: 0.5,
             satiety: 0.5,
-            position: Vec2::new(10., 45.),
+            position: Vec2::new(300., 350.),
             spot,
             rotation: 0.,
             state: EmployeeState::Alive,
