@@ -104,7 +104,10 @@ impl Drawing {
         ));
         camera_personnal_stat.render_target = Some(render_target_personnal_stat.clone());
 
-        let employee_texture = load_texture("./assets/employee.png").await.unwrap();
+        let employee_texture = Texture2D::from_file_with_format(
+            include_bytes!("assets/employee.png"),
+            Some(ImageFormat::Png),
+        );
 
         Self {
             main_render_target,
