@@ -17,6 +17,8 @@ use macroquad::{
     rand::{self, gen_range},
 };
 
+use crate::assets;
+
 pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
@@ -205,7 +207,7 @@ fn sleep_particles() -> particles::EmitterConfig {
         initial_velocity: 30.0,
         atlas: None,
         size: 15.0,
-        blend_mode: BlendMode::Additive,
+        blend_mode: BlendMode::Alpha,
         ..Default::default()
     }
 }
@@ -214,7 +216,7 @@ impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
         let mut emitter = Emitter::new(EmitterConfig {
             local_coords: false,
-            texture: None, //Some(GLOBAL_Z_TEXTURE.clone()),
+            texture: Some(assets::Z_TEXTURE.clone()),
             ..sleep_particles()
         });
 
