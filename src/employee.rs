@@ -337,7 +337,10 @@ impl Employee {
 
         match self.action {
             EmployeeAction::None => (),
-            EmployeeAction::Break => self.satisfaction += REPLENISH_RATE,
+            EmployeeAction::Break => {
+                self.satisfaction += REPLENISH_RATE;
+                self.computer.borrow_mut().broken = true;
+            }
             EmployeeAction::Eat => self.satiety += REPLENISH_RATE,
             EmployeeAction::Sleep => self.energy += REPLENISH_RATE,
             EmployeeAction::FamilyCall => self.hope += REPLENISH_RATE,
