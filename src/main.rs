@@ -236,6 +236,7 @@ async fn main() {
                             }
                         }
                         employee::EmployeeState::Falling | employee::EmployeeState::Clean => (),
+                        employee::EmployeeState::Suicide => (),
                     }
                 }
             }

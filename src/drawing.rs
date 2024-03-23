@@ -301,13 +301,13 @@ impl Drawing {
             },
         );
 
-        if let DoorState::Open = game.get_office().get_door_state() {
+        if let DoorState::Closed = game.get_office().get_door_state() {
             if self.door_rotation < 0.0 {
                 self.door_rotation += DOOR_SPEED
             } else {
                 self.door_rotation = 0.0
             }
-        } else if let DoorState::Closed = game.get_office().get_door_state() {
+        } else if let DoorState::Open = game.get_office().get_door_state() {
             if self.door_rotation > -PI / 2. {
                 self.door_rotation -= DOOR_SPEED
             } else {
@@ -330,7 +330,7 @@ impl Drawing {
 
         self.window_rotation = lerp(
             self.window_rotation,
-            if game.get_office().window_is_open() {
+            if !game.get_office().window_is_open() {
                 0.
             } else {
                 PI / 2.
@@ -341,12 +341,12 @@ impl Drawing {
         draw_texture_ex(
             &assets::WINDOW_TEXTURE,
             1070.,
-            270.,
+            290.,
             WHITE,
             DrawTextureParams {
                 rotation: -self.window_rotation,
-                dest_size: Some(vec2(16., 85.)),
-                pivot: Some(vec2(1078., 270.)),
+                dest_size: Some(vec2(13., 70.)),
+                pivot: Some(vec2(1076.5, 290.)),
                 ..Default::default()
             },
         );
@@ -358,8 +358,8 @@ impl Drawing {
             WHITE,
             DrawTextureParams {
                 rotation: self.window_rotation + PI,
-                dest_size: Some(vec2(16., 85.)),
-                pivot: Some(vec2(1078., 430.)),
+                dest_size: Some(vec2(13., 70.)),
+                pivot: Some(vec2(1076.5, 430.)),
                 ..Default::default()
             },
         );
@@ -726,7 +726,9 @@ impl Drawing {
                                 }
                             }
                         }
-                        EmployeeState::Falling | EmployeeState::Clean => (),
+                        EmployeeState::Falling | EmployeeState::Clean | EmployeeState::Suicide => {
+                            ()
+                        }
                     }
                 }
             }
@@ -814,11 +816,27 @@ impl Drawing {
                         self.bar_satisfaction.h,
                         LIGHTGRAY,
                     );
+                    draw_rectangle_lines(
+                        self.bar_satisfaction.x,
+                        self.bar_satisfaction.y,
+                        self.bar_satisfaction.w,
+                        self.bar_satisfaction.h,
+                        35.,
+                        LIGHTGRAY,
+                    );
                     draw_rectangle(
                         self.bar_energy.x,
                         self.bar_energy.y,
                         self.bar_energy.w,
                         self.bar_energy.h,
+                        LIGHTGRAY,
+                    );
+                    draw_rectangle_lines(
+                        self.bar_energy.x,
+                        self.bar_energy.y,
+                        self.bar_energy.w,
+                        self.bar_energy.h,
+                        35.,
                         LIGHTGRAY,
                     );
                     draw_rectangle(
@@ -828,11 +846,27 @@ impl Drawing {
                         self.bar_satiety.h,
                         LIGHTGRAY,
                     );
+                    draw_rectangle_lines(
+                        self.bar_satiety.x,
+                        self.bar_satiety.y,
+                        self.bar_satiety.w,
+                        self.bar_satiety.h,
+                        35.,
+                        LIGHTGRAY,
+                    );
                     draw_rectangle(
                         self.bar_hope.x,
                         self.bar_hope.y,
                         self.bar_hope.w,
                         self.bar_hope.h,
+                        LIGHTGRAY,
+                    );
+                    draw_rectangle_lines(
+                        self.bar_hope.x,
+                        self.bar_hope.y,
+                        self.bar_hope.w,
+                        self.bar_hope.h,
+                        35.,
                         LIGHTGRAY,
                     );
 
@@ -996,6 +1030,19 @@ impl Drawing {
                 EmployeeState::Clean => {
                     draw_text_ex(
                         "Removed",
+                        100.,
+                        100.,
+                        TextParams {
+                            font: Some(&assets::FONT),
+                            font_size: 100 as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
+                EmployeeState::Suicide => {
+                    draw_text_ex(
+                        "Killing himself",
                         100.,
                         100.,
                         TextParams {

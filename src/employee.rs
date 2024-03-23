@@ -23,6 +23,15 @@ use crate::assets;
 
 use crate::qte::QteEffect;
 
+const SPOT_X: [f32; 4] = [450., 650., 750., 950.];
+const MIDDLE_SPOT_X: [f32; 4] = [400., 700., 700., 1000.];
+const SPOT_Y: [f32; 4] = [175., 265., 472., 551.];
+const MIDDLE_LANE: f32 = 350.;
+const WINDOW_X: f32 = 1120.;
+const OPEN_WINDOW_X: f32 = 1000.;
+const DOOR_X: f32 = 370.;
+
+#[derive(Clone, Copy, Debug)]
 pub enum DoorState {
     /// The door is open
     Open,
@@ -43,16 +52,13 @@ pub struct Office {
 
 impl Office {
     pub fn new() -> Self {
-        let spot_x = [450., 647., 743., 951.];
-        let spot_y = [175., 265., 472., 551.];
-
         let computer_diff_with_spot_x = [60., -70., 65., -80.];
 
-        let available_computers = spot_x
+        let available_computers = SPOT_X
             .iter()
             .enumerate()
             .flat_map(|(i, &x)| {
-                spot_y.iter().map(move |&y| {
+                SPOT_Y.iter().map(move |&y| {
                     Rc::new(RefCell::new(Computer::new(
                         Vec2::new(x + computer_diff_with_spot_x[i], y),
                         Vec2::new(x, y),
@@ -192,10 +198,16 @@ impl Office {
 
         let mut generated_money = 0.;
 
+        if self.iter_employees().any(|x| x.get_pos().x > OPEN_WINDOW_X) {
+            self.window_open = true;
+        } else {
+            self.window_open = false;
+        }
+
         self.employees.retain(|e| {
             let mut e_borrow = e.borrow_mut();
 
-            generated_money += e_borrow.tick();
+            generated_money += e_borrow.tick(self.door_state);
 
             if let EmployeeState::Clean = e_borrow.state {
                 removed_employees.push(e.clone());
@@ -248,6 +260,7 @@ const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
 pub const EMPLOYEE_RADIUS: f32 = 50.;
 const EMPLOYEE_SPEED: f32 = 1.;
+const EMPLOYEE_RUNNING_SPEED: f32 = 3.;
 
 const BONUS_METH_COST: f32 = 1000.;
 
@@ -299,6 +312,8 @@ pub enum EmployeeState {
     Dead,
     /// Employee thrown out of window
     Falling,
+    /// Employee goes to the window
+    Suicide,
     /// Internal state for when the entity can be removed from the world
     Clean,
 }
@@ -330,6 +345,7 @@ pub struct Employee {
     computer: Rc<RefCell<Computer>>,
     rotation: f32,
     state: EmployeeState,
+    movment_step: usize,
     pub action: EmployeeAction,
     pub emitter: Emitter,
 }
@@ -368,21 +384,21 @@ impl Employee {
             hope_factor: rand::gen_range(0.7, 1.3),
             energy_factor: rand::gen_range(0.7, 1.3),
             satiety_factor: rand::gen_range(0.7, 1.3),
-            position: Vec2::new(300., 350.),
+            position: Vec2::new(300., MIDDLE_LANE),
             computer,
             rotation: 0.,
             state: EmployeeState::Alive,
+            movment_step: 0,
             action: EmployeeAction::None,
             emitter,
         }
     }
 
     #[must_use]
-    pub fn tick(&mut self) -> f32 {
+    pub fn tick(&mut self, door_state: DoorState) -> f32 {
         if let EmployeeState::Clean = self.state {
             return 0.;
         }
-
         self.satisfaction -= BASE_DECAY_RATE * self.satisfaction_factor;
         self.hope -= BASE_DECAY_RATE * self.hope_factor * 2.;
         self.energy -= BASE_DECAY_RATE * self.energy_factor;
@@ -412,43 +428,190 @@ impl Employee {
             self.state = EmployeeState::Dead
         }
 
+        if self.hope == 0. && self.movment_step == 3 {
+            self.state = EmployeeState::Suicide;
+            if self.movment_step == 3 {
+                self.movment_step = 0;
+            }
+        }
+
+        if (self.satisfaction == 0. || self.hope == 1.) && self.movment_step == 3 {
+            self.movment_step = 4;
+        }
+
         let spot = self.computer.borrow().spot;
 
-        match self.position.x.total_cmp(&spot.x) {
-            std::cmp::Ordering::Less => {
-                if (spot.x - self.position.x) <= EMPLOYEE_SPEED {
-                    self.position.x = spot.x;
-                } else {
-                    self.position.x += EMPLOYEE_SPEED;
-                    self.rotation = 0.;
+        if let EmployeeState::Alive = self.state {
+            let index_x = SPOT_X.iter().position(|x: &f32| *x == spot.x).unwrap();
+
+            match self.movment_step {
+                0 => {
+                    if self.position.x > MIDDLE_SPOT_X[index_x] {
+                        self.position.x = MIDDLE_SPOT_X[index_x];
+                        self.movment_step += 1;
+                    } else {
+                        self.position.x += EMPLOYEE_SPEED;
+                        self.rotation = 0.;
+                    }
                 }
+                1 => {
+                    if spot.y < MIDDLE_LANE {
+                        if self.position.y > spot.y {
+                            self.position.y -= EMPLOYEE_SPEED;
+                            self.rotation = -PI / 2.;
+                        } else {
+                            self.position.y = spot.y;
+                            self.movment_step += 1;
+                        }
+                    } else {
+                        if self.position.y < spot.y {
+                            self.position.y += EMPLOYEE_SPEED;
+                            self.rotation = PI / 2.;
+                        } else {
+                            self.position.y = spot.y;
+                            self.movment_step += 1;
+                        }
+                    }
+                }
+                2 => {
+                    if index_x % 2 == 0 {
+                        if self.position.x < spot.x {
+                            self.position.x += EMPLOYEE_SPEED;
+                            self.rotation = 0.;
+                        } else {
+                            self.position.x = spot.x;
+                            self.movment_step += 1;
+                        }
+                    } else {
+                        if self.position.x > spot.x {
+                            self.position.x -= EMPLOYEE_SPEED;
+                            self.rotation = PI;
+                        } else {
+                            self.position.x = spot.x;
+                            self.movment_step += 1;
+                        }
+                    }
+                }
+                3 => self.position = spot,
+                4 => {
+                    if index_x % 2 == 0 {
+                        if self.position.x > MIDDLE_SPOT_X[index_x] {
+                            self.position.x -= EMPLOYEE_RUNNING_SPEED;
+                            self.rotation = PI;
+                        } else {
+                            self.position.x = MIDDLE_SPOT_X[index_x];
+                            self.movment_step += 1;
+                        }
+                    } else {
+                        if self.position.x < MIDDLE_SPOT_X[index_x] {
+                            self.position.x += EMPLOYEE_RUNNING_SPEED;
+                            self.rotation = 0.;
+                        } else {
+                            self.position.x = MIDDLE_SPOT_X[index_x];
+                            self.movment_step += 1;
+                        }
+                    }
+                }
+                5 => {
+                    if spot.y < MIDDLE_LANE {
+                        if self.position.y < MIDDLE_LANE {
+                            self.position.y += EMPLOYEE_RUNNING_SPEED;
+                            self.rotation = PI / 2.;
+                        } else {
+                            self.position.y = MIDDLE_LANE;
+                            self.movment_step += 1;
+                        }
+                    } else {
+                        if self.position.y > MIDDLE_LANE {
+                            self.position.y -= EMPLOYEE_RUNNING_SPEED;
+                            self.rotation = -PI / 2.;
+                        } else {
+                            self.position.y = spot.y;
+                            self.movment_step += 1;
+                        }
+                    }
+                }
+                6 => {
+                    if self.position.x > DOOR_X {
+                        self.position.x -= EMPLOYEE_RUNNING_SPEED;
+                        self.rotation = PI
+                    } else if let DoorState::Open = door_state {
+                        self.movment_step += 1;
+                    } else if self.hope < 1. && self.satisfaction > 0. {
+                        self.movment_step = 0
+                    } else {
+                        self.position.x = DOOR_X;
+                    }
+                }
+                7 => {
+                    if self.position.x > 250. {
+                        self.position.x -= EMPLOYEE_RUNNING_SPEED;
+                    } else {
+                        self.position.x = 250.;
+                        self.movment_step += 1;
+                    }
+                }
+                8 => {
+                    self.rotation = -PI / 2.;
+                    self.position.y -= EMPLOYEE_RUNNING_SPEED;
+                    if self.position.y < 0. {
+                        self.clean();
+                    }
+                }
+                _ => (),
             }
-            std::cmp::Ordering::Equal => match self.position.y.total_cmp(&spot.y) {
-                std::cmp::Ordering::Less => {
-                    if (spot.y - self.position.y) <= EMPLOYEE_SPEED {
-                        self.position.y = spot.y;
+        } else if let EmployeeState::Suicide = self.state {
+            let index_x = SPOT_X.iter().position(|x: &f32| *x == spot.x).unwrap();
+
+            match self.movment_step {
+                0 => {
+                    if index_x % 2 == 0 {
+                        if self.position.x > MIDDLE_SPOT_X[index_x] {
+                            self.position.x -= EMPLOYEE_SPEED;
+                            self.rotation = PI;
+                        } else {
+                            self.position.x = MIDDLE_SPOT_X[index_x];
+                            self.movment_step += 1;
+                        }
                     } else {
-                        self.position.y += EMPLOYEE_SPEED;
-                        self.rotation = PI / 2.;
+                        if self.position.x < MIDDLE_SPOT_X[index_x] {
+                            self.position.x += EMPLOYEE_SPEED;
+                            self.rotation = 0.;
+                        } else {
+                            self.position.x = MIDDLE_SPOT_X[index_x];
+                            self.movment_step += 1;
+                        }
                     }
                 }
-                std::cmp::Ordering::Equal => (),
-                std::cmp::Ordering::Greater => {
-                    if (self.position.y - spot.y) <= EMPLOYEE_SPEED {
-                        self.position.y = spot.y;
+                1 => {
+                    if spot.y < MIDDLE_LANE {
+                        if self.position.y < MIDDLE_LANE {
+                            self.position.y += EMPLOYEE_SPEED;
+                            self.rotation = PI / 2.;
+                        } else {
+                            self.position.y = MIDDLE_LANE;
+                            self.movment_step += 1;
+                        }
                     } else {
-                        self.position.y -= EMPLOYEE_SPEED;
-                        self.rotation = 3. * PI / 2.;
+                        if self.position.y > MIDDLE_LANE {
+                            self.position.y -= EMPLOYEE_SPEED;
+                            self.rotation = -PI / 2.;
+                        } else {
+                            self.position.y = spot.y;
+                            self.movment_step += 1;
+                        }
                     }
                 }
-            },
-            std::cmp::Ordering::Greater => {
-                if (self.position.x - spot.x) <= EMPLOYEE_SPEED {
-                    self.position.x = spot.x;
-                } else {
-                    self.position.x -= EMPLOYEE_SPEED;
-                    self.rotation = PI;
+                2 => {
+                    if self.position.x < WINDOW_X {
+                        self.position.x += EMPLOYEE_SPEED;
+                        self.rotation = 0.
+                    } else {
+                        self.position.x = WINDOW_X;
+                        self.movment_step += 1;
+                    }
                 }
+                _ => (),
             }
         }
 
