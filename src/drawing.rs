@@ -1007,6 +1007,29 @@ impl Drawing {
                     );
                 }
             }
+        } else {
+            draw_text_ex(
+                "Sélectionnez un employé pour",
+                100.,
+                300.,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: 100 as u16,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
+            draw_text_ex(
+                "voir ses informations.",
+                100.,
+                400.,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: 100 as u16,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            );
         }
     }
 
