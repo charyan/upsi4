@@ -44,13 +44,20 @@ impl Office {
         let spot_x = [450., 647., 743., 951.];
         let spot_y = [175., 265., 472., 551.];
 
+        let computer_diff_with_spot_x = [60., -70., 65., -80.];
+
         let available_computers = spot_x
             .iter()
-            .flat_map(|&x| {
+            .enumerate()
+            .flat_map(|(i, &x)| {
                 spot_y.iter().map(move |&y| {
                     Rc::new(RefCell::new(Computer::new(
-                        Vec2::new(0., 0.),
+                        Vec2::new(x + computer_diff_with_spot_x[i], y),
                         Vec2::new(x, y),
+                        match i % 2 {
+                            0 => PI / 2.,
+                            _ => -PI / 2.,
+                        },
                     )))
                 })
             })
@@ -218,17 +225,19 @@ pub const EMPLOYEE_RADIUS: f32 = 50.;
 const EMPLOYEE_SPEED: f32 = 1.;
 
 pub struct Computer {
-    position: Vec2,
-    brocken: bool,
-    spot: Vec2,
+    pub position: Vec2,
+    pub broken: bool,
+    pub spot: Vec2,
+    pub rotation: f32,
 }
 
 impl Computer {
-    pub fn new(position: Vec2, spot: Vec2) -> Self {
+    pub fn new(position: Vec2, spot: Vec2, rotation: f32) -> Self {
         Self {
             position,
-            brocken: false,
+            broken: false,
             spot,
+            rotation,
         }
     }
 }

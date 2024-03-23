@@ -364,6 +364,28 @@ impl Drawing {
             },
         );
 
+        // Draw the computers
+        for c in game.get_office().iter_computers() {
+            let computer = c.borrow();
+            let texture: &Texture2D = if computer.broken {
+                &assets::COMPUTER_BROKEN_TEXTURE
+            } else {
+                &assets::COMPUTER_TEXTURE
+            };
+
+            draw_texture_ex(
+                texture,
+                computer.position.x - 25.0,
+                computer.position.y - 25.0,
+                WHITE,
+                DrawTextureParams {
+                    rotation: computer.rotation,
+                    dest_size: Some(Vec2::new(50.0, 50.0)),
+                    ..Default::default()
+                },
+            );
+        }
+
         for mut e in game.get_office().iter_employees_mut() {
             draw_texture_ex(
                 &assets::EMPLOYEE_TEXTURE,

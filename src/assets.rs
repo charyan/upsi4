@@ -52,4 +52,12 @@ lazy_static! {
         include_bytes!("../assets/office/window.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref COMPUTER_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/computer.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref COMPUTER_BROKEN_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/computer_broken.png"),
+        Some(ImageFormat::Png),
+    );
 }
