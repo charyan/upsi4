@@ -347,13 +347,28 @@ impl Drawing {
         )
     }
 
+    fn draw_frame_qte(&self) {
+        draw_texture_ex(
+            &assets::FRAME_MAGENTA_TEXTURE,
+            0.,
+            0.,
+            WHITE,
+            DrawTextureParams {
+                source: None,
+                rotation: 0.0,
+                dest_size: Some(Vec2::new(INFO_WIDTH as f32, INFO_HEIGHT as f32)),
+                ..Default::default()
+            },
+        )
+    }
+
     fn draw_info(&self, game: &Game) {
         set_camera(&self.camera_info);
         clear_background(WHITE);
         let main_pos = Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
 
         if let Some(qte) = game.get_qte_ongoing() {
-            self.draw_frame();
+            self.draw_frame_qte();
 
             for (i, text) in qte.get_text().split("\n").enumerate() {
                 draw_text_ex(

@@ -18,6 +18,10 @@ lazy_static! {
         include_bytes!("../assets/gui/qte_frame.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref FRAME_MAGENTA_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/qte_frame_red.png"),
+        Some(ImageFormat::Png),
+    );
     pub static ref FONT: Font =
         load_ttf_font_from_bytes(include_bytes!("../assets/gui/OpenSans-Medium.ttf")).unwrap();
     pub static ref Z_TEXTURE: Texture2D = Texture2D::from_file_with_format(
