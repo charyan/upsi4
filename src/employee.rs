@@ -42,14 +42,6 @@ pub enum DoorState {
     _Broken,
 }
 
-#[derive(Clone, Copy)]
-pub enum GameState {
-    Running,
-    GameOver,
-    MyLittleOfficeMenu,
-    CrunchSimulatorMenu,
-}
-
 pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
@@ -57,7 +49,6 @@ pub struct Office {
     money: f32,
     door_state: DoorState,
     window_open: bool,
-    game_state: GameState,
 }
 
 impl Office {
@@ -69,7 +60,6 @@ impl Office {
             money: 100.,
             door_state: DoorState::Open,
             window_open: false,
-            game_state: GameState::MyLittleOfficeMenu,
         };
 
         new.start();
@@ -102,7 +92,6 @@ impl Office {
         self.money = 100.;
         self.door_state = DoorState::Open;
         self.window_open = false;
-        self.game_state = GameState::Running;
     }
 
     pub fn add_employee(&mut self) {
@@ -257,15 +246,15 @@ impl Office {
                 }
             }
         }
+    }
 
+    pub fn is_game_over(&self) -> bool {
         let non_dead_employees_count = self
             .iter_employees()
             .filter(|e| !matches!(e.state, EmployeeState::Dead))
             .count();
 
-        if non_dead_employees_count == 0 || self.money < 0. {
-            self.game_state = GameState::GameOver;
-        }
+        non_dead_employees_count == 0 || self.money < 0.
     }
 
     pub fn window_is_open(&self) -> bool {
