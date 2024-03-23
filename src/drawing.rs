@@ -413,16 +413,16 @@ impl Drawing {
                 },
             );
 
-            draw_rectangle(50., 825., 400., 50., LIGHTGRAY);
+            draw_rectangle(50., 825., 400., 50., WHITE);
             draw_rectangle(
-                50. + get_time() as f32 - game.starting_time_qte,
+                50. + (get_time() as f32 - game.starting_time_qte) / qte.get_time() * 400.,
                 825.,
-                400.,
+                400. - (get_time() as f32 - game.starting_time_qte) / qte.get_time() * 400.,
                 50.,
                 LIGHTGRAY,
             );
 
-            draw_rectangle_lines(50., 825., 400., 50., 12., BLACK)
+            draw_rectangle_lines(50., 825., 400., 50., 12., BLACK);
         } else {
             if let Some(_) = game.get_office().get_selected_employee() {
                 if self.rect_personnal_stat.contains(main_pos) {
