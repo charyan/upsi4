@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 
 use crate::{
     assets,
-    employee::{DoorState, EmployeeAction, EmployeeState, EMPLOYEE_RADIUS},
+    employee::{DoorState, EmployeeAction, EmployeeState, EMPLOYEE_RADIUS, MIDDLE_LANE},
     Game,
 };
 
@@ -395,7 +395,15 @@ impl Drawing {
                 WHITE,
                 DrawTextureParams {
                     rotation: e.get_rotation(),
-                    dest_size: Some(Vec2::new(100.0, 100.0)),
+                    dest_size: if let EmployeeState::Falling = e.get_state() {
+                        let scale = 100.0
+                            - (e.get_pos().y - MIDDLE_LANE) / (OFFICE_HEIGHT as f32 - MIDDLE_LANE)
+                                * 100.
+                            + 50.;
+                        Some(Vec2::new(scale, scale))
+                    } else {
+                        Some(Vec2::new(100.0, 100.0))
+                    },
                     ..Default::default()
                 },
             );

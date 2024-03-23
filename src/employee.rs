@@ -19,17 +19,18 @@ use macroquad::{
     rand::{self, gen_range},
 };
 
-use crate::assets;
+use crate::{assets, drawing::OFFICE_HEIGHT};
 
 use crate::qte::QteEffect;
 
 const SPOT_X: [f32; 4] = [450., 650., 750., 950.];
 const MIDDLE_SPOT_X: [f32; 4] = [400., 700., 700., 1000.];
 const SPOT_Y: [f32; 4] = [175., 265., 472., 551.];
-const MIDDLE_LANE: f32 = 350.;
-const WINDOW_X: f32 = 1120.;
+pub const MIDDLE_LANE: f32 = 350.;
+const WINDOW_X: f32 = 1090.;
 const OPEN_WINDOW_X: f32 = 1000.;
 const DOOR_X: f32 = 370.;
+const SPEED_FALL: f32 = 10.;
 
 #[derive(Clone, Copy, Debug)]
 pub enum DoorState {
@@ -548,7 +549,7 @@ impl Employee {
                             self.position.y -= EMPLOYEE_RUNNING_SPEED;
                             self.rotation = -PI / 2.;
                         } else {
-                            self.position.y = spot.y;
+                            self.position.y = MIDDLE_LANE;
                             self.movment_step += 1;
                         }
                     }
@@ -559,7 +560,7 @@ impl Employee {
                         self.rotation = PI
                     } else if let DoorState::Open = door_state {
                         self.movment_step += 1;
-                    } else if self.hope < 1. && self.satisfaction > 0. {
+                    } else if self.hope < 0.9 && self.satisfaction > 0.1 {
                         self.movment_step = 0
                     } else {
                         self.position.x = DOOR_X;
@@ -634,6 +635,12 @@ impl Employee {
                     }
                 }
                 _ => (),
+            }
+        } else if let EmployeeState::Falling = self.state {
+            if self.position.y < OFFICE_HEIGHT as f32 + 50. {
+                self.position += vec2(21., 84.) / SPEED_FALL;
+            } else {
+                self.clean();
             }
         }
 
