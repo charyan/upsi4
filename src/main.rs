@@ -191,7 +191,7 @@ async fn main() {
                 if drawing.get_button_door().contains(pos) {
                     game.get_mut_office().update_door();
                 } else if drawing.get_button_meth().contains(pos) {
-                    println!("Button meth pressed");
+                    game.get_mut_office().bonus_meth();
                 } else if drawing.get_button_rh().contains(pos) {
                     game.get_mut_office().bonus_rh();
                 }

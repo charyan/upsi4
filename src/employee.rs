@@ -179,6 +179,14 @@ impl Office {
         self.employees.len()
     }
 
+    pub fn bonus_meth(&mut self) {
+        if self.money >= BONUS_RH_COST {
+            self.money -= BONUS_RH_COST;
+
+            self.apply_qte_effect(&QteEffect::new(0.3, 0.3, 0.3, -0.3, 0, 0));
+        }
+    }
+
     pub fn tick(&mut self) {
         let mut removed_employees = Vec::new();
 
@@ -238,6 +246,8 @@ const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
 pub const EMPLOYEE_RADIUS: f32 = 50.;
 const EMPLOYEE_SPEED: f32 = 1.;
+
+const BONUS_RH_COST: i64 = 1000;
 
 fn feueur_particles() -> particles::EmitterConfig {
     particles::EmitterConfig {
