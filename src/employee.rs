@@ -625,10 +625,14 @@ impl Employee {
 
         // TODO ! return generated amount of money
         if let EmployeeState::Alive = self.state {
-            if self.satisfaction == 1. {
-                0.01
+            if self.computer.borrow().broken {
+                0.
             } else {
-                0.1
+                if self.satisfaction == 1. {
+                    0.01
+                } else {
+                    0.1
+                }
             }
         } else {
             0.
