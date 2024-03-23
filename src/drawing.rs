@@ -75,6 +75,7 @@ pub struct Drawing {
     // Texture
     employee_texture: Texture2D,
     office_texture: Texture2D,
+    frame_texture: Texture2D,
 }
 
 impl Drawing {
@@ -145,6 +146,11 @@ impl Drawing {
             Some(ImageFormat::Png),
         );
 
+        let frame_texture = Texture2D::from_file_with_format(
+            include_bytes!("../assets/gui/qte_frame.png"),
+            Some(ImageFormat::Png),
+        );
+
         Self {
             main_render_target,
             render_target_office,
@@ -204,6 +210,7 @@ impl Drawing {
 
             employee_texture,
             office_texture,
+            frame_texture,
         }
     }
 
@@ -270,10 +277,28 @@ impl Drawing {
         }
     }
 
+    fn draw_frame(&self) {
+        draw_texture_ex(
+            &self.frame_texture,
+            0.,
+            0.,
+            WHITE,
+            DrawTextureParams {
+                source: None,
+                rotation: 0.0,
+                dest_size: Some(Vec2::new(INFO_WIDTH as f32, INFO_HEIGHT as f32)),
+                ..Default::default()
+            },
+        )
+    }
+
     fn draw_info(&self, game: &Game) {
         set_camera(&self.camera_info);
         clear_background(WHITE);
         let main_pos = Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
+
+        self.draw_frame();
+
         if let Some(_) = game.get_office().get_selected_employee() {
             if self.rect_personnal_stat.contains(main_pos) {
                 let stat_pos = self.convert_main_personnal_stat(main_pos);
