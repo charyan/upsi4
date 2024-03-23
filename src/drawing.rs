@@ -333,7 +333,7 @@ impl Drawing {
                     FONT_SIZE_INFO + 10.,
                     100. + i as f32 * FONT_SIZE_INFO + 10.,
                     TextParams {
-                        font: Some(&self.font),
+                        font: Some(&assets::FONT),
                         font_size: FONT_SIZE_INFO as u16,
                         color: BLACK,
                         ..Default::default()
@@ -364,7 +364,7 @@ impl Drawing {
                 self.button_choice_1.y + (self.button_choice_1.h / 2.) - FONT_SIZE_INFO / 2.
                     + FONT_SIZE_INFO as f32,
                 TextParams {
-                    font: Some(&self.font),
+                    font: Some(&assets::FONT),
                     font_size: FONT_SIZE_INFO as u16,
                     color: BLACK,
                     ..Default::default()
@@ -377,7 +377,7 @@ impl Drawing {
                     + self.button_choice_2.x,
                 self.button_choice_2.y + (self.button_choice_2.h / 2.) - FONT_SIZE_INFO / 2.,
                 TextParams {
-                    font: Some(&self.font),
+                    font: Some(&assets::FONT),
                     font_size: FONT_SIZE_INFO as u16,
                     color: BLACK,
                     ..Default::default()
@@ -394,7 +394,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -408,7 +408,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -422,7 +422,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -436,7 +436,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -450,7 +450,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -464,7 +464,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -478,7 +478,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -492,7 +492,7 @@ impl Drawing {
                                 FONT_SIZE_INFO + 10.,
                                 100. + i as f32 * FONT_SIZE_INFO + 10.,
                                 TextParams {
-                                    font: Some(&self.font),
+                                    font: Some(&assets::FONT),
                                     font_size: FONT_SIZE_INFO as u16,
                                     color: BLACK,
                                     ..Default::default()
@@ -512,7 +512,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -526,7 +526,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
@@ -540,7 +540,7 @@ impl Drawing {
                             FONT_SIZE_INFO + 10.,
                             100. + i as f32 * FONT_SIZE_INFO + 10.,
                             TextParams {
-                                font: Some(&self.font),
+                                font: Some(&assets::FONT),
                                 font_size: FONT_SIZE_INFO as u16,
                                 color: BLACK,
                                 ..Default::default()
