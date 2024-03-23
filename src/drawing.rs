@@ -301,6 +301,7 @@ impl Drawing {
     pub fn convert_screen_main(coords: Vec2) -> Vec2 {
         let height = screen_width() / 16. * 9.;
         let y = (screen_height() - height) / 2.;
+
         vec2(
             ((coords.x - 0.) / screen_width()) * GAME_WINDOW_WIDTH as f32,
             ((coords.y - y) / height) * GAME_WINDOW_HEIGHT as f32,
@@ -311,12 +312,51 @@ impl Drawing {
         let x = GAME_WINDOW_WIDTH as f32 * 0.3;
         let width = GAME_WINDOW_WIDTH as f32 * 0.69;
 
-        let height = GAME_WINDOW_HEIGHT as f32 * 0.69;
         let y = GAME_WINDOW_HEIGHT as f32 * 0.3;
+        let height = GAME_WINDOW_HEIGHT as f32 * 0.69;
 
         vec2(
             ((main_coords.x - x) / width) * OFFICE_WIDTH as f32,
             ((main_coords.y - y) / height) * OFFICE_HEIGHT as f32,
+        )
+    }
+
+    pub fn convert_main_info(&self, main_coords: Vec2) -> Vec2 {
+        let x = GAME_WINDOW_WIDTH as f32 * 0.01;
+        let width = GAME_WINDOW_WIDTH as f32 * 0.28;
+
+        let y = GAME_WINDOW_HEIGHT as f32 * 0.3;
+        let height = GAME_WINDOW_HEIGHT as f32 * 0.69;
+
+        vec2(
+            ((main_coords.x - x) / width) * INFO_WIDTH as f32,
+            ((main_coords.y - y) / height) * INFO_HEIGHT as f32,
+        )
+    }
+
+    pub fn convert_main_personnal_stat(&self, main_coords: Vec2) -> Vec2 {
+        let x = GAME_WINDOW_WIDTH as f32 * 0.01;
+        let width = GAME_WINDOW_WIDTH as f32 * 0.28;
+
+        let y = GAME_WINDOW_HEIGHT as f32 * 0.01;
+        let height = GAME_WINDOW_HEIGHT as f32 * 0.28;
+
+        vec2(
+            ((main_coords.x - x) / width) * PERSONNAL_STAT_WIDTH as f32,
+            ((main_coords.y - y) / height) * PERSONNAL_STAT_HEIGHT as f32,
+        )
+    }
+
+    pub fn convert_main_global_stat(&self, main_coords: Vec2) -> Vec2 {
+        let x = GAME_WINDOW_WIDTH as f32 * 0.3;
+        let width = GAME_WINDOW_WIDTH as f32 * 0.69;
+
+        let y = GAME_WINDOW_HEIGHT as f32 * 0.01;
+        let height = GAME_WINDOW_HEIGHT as f32 * 0.28;
+
+        vec2(
+            ((main_coords.x - x) / width) * GLOBAL_STAT_WIDTH as f32,
+            ((main_coords.y - y) / height) * GLOBAL_STAT_HEIGHT as f32,
         )
     }
 
