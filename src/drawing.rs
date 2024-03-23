@@ -1,3 +1,5 @@
+use std::default;
+
 use macroquad::prelude::*;
 
 use crate::{
@@ -22,14 +24,22 @@ pub const INFO_HEIGHT: u32 = 1000;
 
 pub const ANIMATION_SPEED: f32 = 0.1;
 
-const DESCRIPTION_BUTTON_HOPE: &str = "Laissez votre employée faire un appel vidéo avec sa famille";
-const DESCRIPTION_BUTTON_ENERGY: &str = "Laissez votre employée dormir";
-const DESCRIPTION_BUTTON_SATISFACTION: &str = "Laissez votre employée faire une pause";
-const DESCRIPTION_BUTTON_SATIETY: &str = "Laissez votre employée manger";
+const FONT_SIZE_INFO: f32 = 35.;
 
-const DESCRIPTION_BUTTON_DOOR: &str = "Ouvrez la porte à vos employée";
-const DESCRIPTION_BUTTON_METH: &str = "Donnez un coup de pouce à vos employée";
-const DESCRIPTION_BUTTON_RH: &str = "Recrutez un employée utile";
+const DESCRIPTION_BUTTON_HOPE: &str = "Laissez votre employée\nfaire un appel vidéo\navec sa famille.\n\nMais attention !\nLes relations sociales\nne participe pas\nà l'avancement du \nprojet.";
+const DESCRIPTION_BUTTON_ENERGY: &str =
+    "Laissez votre employée\ndormir.\n\nMais attention !\nDormir est une\nperte de temps.";
+const DESCRIPTION_BUTTON_SATISFACTION: &str = "Laissez votre employée\nfaire une pause.\n\nMais attention !\nLes pauses ne sont\nabsolument pas\nnécessaire à\nl'avancement du projet.";
+const DESCRIPTION_BUTTON_SATIETY: &str = "Laissez votre employée\nmanger.\nMais attention !\n\nSeule la nourriture\nspirituelle qu'est le\ntravail devrait\nleur suffire.";
+
+const DESCRIPTION_BUTTON_DOOR: &str = "Ouvrez la porte à vos\nemployée";
+const DESCRIPTION_BUTTON_METH: &str = "Donnez un coup de \npouce à vos employée";
+const DESCRIPTION_BUTTON_RH: &str = "Recrutez un employée\nvraiment utile";
+
+const DESCRIPTION_HOPE: &str = "Hope";
+const DESCRIPTION_SATISFACTION: &str = "Statisfaction";
+const DESCRIPTION_SATIETY: &str = "Satiety";
+const DESCRIPTION_ENERGY: &str = "Energy";
 
 fn lerp(start: f32, end: f32, t: f32) -> f32 {
     start.mul_add(1.0 - t, end * t)
@@ -72,10 +82,17 @@ pub struct Drawing {
     rect_personnal_stat: Rect,
     rect_global_stat: Rect,
 
+    // Bar stat
+    bar_satisfaction: Rect,
+    bar_energy: Rect,
+    bar_satiety: Rect,
+    bar_hope: Rect,
+
     // Texture
     employee_texture: Texture2D,
     office_texture: Texture2D,
     frame_texture: Texture2D,
+    font: Font,
 }
 
 impl Drawing {
@@ -151,6 +168,9 @@ impl Drawing {
             Some(ImageFormat::Png),
         );
 
+        let font =
+            load_ttf_font_from_bytes(include_bytes!("../assets/gui/OpenSans-Medium.ttf")).unwrap();
+
         Self {
             main_render_target,
             render_target_office,
@@ -182,6 +202,12 @@ impl Drawing {
             button_global_meth: Rect::new(350., 400., 200., 200.),
             button_global_rh: Rect::new(650., 400., 200., 200.),
 
+            //Bar stats
+            bar_satisfaction: Rect::new(100., 100., 1000., 100.),
+            bar_energy: Rect::new(100., 300., 1000., 100.),
+            bar_satiety: Rect::new(100., 500., 1000., 100.),
+            bar_hope: Rect::new(100., 700., 1000., 100.),
+
             //Render rect
             rect_office: Rect::new(
                 GAME_WINDOW_WIDTH as f32 * 0.3,
@@ -211,6 +237,7 @@ impl Drawing {
             employee_texture,
             office_texture,
             frame_texture,
+            font,
         }
     }
 
@@ -314,13 +341,61 @@ impl Drawing {
             if self.rect_personnal_stat.contains(main_pos) {
                 let stat_pos = self.convert_main_personnal_stat(main_pos);
                 if self.button_personnal_energy.contains(stat_pos) {
-                    draw_text(DESCRIPTION_BUTTON_ENERGY, 100., 100., 50., BLACK);
+                    for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
                 } else if self.button_personnal_hope.contains(stat_pos) {
-                    draw_text(DESCRIPTION_BUTTON_HOPE, 100., 100., 50., BLACK);
+                    for (i, text) in DESCRIPTION_BUTTON_HOPE.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
                 } else if self.button_personnal_satiety.contains(stat_pos) {
-                    draw_text(DESCRIPTION_BUTTON_SATIETY, 100., 100., 50., BLACK);
+                    for (i, text) in DESCRIPTION_BUTTON_SATIETY.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
                 } else if self.button_personnal_satisfaction.contains(stat_pos) {
-                    draw_text(DESCRIPTION_BUTTON_SATISFACTION, 100., 100., 50., BLACK);
+                    for (i, text) in DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
                 }
             }
         }
@@ -328,11 +403,47 @@ impl Drawing {
         if self.rect_global_stat.contains(main_pos) {
             let global_pos = self.convert_main_global_stat(main_pos);
             if self.button_global_door.contains(global_pos) {
-                draw_text(DESCRIPTION_BUTTON_DOOR, 100., 100., 50., BLACK);
+                for (i, text) in DESCRIPTION_BUTTON_DOOR.split("\n").enumerate() {
+                    draw_text_ex(
+                        text,
+                        FONT_SIZE_INFO + 10.,
+                        100. + i as f32 * FONT_SIZE_INFO + 10.,
+                        TextParams {
+                            font: Some(&self.font),
+                            font_size: FONT_SIZE_INFO as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
             } else if self.button_global_meth.contains(global_pos) {
-                draw_text(DESCRIPTION_BUTTON_METH, 100., 100., 50., BLACK);
+                for (i, text) in DESCRIPTION_BUTTON_METH.split("\n").enumerate() {
+                    draw_text_ex(
+                        text,
+                        FONT_SIZE_INFO + 10.,
+                        100. + i as f32 * FONT_SIZE_INFO + 10.,
+                        TextParams {
+                            font: Some(&self.font),
+                            font_size: FONT_SIZE_INFO as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
             } else if self.button_global_rh.contains(global_pos) {
-                draw_text(DESCRIPTION_BUTTON_RH, 100., 100., 50., BLACK);
+                for (i, text) in DESCRIPTION_BUTTON_RH.split("\n").enumerate() {
+                    draw_text_ex(
+                        text,
+                        FONT_SIZE_INFO + 10.,
+                        100. + i as f32 * FONT_SIZE_INFO + 10.,
+                        TextParams {
+                            font: Some(&self.font),
+                            font_size: FONT_SIZE_INFO as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
             }
         }
     }
@@ -341,35 +452,57 @@ impl Drawing {
         set_camera(&self.camera_personnal_stat);
         clear_background(WHITE);
 
-        let bar_width_max: f32 = 1000.;
-
         if let Some(selected_employee) = game.get_office().get_selected_employee() {
-            draw_rectangle(100., 100., bar_width_max, 100., LIGHTGRAY);
-            draw_rectangle(100., 300., bar_width_max, 100., LIGHTGRAY);
-            draw_rectangle(100., 500., bar_width_max, 100., LIGHTGRAY);
-            draw_rectangle(100., 700., bar_width_max, 100., LIGHTGRAY);
+            draw_rectangle(
+                self.bar_satisfaction.x,
+                self.bar_satisfaction.y,
+                self.bar_satisfaction.w,
+                self.bar_satisfaction.h,
+                LIGHTGRAY,
+            );
+            draw_rectangle(
+                self.bar_energy.x,
+                self.bar_energy.y,
+                self.bar_energy.w,
+                self.bar_energy.h,
+                LIGHTGRAY,
+            );
+            draw_rectangle(
+                self.bar_satiety.x,
+                self.bar_satiety.y,
+                self.bar_satiety.w,
+                self.bar_satiety.h,
+                LIGHTGRAY,
+            );
+            draw_rectangle(
+                self.bar_hope.x,
+                self.bar_hope.y,
+                self.bar_hope.w,
+                self.bar_hope.h,
+                LIGHTGRAY,
+            );
 
             self.displayed_satisfaction = lerp(
                 self.displayed_satisfaction,
-                selected_employee.as_ref().borrow().get_satisfaction() * bar_width_max,
+                selected_employee.as_ref().borrow().get_satisfaction() * self.bar_satisfaction.w,
                 ANIMATION_SPEED,
             );
 
             self.displayed_energy = lerp(
                 self.displayed_energy,
-                selected_employee.as_ref().borrow().get_energy() * bar_width_max,
+                selected_employee.as_ref().borrow().get_energy() * self.bar_energy.w,
                 ANIMATION_SPEED,
             );
 
             self.displayed_hope = lerp(
                 self.displayed_hope,
-                selected_employee.as_ref().borrow().get_hope() * bar_width_max,
+                selected_employee.as_ref().borrow().get_hope() * self.bar_hope.w,
                 ANIMATION_SPEED,
             );
 
             self.displayed_satiety = lerp(
                 self.displayed_satiety,
-                selected_employee.as_ref().borrow().get_satiety() * bar_width_max,
+                selected_employee.as_ref().borrow().get_satiety() * self.bar_satiety.w,
                 ANIMATION_SPEED,
             );
 
@@ -431,22 +564,31 @@ impl Drawing {
     fn draw_global_stat(&self, game: &Game) {
         set_camera(&self.camera_global_stat);
         clear_background(WHITE);
-        draw_text(
+        draw_text_ex(
             &format!(
                 "Employees : {}",
                 game.get_office().employees_count().to_string()
             ),
             50.,
             100.,
-            100.,
-            BLACK,
+            TextParams {
+                font: Some(&self.font),
+                font_size: 100 as u16,
+                color: BLACK,
+                ..Default::default()
+            },
         );
-        draw_text(
+
+        draw_text_ex(
             &format!("Money : {}", game.get_office().get_money()),
             50.,
             200.,
-            100.,
-            BLACK,
+            TextParams {
+                font: Some(&self.font),
+                font_size: 100 as u16,
+                color: BLACK,
+                ..Default::default()
+            },
         );
 
         draw_rectangle(
