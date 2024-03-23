@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use macroquad_particles::{self as particles, BlendMode, Emitter, EmitterConfig};
+use macroquad_particles::{self as particles, AtlasConfig, BlendMode, Emitter, EmitterConfig};
 
 use std::{
     cell::{Ref, RefCell, RefMut},
@@ -165,6 +165,14 @@ impl Office {
             .chain(self.employees.iter().map(|e| e.borrow().computer.clone()))
     }
 
+    pub fn iter_computers_mut(&self) -> impl Iterator<Item = Rc<RefCell<Computer>>> + '_ {
+        self.available_computers.iter().cloned().chain(
+            self.employees
+                .iter()
+                .map(|e| e.borrow_mut().computer.clone()),
+        )
+    }
+
     pub fn employees_count(&self) -> usize {
         self.employees.len()
     }
@@ -224,20 +232,42 @@ const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 pub const EMPLOYEE_RADIUS: f32 = 50.;
 const EMPLOYEE_SPEED: f32 = 1.;
 
+fn feueur_particles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 0.4,
+        lifetime_randomness: 0.1,
+        amount: 10,
+        initial_direction_spread: 0.5,
+        initial_velocity: 300.0,
+        atlas: Some(AtlasConfig::new(4, 4, 8..)),
+        size: 10.0,
+        blend_mode: BlendMode::Additive,
+        ..Default::default()
+    }
+}
+
 pub struct Computer {
     pub position: Vec2,
     pub broken: bool,
     pub spot: Vec2,
     pub rotation: f32,
+    pub emitter: Emitter,
 }
 
 impl Computer {
     pub fn new(position: Vec2, spot: Vec2, rotation: f32) -> Self {
+        let emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: Some(assets::FEUER_TEXTURE.clone()),
+            ..feueur_particles()
+        });
+
         Self {
             position,
             broken: false,
             spot,
             rotation,
+            emitter,
         }
     }
 }

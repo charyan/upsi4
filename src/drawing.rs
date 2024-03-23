@@ -365,8 +365,8 @@ impl Drawing {
         );
 
         // Draw the computers
-        for c in game.get_office().iter_computers() {
-            let computer = c.borrow();
+        for c in game.get_office().iter_computers_mut() {
+            let mut computer = c.borrow_mut();
             let texture: &Texture2D = if computer.broken {
                 &assets::COMPUTER_BROKEN_TEXTURE
             } else {
@@ -386,6 +386,7 @@ impl Drawing {
             );
         }
 
+        // Draw employees
         for mut e in game.get_office().iter_employees_mut() {
             draw_texture_ex(
                 &assets::EMPLOYEE_TEXTURE,
@@ -425,6 +426,16 @@ impl Drawing {
                 }
             }
         }
+
+        // Draw fire on broken computers
+        game.get_office()
+            .iter_computers_mut()
+            .filter(|c| c.borrow().broken)
+            .for_each(|c| {
+                let mut computer = c.borrow_mut();
+                let pos = computer.position;
+                computer.emitter.draw(pos);
+            });
     }
 
     fn draw_frame(&self) {

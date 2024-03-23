@@ -80,4 +80,8 @@ lazy_static! {
         include_bytes!("../assets/office/computer_broken.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref FEUER_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/feuer.png"),
+        Some(ImageFormat::Png),
+    );
 }
