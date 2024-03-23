@@ -408,6 +408,9 @@ impl Drawing {
                 },
             );
 
+            let x = e.get_pos().x;
+            let y = e.get_pos().y;
+
             if matches!(e.get_state(), EmployeeState::Dead) {
                 draw_texture_ex(
                     &assets::X_TEXTURE,
@@ -421,13 +424,11 @@ impl Drawing {
                     },
                 );
             } else if matches!(e.action, EmployeeAction::Sleep) {
-                let x = e.get_pos().x;
-                let y = e.get_pos().y;
                 e.z_emitter.draw(vec2(x, y));
             } else if matches!(e.get_state(), EmployeeState::Suicide) {
-                let x = e.get_pos().x;
-                let y = e.get_pos().y;
                 e.cry_emitter.draw(vec2(x, y));
+            } else if e.is_happy() {
+                e.happy_emitter.draw(vec2(x, y));
             }
         }
 

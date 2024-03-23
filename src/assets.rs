@@ -88,4 +88,8 @@ lazy_static! {
         include_bytes!("../assets/office/cry.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref HAPPY_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/office/happy.png"),
+        Some(ImageFormat::Png),
+    );
 }
