@@ -28,12 +28,56 @@ struct Game {
     next_time_qte: f32,
     answer: Option<String>,
     starting_time_answer: f32,
+    qtes: Vec<QTE>,
 }
 
 impl Game {
     pub fn new() -> Self {
         let mut new_office = Office::new();
         new_office.add_employee();
+        let qtes = vec![
+            QTE::new(
+                "Voulez vous tuer\nun employée ?".to_owned(),
+                QteEffect::new(0., 0., 0., 0., 0, -1),
+                QteEffect::new(0., 0., 0., 0., 1, 0),
+                "Oui".to_owned(),
+                "Non".to_owned(),
+                "Il est mort".to_owned(),
+                "Il est pas mort".to_owned(),
+                3.,
+            ),
+            QTE::new(
+                "Voulez vous perdre\nde l'argent ?".to_owned(),
+                QteEffect::new(0., 0., 0., 0., -10000, 0),
+                QteEffect::new(0., 0., 0., 0., 0, 0),
+                "Oui".to_owned(),
+                "Non".to_owned(),
+                "Vous êtes con".to_owned(),
+                "Bravo".to_owned(),
+                3.,
+            ),
+            QTE::new(
+                "Voulez vous recevoir\nun super bonus ?".to_owned(),
+                QteEffect::new(1., 1., 1., 1., 0, 0),
+                QteEffect::new(0., 0., 0., 0., 0, 0),
+                "Oui".to_owned(),
+                "Non".to_owned(),
+                "Bravo".to_owned(),
+                "Tant pis".to_owned(),
+                3.,
+            ),
+            QTE::new(
+                "Voulez vous ?".to_owned(),
+                QteEffect::new(0., 0., 0., 0., 0, 0),
+                QteEffect::new(0., 0., 0., 0., 0, 0),
+                "Oui".to_owned(),
+                "Non".to_owned(),
+                "Ah".to_owned(),
+                "Oh".to_owned(),
+                3.,
+            ),
+        ];
+
         Self {
             office: new_office,
             qte_ongoing: None,
@@ -42,6 +86,7 @@ impl Game {
             starting_time_answer: 0.,
             next_time_qte: MAX_PERIOD_WITHOUT_QTE,
             answer: None,
+            qtes,
         }
     }
 
@@ -85,17 +130,9 @@ impl Game {
 
     pub fn launch_qte(&mut self) -> Option<QTE> {
         self.starting_time_qte = get_time() as f32;
+        let choosed = rand::gen_range(0, self.qtes.len() - 1);
 
-        Some(QTE::new(
-            "Voulez vous tuer\nun employée ?".to_owned(),
-            QteEffect::new(0., 0., 0., 0., 0, -1),
-            QteEffect::new(0., 0., 0., 0., 1, 0),
-            "Oui".to_owned(),
-            "Non".to_owned(),
-            "Il est mort".to_owned(),
-            "Il est pas mort".to_owned(),
-            3.,
-        ))
+        Some(self.qtes[choosed].clone())
     }
 
     pub fn quit_qte(&mut self, answer: String) {
