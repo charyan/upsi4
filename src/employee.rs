@@ -183,6 +183,10 @@ impl Employee {
         self.energy = self.energy.clamp(0., 1.);
         self.satiety = self.satiety.clamp(0., 1.);
 
+        if self.energy == 0. {
+            self.action = EmployeeAction::Sleep
+        }
+
         if self.satiety == 0. {
             self.state = EmployeeState::Dead
         }
@@ -225,7 +229,12 @@ impl Employee {
             }
         }
 
-        1 // TODO ! return generated amount of money
+        // TODO ! return generated amount of money
+        if let EmployeeState::Alive = self.state {
+            1
+        } else {
+            0
+        }
     }
 
     pub fn get_satisfaction(&self) -> f32 {
