@@ -4,7 +4,7 @@ pub struct QteEffect {
     pub energy_delta: f32,
     pub satiety_delta: f32,
     pub hope_delta: f32,
-    pub money_delta: i64,
+    pub money_delta: f32,
     pub employee_delta: i64,
 }
 
@@ -14,7 +14,7 @@ impl QteEffect {
         energy_delta: f32,
         satiety_delta: f32,
         hope_delta: f32,
-        money_delta: i64,
+        money_delta: f32,
         employee_delta: i64,
     ) -> Self {
         Self {

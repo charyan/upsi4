@@ -12,7 +12,7 @@ const NAMES: &[&str] = &[
     "Edsger", "Stephano", "Olivier", "Mathieu", "Valérie", "Roland", "Tom",
 ];
 
-const BONUS_RH_COST: i64 = 1000;
+const BONUS_RH_COST: f32 = 1000.;
 
 use macroquad::{
     math::Vec2,
@@ -36,7 +36,7 @@ pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
     selected_employee: Option<Rc<RefCell<Employee>>>,
-    money: i64,
+    money: f32,
     door_state: DoorState,
     window_open: bool,
 }
@@ -69,7 +69,7 @@ impl Office {
             available_computers,
             employees: Vec::new(),
             selected_employee: None,
-            money: 100,
+            money: 100.,
             door_state: DoorState::Open,
             window_open: false,
         }
@@ -183,14 +183,14 @@ impl Office {
         if self.money >= BONUS_METH_COST {
             self.money -= BONUS_METH_COST;
 
-            self.apply_qte_effect(&QteEffect::new(0.3, 0.3, 0.3, -0.3, 0, 0));
+            self.apply_qte_effect(&QteEffect::new(0.3, 0.3, 0.3, -0.3, 0., 0));
         }
     }
 
     pub fn tick(&mut self) {
         let mut removed_employees = Vec::new();
 
-        let mut generated_money = 0;
+        let mut generated_money = 0.;
 
         self.employees.retain(|e| {
             let mut e_borrow = e.borrow_mut();
@@ -231,7 +231,7 @@ impl Office {
         &self.door_state
     }
 
-    pub fn get_money(&self) -> i64 {
+    pub fn get_money(&self) -> f32 {
         self.money
     }
 
@@ -249,7 +249,7 @@ const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 pub const EMPLOYEE_RADIUS: f32 = 50.;
 const EMPLOYEE_SPEED: f32 = 1.;
 
-const BONUS_METH_COST: i64 = 1000;
+const BONUS_METH_COST: f32 = 1000.;
 
 fn feueur_particles() -> particles::EmitterConfig {
     particles::EmitterConfig {
@@ -350,7 +350,7 @@ fn sleep_particles() -> particles::EmitterConfig {
 
 impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
-        let mut emitter = Emitter::new(EmitterConfig {
+        let emitter = Emitter::new(EmitterConfig {
             local_coords: false,
             texture: Some(assets::Z_TEXTURE.clone()),
             ..sleep_particles()
@@ -378,13 +378,13 @@ impl Employee {
     }
 
     #[must_use]
-    pub fn tick(&mut self) -> i64 {
+    pub fn tick(&mut self) -> f32 {
         if let EmployeeState::Clean = self.state {
-            return 0;
+            return 0.;
         }
 
         self.satisfaction -= BASE_DECAY_RATE * self.satisfaction_factor;
-        self.hope -= BASE_DECAY_RATE * self.hope_factor;
+        self.hope -= BASE_DECAY_RATE * self.hope_factor * 2.;
         self.energy -= BASE_DECAY_RATE * self.energy_factor;
         self.satiety -= BASE_DECAY_RATE * self.satiety_factor;
 
@@ -454,9 +454,13 @@ impl Employee {
 
         // TODO ! return generated amount of money
         if let EmployeeState::Alive = self.state {
-            1
+            if self.satisfaction == 1. {
+                0.01
+            } else {
+                0.1
+            }
         } else {
-            0
+            0.
         }
     }
 

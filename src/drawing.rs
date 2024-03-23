@@ -366,7 +366,7 @@ impl Drawing {
 
         // Draw the computers
         for c in game.get_office().iter_computers_mut() {
-            let mut computer = c.borrow_mut();
+            let computer = c.borrow();
             let texture: &Texture2D = if computer.broken {
                 &assets::COMPUTER_BROKEN_TEXTURE
             } else {
@@ -1052,7 +1052,7 @@ impl Drawing {
         );
 
         draw_text_ex(
-            &format!("Money : {}", game.get_office().get_money()),
+            &format!("Money : {}", game.get_office().get_money().round()),
             700.,
             100.,
             TextParams {

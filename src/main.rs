@@ -38,8 +38,8 @@ impl Game {
         let qtes = vec![
             QTE::new(
                 "Voulez vous tuer\nun employée ?".to_owned(),
-                QteEffect::new(0., 0., 0., 0., 0, -1),
-                QteEffect::new(0., 0., 0., 0., 1, 0),
+                QteEffect::new(0., 0., 0., 0., 0., -1),
+                QteEffect::new(0., 0., 0., 0., 1., 0),
                 "Oui".to_owned(),
                 "Non".to_owned(),
                 "Il est mort".to_owned(),
@@ -48,8 +48,8 @@ impl Game {
             ),
             QTE::new(
                 "Voulez vous perdre\nde l'argent ?".to_owned(),
-                QteEffect::new(0., 0., 0., 0., -10000, 0),
-                QteEffect::new(0., 0., 0., 0., 0, 0),
+                QteEffect::new(0., 0., 0., 0., -10000., 0),
+                QteEffect::new(0., 0., 0., 0., 0., 0),
                 "Oui".to_owned(),
                 "Non".to_owned(),
                 "Vous êtes con".to_owned(),
@@ -58,8 +58,8 @@ impl Game {
             ),
             QTE::new(
                 "Voulez vous recevoir\nun super bonus ?".to_owned(),
-                QteEffect::new(1., 1., 1., 1., 0, 0),
-                QteEffect::new(0., 0., 0., 0., 0, 0),
+                QteEffect::new(1., 1., 1., 1., 0., 0),
+                QteEffect::new(0., 0., 0., 0., 0., 0),
                 "Oui".to_owned(),
                 "Non".to_owned(),
                 "Bravo".to_owned(),
@@ -68,8 +68,8 @@ impl Game {
             ),
             QTE::new(
                 "Voulez vous ?".to_owned(),
-                QteEffect::new(0., 0., 0., 0., 0, 0),
-                QteEffect::new(0., 0., 0., 0., 0, 0),
+                QteEffect::new(0., 0., 0., 0., 0., 0),
+                QteEffect::new(0., 0., 0., 0., 0., 0),
                 "Oui".to_owned(),
                 "Non".to_owned(),
                 "Ah".to_owned(),
