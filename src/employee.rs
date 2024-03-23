@@ -30,8 +30,8 @@ pub struct Office {
 
 impl Office {
     pub fn new() -> Self {
-        let spot_x = [450., 600., 720., 860.];
-        let spot_y = [175., 265., 435., 530.];
+        let spot_x = [450., 647., 743., 951.];
+        let spot_y = [175., 265., 472., 551.];
 
         let available_computers = spot_x
             .iter()
