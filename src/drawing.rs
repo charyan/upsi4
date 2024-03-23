@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
 use crate::{
-    assets,
+    assets::{self},
     employee::{EmployeeAction, EMPLOYEE_RADIUS},
     Game,
 };
@@ -65,6 +65,7 @@ pub struct Drawing {
     displayed_satiety: f32,
     displayed_satisfaction: f32,
     displayed_energy: f32,
+    displayed_qte_time: f32,
 
     // Button personnal
     button_personnal_hope: Rect,
@@ -171,6 +172,7 @@ impl Drawing {
             displayed_hope: 0.,
             displayed_satiety: 0.,
             displayed_satisfaction: 0.,
+            displayed_qte_time: 0.,
 
             // Button personnal
             button_personnal_satisfaction: Rect::new(1200., 75., 300., 150.),
@@ -263,6 +265,14 @@ impl Drawing {
 
     pub fn get_button_door(&self) -> &Rect {
         &self.button_global_door
+    }
+
+    pub fn get_button_choice_1(&self) -> &Rect {
+        &self.button_choice_1
+    }
+
+    pub fn get_button_choice_2(&self) -> &Rect {
+        &self.button_choice_2
     }
 
     fn draw_office(&self, game: &Game) {
@@ -377,9 +387,9 @@ impl Drawing {
                 qte.get_choice1(),
                 (self.button_choice_1.w - FONT_SIZE_INFO * qte.get_choice1().len() as f32) / 2.
                     + self.button_choice_1.x
-                    + FONT_SIZE_INFO as f32,
+                    + FONT_SIZE_INFO / 2.,
                 self.button_choice_1.y + (self.button_choice_1.h / 2.) - FONT_SIZE_INFO / 2.
-                    + FONT_SIZE_INFO as f32,
+                    + FONT_SIZE_INFO / 2.,
                 TextParams {
                     font: Some(&assets::FONT),
                     font_size: FONT_SIZE_INFO as u16,
@@ -391,8 +401,10 @@ impl Drawing {
             draw_text_ex(
                 qte.get_choice2(),
                 (self.button_choice_2.w - FONT_SIZE_INFO * qte.get_choice2().len() as f32) / 2.
-                    + self.button_choice_2.x,
-                self.button_choice_2.y + (self.button_choice_2.h / 2.) - FONT_SIZE_INFO / 2.,
+                    + self.button_choice_2.x
+                    + FONT_SIZE_INFO / 2.,
+                self.button_choice_2.y + (self.button_choice_2.h / 2.) - FONT_SIZE_INFO / 2.
+                    + FONT_SIZE_INFO / 2.,
                 TextParams {
                     font: Some(&assets::FONT),
                     font_size: FONT_SIZE_INFO as u16,
@@ -400,10 +412,21 @@ impl Drawing {
                     ..Default::default()
                 },
             );
+
+            draw_rectangle(50., 825., 400., 50., LIGHTGRAY);
+            draw_rectangle(
+                50. + get_time() as f32 - game.starting_time_qte,
+                825.,
+                400.,
+                50.,
+                LIGHTGRAY,
+            );
+
+            draw_rectangle_lines(50., 825., 400., 50., 12., BLACK)
         } else {
             if let Some(_) = game.get_office().get_selected_employee() {
                 if self.rect_personnal_stat.contains(main_pos) {
-                    let stat_pos = self.convert_main_personnal_stat(main_pos);
+                    let stat_pos = Self::convert_main_personnal_stat(main_pos);
                     if self.button_personnal_energy.contains(stat_pos) {
                         for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
                             draw_text_ex(
@@ -521,7 +544,7 @@ impl Drawing {
             }
 
             if self.rect_global_stat.contains(main_pos) {
-                let global_pos = self.convert_main_global_stat(main_pos);
+                let global_pos = Self::convert_main_global_stat(main_pos);
                 if self.button_global_door.contains(global_pos) {
                     for (i, text) in DESCRIPTION_BUTTON_DOOR.split("\n").enumerate() {
                         draw_text_ex(
@@ -651,6 +674,39 @@ impl Drawing {
                     draw_rectangle(100., 500., self.displayed_satiety, 100., BLUE);
 
                     draw_rectangle(100., 700., self.displayed_hope, 100., GREEN);
+
+                    draw_rectangle_lines(
+                        self.bar_satisfaction.x,
+                        self.bar_satisfaction.y,
+                        self.bar_satisfaction.w,
+                        self.bar_satisfaction.h,
+                        35.,
+                        BLACK,
+                    );
+                    draw_rectangle_lines(
+                        self.bar_energy.x,
+                        self.bar_energy.y,
+                        self.bar_energy.w,
+                        self.bar_energy.h,
+                        35.,
+                        BLACK,
+                    );
+                    draw_rectangle_lines(
+                        self.bar_satiety.x,
+                        self.bar_satiety.y,
+                        self.bar_satiety.w,
+                        self.bar_satiety.h,
+                        35.,
+                        BLACK,
+                    );
+                    draw_rectangle_lines(
+                        self.bar_hope.x,
+                        self.bar_hope.y,
+                        self.bar_hope.w,
+                        self.bar_hope.h,
+                        35.,
+                        BLACK,
+                    );
 
                     draw_rectangle(
                         self.button_personnal_satiety.x,
@@ -894,7 +950,7 @@ impl Drawing {
         )
     }
 
-    pub fn convert_main_info(&self, main_coords: Vec2) -> Vec2 {
+    pub fn convert_main_info(main_coords: Vec2) -> Vec2 {
         let x = GAME_WINDOW_WIDTH as f32 * 0.01;
         let width = GAME_WINDOW_WIDTH as f32 * 0.28;
 
@@ -907,7 +963,7 @@ impl Drawing {
         )
     }
 
-    pub fn convert_main_personnal_stat(&self, main_coords: Vec2) -> Vec2 {
+    pub fn convert_main_personnal_stat(main_coords: Vec2) -> Vec2 {
         let x = GAME_WINDOW_WIDTH as f32 * 0.01;
         let width = GAME_WINDOW_WIDTH as f32 * 0.28;
 
@@ -920,7 +976,7 @@ impl Drawing {
         )
     }
 
-    pub fn convert_main_global_stat(&self, main_coords: Vec2) -> Vec2 {
+    pub fn convert_main_global_stat(main_coords: Vec2) -> Vec2 {
         let x = GAME_WINDOW_WIDTH as f32 * 0.3;
         let width = GAME_WINDOW_WIDTH as f32 * 0.69;
 

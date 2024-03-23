@@ -113,12 +113,20 @@ async fn main() {
                 game.get_mut_office().click(pos);
                 drawing.reset_displayed();
 
+                if let Some(qte) = game.get_qte_ongoing().clone() {
+                    if drawing.get_button_choice_1().contains(pos) {
+                        game.get_mut_office().apply_qte_effect(qte.get_effect_1());
+                    } else if drawing.get_button_choice_2().contains(pos) {
+                        game.get_mut_office().apply_qte_effect(qte.get_effect_2());
+                    }
+                }
+
                 println!("Office pos : {:?}", pos);
             } else if drawing.get_rect_info().contains(main_pos) {
-                let pos = drawing.convert_main_info(main_pos);
+                let pos = Drawing::convert_main_info(main_pos);
                 println!("Info pos : {:?}", pos);
             } else if drawing.get_rect_global_stat().contains(main_pos) {
-                let pos = drawing.convert_main_global_stat(main_pos);
+                let pos = Drawing::convert_main_global_stat(main_pos);
                 println!("Drawing pos : {:?}", pos);
 
                 if drawing.get_button_door().contains(pos) {
@@ -129,7 +137,7 @@ async fn main() {
                     println!("Button rh pressed");
                 }
             } else if drawing.get_rect_personnal_stat().contains(main_pos) {
-                let pos = drawing.convert_main_personnal_stat(main_pos);
+                let pos = Drawing::convert_main_personnal_stat(main_pos);
                 println!("personnal pos : {:?}", pos);
 
                 if let Some(employee) = game.get_office().get_selected_employee() {

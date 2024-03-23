@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct QteEffect {
     pub satisfaction_delta: f32,
     pub energy_delta: f32,
@@ -27,6 +28,7 @@ impl QteEffect {
     }
 }
 
+#[derive(Clone)]
 pub struct QTE {
     text: String,
     effect_choice_1: QteEffect,
