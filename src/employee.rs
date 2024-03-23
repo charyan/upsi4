@@ -81,8 +81,15 @@ impl Office {
     }
 
     pub fn kill_random_employee(&mut self) {
-        if self.employees.len() > 0 {
-            self.employees[rand::gen_range(0, self.employees.len())]
+        let alive_employees = self
+            .employees
+            .iter()
+            .filter(|&e| matches!(e.borrow().state, EmployeeState::Alive))
+            .cloned()
+            .collect::<Vec<Rc<RefCell<Employee>>>>();
+
+        if alive_employees.len() > 0 {
+            alive_employees[rand::gen_range(0, self.employees.len())]
                 .borrow_mut()
                 .state = EmployeeState::Dead;
         }
