@@ -270,7 +270,7 @@ impl Drawing {
                 ..Default::default()
             },
         );
-        for e in game.get_office().iter_employees() {
+        for mut e in game.get_office().iter_employees_mut() {
             draw_texture_ex(
                 &assets::EMPLOYEE_TEXTURE,
                 e.get_pos().x - EMPLOYEE_RADIUS,
@@ -282,6 +282,15 @@ impl Drawing {
                     ..Default::default()
                 },
             );
+
+            match e.action {
+                EmployeeAction::Sleep => {
+                    let x = e.get_pos().x;
+                    let y = e.get_pos().y;
+                    e.emitter.draw(vec2(x, y));
+                }
+                _ => (),
+            }
         }
     }
 

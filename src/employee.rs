@@ -1,5 +1,8 @@
+use macroquad::prelude::*;
+use macroquad_particles::{self as particles, AtlasConfig, BlendMode, Emitter, EmitterConfig};
+
 use std::{
-    cell::{Ref, RefCell},
+    cell::{Ref, RefCell, RefMut},
     f32::consts::PI,
     rc::Rc,
 };
@@ -73,6 +76,10 @@ impl Office {
 
     pub fn iter_employees(&self) -> impl Iterator<Item = Ref<'_, Employee>> {
         self.employees.iter().map(|e| e.borrow())
+    }
+
+    pub fn iter_employees_mut(&self) -> impl Iterator<Item = RefMut<'_, Employee>> {
+        self.employees.iter().map(|e| e.borrow_mut())
     }
 
     pub fn iter_computers(&self) -> impl Iterator<Item = Rc<RefCell<Computer>>> + '_ {
@@ -186,10 +193,31 @@ pub struct Employee {
     rotation: f32,
     state: EmployeeState,
     pub action: EmployeeAction,
+    pub emitter: Emitter,
+}
+
+fn sleep_particles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 3.,
+        lifetime_randomness: 0.1,
+        amount: 3,
+        initial_direction_spread: 5.,
+        initial_velocity: 30.0,
+        atlas: None,
+        size: 15.0,
+        blend_mode: BlendMode::Additive,
+        ..Default::default()
+    }
 }
 
 impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
+        let mut emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: None, //Some(GLOBAL_Z_TEXTURE.clone()),
+            ..sleep_particles()
+        });
+
         let name = NAMES[gen_range(0, NAMES.len())].to_owned();
 
         Self {
@@ -203,6 +231,7 @@ impl Employee {
             rotation: 0.,
             state: EmployeeState::Alive,
             action: EmployeeAction::None,
+            emitter,
         }
     }
 

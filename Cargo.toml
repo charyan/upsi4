@@ -16,3 +16,4 @@ opt-level = 3
 [dependencies]
 lazy_static = "1.4.0"
 macroquad = "0.4.5"
+macroquad-particles = "0.2.1"
