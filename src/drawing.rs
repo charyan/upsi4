@@ -1,8 +1,8 @@
 use macroquad::prelude::*;
 
 use crate::{
-    assets::{self},
-    employee::{EmployeeAction, EMPLOYEE_RADIUS},
+    assets,
+    employee::{EmployeeAction, EmployeeState, EMPLOYEE_RADIUS},
     Game,
 };
 
@@ -33,6 +33,8 @@ const DESCRIPTION_BUTTON_ENERGY: &str =
     "Laissez votre employée\ndormir.\n\nMais attention !\nDormir est une\nperte de temps.";
 const DESCRIPTION_BUTTON_SATISFACTION: &str = "Laissez votre employée\nfaire une pause.\n\nMais attention !\nLes pauses ne sont\nabsolument pas\nnécessaire à\nl'avancement du projet.";
 const DESCRIPTION_BUTTON_SATIETY: &str = "Laissez votre employée\nmanger.\nMais attention !\n\nSeule la nourriture\nspirituelle qu'est le\ntravail devrait\nleur suffire.";
+
+const DESCRIPTION_BUTTON_CLEAN: &str = "Libérez de l'espace en\nvous débarassant de\nvotre employé";
 
 const DESCRIPTION_BUTTON_DOOR: &str = "Ouvrez la porte à vos\nemployée";
 const DESCRIPTION_BUTTON_METH: &str = "Donnez un coup de \npouce à vos employée";
@@ -446,137 +448,163 @@ impl Drawing {
                 );
             }
         } else {
-            if let Some(_) = game.get_office().get_selected_employee() {
-                if self.rect_personnal_stat.contains(main_pos) {
-                    let stat_pos = Self::convert_main_personnal_stat(main_pos);
-                    if self.button_personnal_energy.contains(stat_pos) {
-                        self.draw_frame();
+            if self.rect_personnal_stat.contains(main_pos) {
+                if let Some(employee) = game.get_office().get_selected_employee() {
+                    match employee.borrow().get_state() {
+                        EmployeeState::Alive => {
+                            let stat_pos = Self::convert_main_personnal_stat(main_pos);
+                            if self.button_personnal_energy.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
-                        }
-                    } else if self.button_personnal_hope.contains(stat_pos) {
-                        self.draw_frame();
+                                for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            } else if self.button_personnal_hope.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_BUTTON_HOPE.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
-                        }
-                    } else if self.button_personnal_satiety.contains(stat_pos) {
-                        self.draw_frame();
+                                for (i, text) in DESCRIPTION_BUTTON_HOPE.split("\n").enumerate() {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            } else if self.button_personnal_satiety.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_BUTTON_SATIETY.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
-                        }
-                    } else if self.button_personnal_satisfaction.contains(stat_pos) {
-                        self.draw_frame();
+                                for (i, text) in DESCRIPTION_BUTTON_SATIETY.split("\n").enumerate()
+                                {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            } else if self.button_personnal_satisfaction.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
-                        }
-                    } else if self.bar_energy.contains(stat_pos) {
-                        self.draw_frame();
+                                for (i, text) in
+                                    DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate()
+                                {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            } else if self.bar_energy.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_ENERGY.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
-                        }
-                    } else if self.bar_hope.contains(stat_pos) {
-                        self.draw_frame();
+                                for (i, text) in DESCRIPTION_ENERGY.split("\n").enumerate() {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            } else if self.bar_hope.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_HOPE.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
-                        }
-                    } else if self.bar_satiety.contains(stat_pos) {
-                        self.draw_frame();
+                                for (i, text) in DESCRIPTION_HOPE.split("\n").enumerate() {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            } else if self.bar_satiety.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_SATIETY.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
-                        }
-                    } else if self.bar_satisfaction.contains(stat_pos) {
-                        self.draw_frame();
+                                for (i, text) in DESCRIPTION_SATIETY.split("\n").enumerate() {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            } else if self.bar_satisfaction.contains(stat_pos) {
+                                self.draw_frame();
 
-                        for (i, text) in DESCRIPTION_SATISFACTION.split("\n").enumerate() {
-                            draw_text_ex(
-                                text,
-                                FONT_SIZE_INFO + 50.,
-                                300. + i as f32 * FONT_SIZE_INFO + 10.,
-                                TextParams {
-                                    font: Some(&assets::FONT),
-                                    font_size: FONT_SIZE_INFO as u16,
-                                    color: BLACK,
-                                    ..Default::default()
-                                },
-                            );
+                                for (i, text) in DESCRIPTION_SATISFACTION.split("\n").enumerate() {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 50.,
+                                        300. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            }
                         }
+                        EmployeeState::Dead => {
+                            let stat_pos = Self::convert_main_personnal_stat(main_pos);
+                            if self.button_personnal_satisfaction.contains(stat_pos) {
+                                for (i, text) in DESCRIPTION_BUTTON_CLEAN.split("\n").enumerate() {
+                                    draw_text_ex(
+                                        text,
+                                        FONT_SIZE_INFO + 10.,
+                                        100. + i as f32 * FONT_SIZE_INFO + 10.,
+                                        TextParams {
+                                            font: Some(&assets::FONT),
+                                            font_size: FONT_SIZE_INFO as u16,
+                                            color: BLACK,
+                                            ..Default::default()
+                                        },
+                                    );
+                                }
+                            }
+                        }
+                        EmployeeState::Falling | EmployeeState::Clean => (),
                     }
                 }
             }
@@ -642,21 +670,47 @@ impl Drawing {
 
         if let Some(selected_employee) = game.get_office().get_selected_employee() {
             match selected_employee.borrow().get_state() {
-                crate::employee::EmployeeState::Dead => {
-                    draw_text_ex(
-                        "Dead",
-                        100.,
-                        100.,
-                        TextParams {
-                            font: Some(&assets::FONT),
-                            font_size: 100 as u16,
-                            color: BLACK,
-                            ..Default::default()
-                        },
+                EmployeeState::Dead => {
+                    draw_rectangle(
+                        self.bar_satisfaction.x,
+                        self.bar_satisfaction.y,
+                        self.bar_satisfaction.w,
+                        self.bar_satisfaction.h,
+                        LIGHTGRAY,
                     );
+                    draw_rectangle(
+                        self.bar_energy.x,
+                        self.bar_energy.y,
+                        self.bar_energy.w,
+                        self.bar_energy.h,
+                        LIGHTGRAY,
+                    );
+                    draw_rectangle(
+                        self.bar_satiety.x,
+                        self.bar_satiety.y,
+                        self.bar_satiety.w,
+                        self.bar_satiety.h,
+                        LIGHTGRAY,
+                    );
+                    draw_rectangle(
+                        self.bar_hope.x,
+                        self.bar_hope.y,
+                        self.bar_hope.w,
+                        self.bar_hope.h,
+                        LIGHTGRAY,
+                    );
+
+                    draw_rectangle(
+                        self.button_personnal_satisfaction.x,
+                        self.button_personnal_satisfaction.y,
+                        self.button_personnal_satisfaction.w,
+                        self.button_personnal_satisfaction.h,
+                        GREEN,
+                    );
+
                     return;
                 }
-                crate::employee::EmployeeState::Alive => {
+                EmployeeState::Alive => {
                     draw_rectangle(
                         self.bar_satisfaction.x,
                         self.bar_satisfaction.y,
@@ -797,7 +851,7 @@ impl Drawing {
                         },
                     );
                 }
-                crate::employee::EmployeeState::Falling => {
+                EmployeeState::Falling => {
                     draw_text_ex(
                         "Falling",
                         100.,
@@ -810,7 +864,7 @@ impl Drawing {
                         },
                     );
                 }
-                crate::employee::EmployeeState::Remove => {
+                EmployeeState::Clean => {
                     draw_text_ex(
                         "Removed",
                         100.,
@@ -823,7 +877,6 @@ impl Drawing {
                         },
                     );
                 }
-                _ => (),
             }
         }
     }

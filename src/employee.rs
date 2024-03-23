@@ -147,7 +147,7 @@ impl Office {
 
             generated_money += e_borrow.tick();
 
-            if let EmployeeState::Remove = e_borrow.state {
+            if let EmployeeState::Clean = e_borrow.state {
                 removed_employees.push(e.clone());
                 false
             } else {
@@ -209,7 +209,7 @@ pub enum EmployeeState {
     /// Employee thrown out of window
     Falling,
     /// Internal state for when the entity can be removed from the world
-    Remove,
+    Clean,
 }
 
 #[derive(Clone, Copy)]
@@ -352,6 +352,10 @@ impl Employee {
         } else {
             0
         }
+    }
+
+    pub fn clean(&mut self) {
+        self.state = EmployeeState::Clean;
     }
 
     pub fn get_name(&self) -> &str {

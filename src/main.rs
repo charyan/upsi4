@@ -202,30 +202,40 @@ async fn main() {
                 if let Some(employee) = game.get_office().get_selected_employee() {
                     let mut employee = employee.as_ref().borrow_mut();
 
-                    if drawing.get_button_energy().contains(pos) {
-                        if let EmployeeAction::Sleep = employee.action {
-                            employee.action = EmployeeAction::None;
-                        } else {
-                            employee.action = EmployeeAction::Sleep;
+                    match employee.get_state() {
+                        employee::EmployeeState::Alive => {
+                            if drawing.get_button_energy().contains(pos) {
+                                if let EmployeeAction::Sleep = employee.action {
+                                    employee.action = EmployeeAction::None;
+                                } else {
+                                    employee.action = EmployeeAction::Sleep;
+                                }
+                            } else if drawing.get_button_hope().contains(pos) {
+                                if let EmployeeAction::FamilyCall = employee.action {
+                                    employee.action = EmployeeAction::None;
+                                } else {
+                                    employee.action = EmployeeAction::FamilyCall;
+                                }
+                            } else if drawing.get_button_satiety().contains(pos) {
+                                if let EmployeeAction::Eat = employee.action {
+                                    employee.action = EmployeeAction::None;
+                                } else {
+                                    employee.action = EmployeeAction::Eat;
+                                }
+                            } else if drawing.get_button_satisfaction().contains(pos) {
+                                if let EmployeeAction::Break = employee.action {
+                                    employee.action = EmployeeAction::None;
+                                } else {
+                                    employee.action = EmployeeAction::Break;
+                                }
+                            }
                         }
-                    } else if drawing.get_button_hope().contains(pos) {
-                        if let EmployeeAction::FamilyCall = employee.action {
-                            employee.action = EmployeeAction::None;
-                        } else {
-                            employee.action = EmployeeAction::FamilyCall;
+                        employee::EmployeeState::Dead => {
+                            if drawing.get_button_satisfaction().contains(pos) {
+                                employee.clean();
+                            }
                         }
-                    } else if drawing.get_button_satiety().contains(pos) {
-                        if let EmployeeAction::Eat = employee.action {
-                            employee.action = EmployeeAction::None;
-                        } else {
-                            employee.action = EmployeeAction::Eat;
-                        }
-                    } else if drawing.get_button_satisfaction().contains(pos) {
-                        if let EmployeeAction::Break = employee.action {
-                            employee.action = EmployeeAction::None;
-                        } else {
-                            employee.action = EmployeeAction::Break;
-                        }
+                        employee::EmployeeState::Falling | employee::EmployeeState::Clean => (),
                     }
                 }
             }
