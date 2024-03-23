@@ -42,6 +42,14 @@ pub enum DoorState {
     _Broken,
 }
 
+#[derive(Clone, Copy)]
+pub enum GameState {
+    Running,
+    GameOver,
+    MyLittleOfficeMenu,
+    CrunchSimulatorMenu,
+}
+
 pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
     employees: Vec<Rc<RefCell<Employee>>>,
@@ -49,13 +57,30 @@ pub struct Office {
     money: f32,
     door_state: DoorState,
     window_open: bool,
+    game_state: GameState,
 }
 
 impl Office {
     pub fn new() -> Self {
+        let mut new = Self {
+            available_computers: Vec::new(),
+            employees: Vec::new(),
+            selected_employee: None,
+            money: 100.,
+            door_state: DoorState::Open,
+            window_open: false,
+            game_state: GameState::MyLittleOfficeMenu,
+        };
+
+        new.start();
+
+        new
+    }
+
+    pub fn start(&mut self) {
         let computer_diff_with_spot_x = [60., -70., 65., -80.];
 
-        let available_computers = SPOT_X
+        self.available_computers = SPOT_X
             .iter()
             .enumerate()
             .flat_map(|(i, &x)| {
@@ -72,14 +97,12 @@ impl Office {
             })
             .collect::<Vec<Rc<RefCell<Computer>>>>();
 
-        Self {
-            available_computers,
-            employees: Vec::new(),
-            selected_employee: None,
-            money: 100.,
-            door_state: DoorState::Open,
-            window_open: false,
-        }
+        self.employees.clear();
+        self.selected_employee = None;
+        self.money = 100.;
+        self.door_state = DoorState::Open;
+        self.window_open = false;
+        self.game_state = GameState::Running;
     }
 
     pub fn add_employee(&mut self) {
@@ -233,6 +256,15 @@ impl Office {
                     break;
                 }
             }
+        }
+
+        let non_dead_employees_count = self
+            .iter_employees()
+            .filter(|e| !matches!(e.state, EmployeeState::Dead))
+            .count();
+
+        if non_dead_employees_count == 0 || self.money < 0. {
+            self.game_state = GameState::GameOver;
         }
     }
 
@@ -669,7 +701,6 @@ impl Employee {
             }
         }
 
-        // TODO ! return generated amount of money
         if let EmployeeState::Alive = self.state {
             if self.computer.borrow().broken || self.movment_step != 3 {
                 0.
