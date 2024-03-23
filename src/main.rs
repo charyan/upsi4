@@ -1,7 +1,9 @@
+#[warn(clippy::pedantic, clippy::nursery)]
+#[allow(clippy::cast_precision_loss)]
 mod drawing;
 mod employee;
 
-use drawing::{GAME_WINDOW_HEIGHT, GAME_WINDOW_WIDTH};
+use drawing::{Drawing, GAME_WINDOW_HEIGHT, GAME_WINDOW_WIDTH};
 use employee::Office;
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
 
@@ -41,7 +43,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut drawing = drawing::Drawing::new().await;
+    let mut drawing = drawing::Drawing::new();
     let mut game = Game::new();
 
     loop {
@@ -49,7 +51,7 @@ async fn main() {
 
         if is_mouse_button_pressed(MouseButton::Left) {
             let main_pos =
-                drawing.convert_screen_main(vec2(mouse_position().0, mouse_position().1));
+                Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
             let rect_office = Rect::new(
                 GAME_WINDOW_WIDTH as f32 * 0.3,
                 GAME_WINDOW_HEIGHT as f32 * 0.3,
@@ -59,7 +61,7 @@ async fn main() {
 
             if rect_office.contains(main_pos) {
                 game.get_mut_office()
-                    .click(drawing.convert_main_office(main_pos));
+                    .click(Drawing::convert_main_office(main_pos));
                 drawing.reset_displayed();
             }
         }

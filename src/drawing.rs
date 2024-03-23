@@ -47,7 +47,7 @@ pub struct Drawing {
 }
 
 impl Drawing {
-    pub async fn new() -> Self {
+    pub fn new() -> Self {
         // Main target
         let main_render_target = render_target(GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT);
         main_render_target.texture.set_filter(FilterMode::Nearest);
@@ -298,7 +298,7 @@ impl Drawing {
         );
     }
 
-    pub fn convert_screen_main(&self, coords: Vec2) -> Vec2 {
+    pub fn convert_screen_main(coords: Vec2) -> Vec2 {
         let height = screen_width() / 16. * 9.;
         let y = (screen_height() - height) / 2.;
         vec2(
@@ -307,7 +307,7 @@ impl Drawing {
         )
     }
 
-    pub fn convert_main_office(&self, main_coords: Vec2) -> Vec2 {
+    pub fn convert_main_office(main_coords: Vec2) -> Vec2 {
         let x = GAME_WINDOW_WIDTH as f32 * 0.3;
         let width = GAME_WINDOW_WIDTH as f32 * 0.69;
 

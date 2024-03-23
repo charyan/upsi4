@@ -85,7 +85,7 @@ impl Office {
         // Deselect dead employee
         if let Some(selected) = &self.selected_employee {
             for removed in removed_employees {
-                if Rc::ptr_eq(&removed, &selected) {
+                if Rc::ptr_eq(&removed, selected) {
                     self.selected_employee = None;
                     break;
                 }
