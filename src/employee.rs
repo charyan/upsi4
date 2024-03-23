@@ -383,6 +383,8 @@ pub struct Employee {
     pub z_emitter: Emitter,
     pub cry_emitter: Emitter,
     pub happy_emitter: Emitter,
+    pub mad1_emitter: Emitter,
+    pub mad2_emitter: Emitter,
 }
 
 fn sleep_particles() -> particles::EmitterConfig {
@@ -427,6 +429,34 @@ fn happy_particles() -> particles::EmitterConfig {
     }
 }
 
+fn mad1_particles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 2.,
+        lifetime_randomness: 0.1,
+        amount: 1,
+        initial_direction_spread: 2. * PI,
+        initial_velocity: 20.0,
+        atlas: None,
+        size: 10.0,
+        blend_mode: BlendMode::Additive,
+        ..Default::default()
+    }
+}
+
+fn mad2_particles() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 2.,
+        lifetime_randomness: 0.1,
+        amount: 3,
+        initial_direction_spread: 2. * PI,
+        initial_velocity: 20.0,
+        atlas: None,
+        size: 10.0,
+        blend_mode: BlendMode::Additive,
+        ..Default::default()
+    }
+}
+
 impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
         let mut z_emitter = Emitter::new(EmitterConfig {
@@ -445,6 +475,18 @@ impl Employee {
             local_coords: false,
             texture: Some(assets::HAPPY_TEXTURE.clone()),
             ..happy_particles()
+        });
+
+        let mut mad1_emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: Some(assets::MAD1_TEXTURE.clone()),
+            ..mad1_particles()
+        });
+
+        let mut mad2_emitter = Emitter::new(EmitterConfig {
+            local_coords: false,
+            texture: Some(assets::MAD2_TEXTURE.clone()),
+            ..mad2_particles()
         });
 
         let name = NAMES[gen_range(0, NAMES.len())].to_owned();
@@ -468,6 +510,8 @@ impl Employee {
             z_emitter,
             cry_emitter,
             happy_emitter,
+            mad1_emitter,
+            mad2_emitter,
         }
     }
 
