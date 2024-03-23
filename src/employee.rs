@@ -1,5 +1,6 @@
 use std::{
     cell::{Ref, RefCell},
+    f32::consts::PI,
     rc::Rc,
 };
 
@@ -149,6 +150,7 @@ impl Employee {
                     self.position.x = self.spot.x;
                 } else {
                     self.position.x += EMPLOYEE_SPEED;
+                    self.rotation = 0.;
                 }
             }
             std::cmp::Ordering::Equal => match self.position.y.total_cmp(&self.spot.y) {
@@ -157,6 +159,7 @@ impl Employee {
                         self.position.y = self.spot.y;
                     } else {
                         self.position.y += EMPLOYEE_SPEED;
+                        self.rotation = PI / 2.;
                     }
                 }
                 std::cmp::Ordering::Equal => (),
@@ -165,6 +168,7 @@ impl Employee {
                         self.position.y = self.spot.y;
                     } else {
                         self.position.y -= EMPLOYEE_SPEED;
+                        self.rotation = 3. * PI / 2.;
                     }
                 }
             },
@@ -173,6 +177,7 @@ impl Employee {
                     self.position.x = self.spot.x;
                 } else {
                     self.position.x -= EMPLOYEE_SPEED;
+                    self.rotation = PI;
                 }
             }
         }
