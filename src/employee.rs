@@ -9,7 +9,10 @@ const NAMES: &[&str] = &[
     "Edsger", "Stephano", "Olivier", "Mathieu", "Valérie", "Roland", "Tom",
 ];
 
-use macroquad::{math::Vec2, rand};
+use macroquad::{
+    math::Vec2,
+    rand::{self, gen_range},
+};
 
 pub struct Office {
     available_computers: Vec<Rc<RefCell<Computer>>>,
@@ -70,6 +73,14 @@ impl Office {
 
     pub fn iter_employees(&self) -> impl Iterator<Item = Ref<'_, Employee>> {
         self.employees.iter().map(|e| e.borrow())
+    }
+
+    pub fn iter_computers(&self) -> impl Iterator<Item = Rc<RefCell<Computer>>> + '_ {
+        self.available_computers
+            .iter()
+            .cloned()
+            .chain(self.employees.iter().map(|e| e.borrow().computer.clone()))
+            .map(|c| c)
     }
 
     pub fn employees_count(&self) -> usize {
@@ -165,6 +176,7 @@ pub enum EmployeeAction {
 }
 
 pub struct Employee {
+    name: String,
     satisfaction: f32,
     hope: f32,
     energy: f32,
@@ -178,7 +190,10 @@ pub struct Employee {
 
 impl Employee {
     pub fn new(computer: Rc<RefCell<Computer>>) -> Self {
+        let name = NAMES[gen_range(0, NAMES.len())].to_owned();
+
         Self {
+            name,
             satisfaction: 0.5,
             hope: 0.5,
             energy: 0.5,
