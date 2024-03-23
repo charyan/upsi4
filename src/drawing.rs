@@ -346,12 +346,12 @@ impl Drawing {
 
     fn draw_info(&self, game: &Game) {
         set_camera(&self.camera_info);
-        clear_background(TRANSPARENT);
+        clear_background(WHITE);
         let main_pos = Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
 
-        self.draw_frame();
-
         if let Some(qte) = game.get_qte_ongoing() {
+            self.draw_frame();
+
             for (i, text) in qte.get_text().split("\n").enumerate() {
                 draw_text_ex(
                     text,
@@ -422,6 +422,8 @@ impl Drawing {
 
             draw_rectangle_lines(50., 825., 400., 50., 12., BLACK);
         } else if let Some(answer) = game.get_answer() {
+            self.draw_frame();
+
             for (i, text) in answer.split("\n").enumerate() {
                 draw_text_ex(
                     text,
@@ -440,6 +442,8 @@ impl Drawing {
                 if self.rect_personnal_stat.contains(main_pos) {
                     let stat_pos = Self::convert_main_personnal_stat(main_pos);
                     if self.button_personnal_energy.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_BUTTON_ENERGY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -454,6 +458,8 @@ impl Drawing {
                             );
                         }
                     } else if self.button_personnal_hope.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_BUTTON_HOPE.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -468,6 +474,8 @@ impl Drawing {
                             );
                         }
                     } else if self.button_personnal_satiety.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_BUTTON_SATIETY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -482,6 +490,8 @@ impl Drawing {
                             );
                         }
                     } else if self.button_personnal_satisfaction.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -496,6 +506,8 @@ impl Drawing {
                             );
                         }
                     } else if self.bar_energy.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_ENERGY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -510,6 +522,8 @@ impl Drawing {
                             );
                         }
                     } else if self.bar_hope.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_HOPE.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -524,6 +538,8 @@ impl Drawing {
                             );
                         }
                     } else if self.bar_satiety.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_SATIETY.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -538,6 +554,8 @@ impl Drawing {
                             );
                         }
                     } else if self.bar_satisfaction.contains(stat_pos) {
+                        self.draw_frame();
+
                         for (i, text) in DESCRIPTION_SATISFACTION.split("\n").enumerate() {
                             draw_text_ex(
                                 text,
@@ -558,6 +576,8 @@ impl Drawing {
             if self.rect_global_stat.contains(main_pos) {
                 let global_pos = Self::convert_main_global_stat(main_pos);
                 if self.button_global_door.contains(global_pos) {
+                    self.draw_frame();
+
                     for (i, text) in DESCRIPTION_BUTTON_DOOR.split("\n").enumerate() {
                         draw_text_ex(
                             text,
@@ -572,6 +592,8 @@ impl Drawing {
                         );
                     }
                 } else if self.button_global_meth.contains(global_pos) {
+                    self.draw_frame();
+
                     for (i, text) in DESCRIPTION_BUTTON_METH.split("\n").enumerate() {
                         draw_text_ex(
                             text,
@@ -586,6 +608,8 @@ impl Drawing {
                         );
                     }
                 } else if self.button_global_rh.contains(global_pos) {
+                    self.draw_frame();
+
                     for (i, text) in DESCRIPTION_BUTTON_RH.split("\n").enumerate() {
                         draw_text_ex(
                             text,
