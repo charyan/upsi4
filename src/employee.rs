@@ -255,7 +255,7 @@ impl Office {
             .filter(|e| !matches!(e.state, EmployeeState::Dead))
             .count();
 
-        non_dead_employees_count == 0 || self.money < 0.
+        non_dead_employees_count == 0
     }
 
     pub fn window_is_open(&self) -> bool {
