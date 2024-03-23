@@ -499,4 +499,12 @@ impl Employee {
     pub fn get_state(&self) -> EmployeeState {
         self.state
     }
+
+    pub fn is_happy(&self) -> bool {
+        self.satisfaction == 1.
+    }
+
+    pub fn is_mad(&self) -> bool {
+        self.satisfaction == 0.
+    }
 }
