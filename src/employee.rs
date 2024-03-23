@@ -74,7 +74,7 @@ impl Office {
 
             generated_money += e_borrow.tick();
 
-            if e_borrow.cleaned {
+            if let EmployeeState::Remove = e_borrow.state {
                 removed_employees.push(e.clone());
                 false
             } else {
@@ -109,6 +109,28 @@ const BASE_DECAY_RATE: f32 = 0.0001;
 pub const EMPLOYEE_RADIUS: f32 = 150.;
 const EMPLOYEE_SPEED: f32 = 1.;
 
+pub enum EmployeeState {
+    /// Normal employee state
+    Alive,
+    // Dead state with option to reanimate or dispose of
+    Dead,
+    Falling,
+    /// Internal state for when the entity can be removed from the world
+    Remove,
+}
+
+pub enum EmployeeAction {
+    None,
+    /// Satisfaction
+    Break,
+    /// Satiety
+    Eat,
+    /// Energy
+    Sleep,
+    /// Hope
+    FamilyCall,
+}
+
 pub struct Employee {
     satisfaction: f32,
     hope: f32,
@@ -117,8 +139,8 @@ pub struct Employee {
     position: Vec2,
     spot: Vec2,
     rotation: f32,
-    alive: bool,
-    cleaned: bool,
+    state: EmployeeState,
+    pub action: EmployeeAction,
 }
 
 impl Employee {
@@ -131,8 +153,8 @@ impl Employee {
             position: Vec2::new(10., 45.),
             spot,
             rotation: 0.,
-            alive: true,
-            cleaned: false,
+            state: EmployeeState::Alive,
+            action: EmployeeAction::None,
         }
     }
 
@@ -147,6 +169,10 @@ impl Employee {
         self.hope = self.hope.clamp(0., 1.);
         self.energy = self.energy.clamp(0., 1.);
         self.satiety = self.satiety.clamp(0., 1.);
+
+        if self.satiety == 0. {
+            self.state = EmployeeState::Dead
+        }
 
         match self.position.x.total_cmp(&self.spot.x) {
             std::cmp::Ordering::Less => {
