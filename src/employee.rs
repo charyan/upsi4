@@ -89,7 +89,7 @@ impl Office {
             .collect::<Vec<Rc<RefCell<Employee>>>>();
 
         if alive_employees.len() > 0 {
-            alive_employees[rand::gen_range(0, self.employees.len())]
+            alive_employees[rand::gen_range(0, alive_employees.len())]
                 .borrow_mut()
                 .state = EmployeeState::Dead;
         }
