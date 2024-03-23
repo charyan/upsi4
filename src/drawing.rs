@@ -293,13 +293,30 @@ impl Drawing {
                 },
             );
 
-            match e.action {
-                EmployeeAction::Sleep => {
-                    let x = e.get_pos().x;
-                    let y = e.get_pos().y;
-                    e.emitter.draw(vec2(x, y));
+            match e.get_state() {
+                crate::employee::EmployeeState::Dead => {
+                    draw_texture_ex(
+                        &assets::X_TEXTURE,
+                        e.get_pos().x - EMPLOYEE_RADIUS / 2.,
+                        e.get_pos().y - EMPLOYEE_RADIUS / 2.,
+                        WHITE,
+                        DrawTextureParams {
+                            rotation: e.get_rotation(),
+                            dest_size: Some(Vec2::new(EMPLOYEE_RADIUS, EMPLOYEE_RADIUS)),
+                            ..Default::default()
+                        },
+                    );
                 }
-                _ => (),
+                _ => {
+                    (match e.action {
+                        EmployeeAction::Sleep => {
+                            let x = e.get_pos().x;
+                            let y = e.get_pos().y;
+                            e.emitter.draw(vec2(x, y));
+                        }
+                        _ => (),
+                    });
+                }
             }
         }
     }
@@ -557,111 +574,157 @@ impl Drawing {
         clear_background(WHITE);
 
         if let Some(selected_employee) = game.get_office().get_selected_employee() {
-            draw_rectangle(
-                self.bar_satisfaction.x,
-                self.bar_satisfaction.y,
-                self.bar_satisfaction.w,
-                self.bar_satisfaction.h,
-                LIGHTGRAY,
-            );
-            draw_rectangle(
-                self.bar_energy.x,
-                self.bar_energy.y,
-                self.bar_energy.w,
-                self.bar_energy.h,
-                LIGHTGRAY,
-            );
-            draw_rectangle(
-                self.bar_satiety.x,
-                self.bar_satiety.y,
-                self.bar_satiety.w,
-                self.bar_satiety.h,
-                LIGHTGRAY,
-            );
-            draw_rectangle(
-                self.bar_hope.x,
-                self.bar_hope.y,
-                self.bar_hope.w,
-                self.bar_hope.h,
-                LIGHTGRAY,
-            );
+            match selected_employee.borrow().get_state() {
+                crate::employee::EmployeeState::Dead => {
+                    draw_text_ex(
+                        "Dead",
+                        100.,
+                        100.,
+                        TextParams {
+                            font: Some(&assets::FONT),
+                            font_size: 100 as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                    return;
+                }
+                crate::employee::EmployeeState::Alive => {
+                    draw_rectangle(
+                        self.bar_satisfaction.x,
+                        self.bar_satisfaction.y,
+                        self.bar_satisfaction.w,
+                        self.bar_satisfaction.h,
+                        LIGHTGRAY,
+                    );
+                    draw_rectangle(
+                        self.bar_energy.x,
+                        self.bar_energy.y,
+                        self.bar_energy.w,
+                        self.bar_energy.h,
+                        LIGHTGRAY,
+                    );
+                    draw_rectangle(
+                        self.bar_satiety.x,
+                        self.bar_satiety.y,
+                        self.bar_satiety.w,
+                        self.bar_satiety.h,
+                        LIGHTGRAY,
+                    );
+                    draw_rectangle(
+                        self.bar_hope.x,
+                        self.bar_hope.y,
+                        self.bar_hope.w,
+                        self.bar_hope.h,
+                        LIGHTGRAY,
+                    );
 
-            self.displayed_satisfaction = lerp(
-                self.displayed_satisfaction,
-                selected_employee.as_ref().borrow().get_satisfaction() * self.bar_satisfaction.w,
-                ANIMATION_SPEED,
-            );
+                    self.displayed_satisfaction = lerp(
+                        self.displayed_satisfaction,
+                        selected_employee.as_ref().borrow().get_satisfaction()
+                            * self.bar_satisfaction.w,
+                        ANIMATION_SPEED,
+                    );
 
-            self.displayed_energy = lerp(
-                self.displayed_energy,
-                selected_employee.as_ref().borrow().get_energy() * self.bar_energy.w,
-                ANIMATION_SPEED,
-            );
+                    self.displayed_energy = lerp(
+                        self.displayed_energy,
+                        selected_employee.as_ref().borrow().get_energy() * self.bar_energy.w,
+                        ANIMATION_SPEED,
+                    );
 
-            self.displayed_hope = lerp(
-                self.displayed_hope,
-                selected_employee.as_ref().borrow().get_hope() * self.bar_hope.w,
-                ANIMATION_SPEED,
-            );
+                    self.displayed_hope = lerp(
+                        self.displayed_hope,
+                        selected_employee.as_ref().borrow().get_hope() * self.bar_hope.w,
+                        ANIMATION_SPEED,
+                    );
 
-            self.displayed_satiety = lerp(
-                self.displayed_satiety,
-                selected_employee.as_ref().borrow().get_satiety() * self.bar_satiety.w,
-                ANIMATION_SPEED,
-            );
+                    self.displayed_satiety = lerp(
+                        self.displayed_satiety,
+                        selected_employee.as_ref().borrow().get_satiety() * self.bar_satiety.w,
+                        ANIMATION_SPEED,
+                    );
 
-            draw_rectangle(100., 100., self.displayed_satisfaction, 100., RED);
+                    draw_rectangle(100., 100., self.displayed_satisfaction, 100., RED);
 
-            draw_rectangle(100., 300., self.displayed_energy, 100., YELLOW);
+                    draw_rectangle(100., 300., self.displayed_energy, 100., YELLOW);
 
-            draw_rectangle(100., 500., self.displayed_satiety, 100., BLUE);
+                    draw_rectangle(100., 500., self.displayed_satiety, 100., BLUE);
 
-            draw_rectangle(100., 700., self.displayed_hope, 100., GREEN);
+                    draw_rectangle(100., 700., self.displayed_hope, 100., GREEN);
 
-            draw_rectangle(
-                self.button_personnal_satiety.x,
-                self.button_personnal_satiety.y,
-                self.button_personnal_satiety.w,
-                self.button_personnal_satiety.h,
-                if let EmployeeAction::Eat = selected_employee.borrow().action {
-                    RED
-                } else {
-                    GREEN
-                },
-            );
-            draw_rectangle(
-                self.button_personnal_energy.x,
-                self.button_personnal_energy.y,
-                self.button_personnal_energy.w,
-                self.button_personnal_energy.h,
-                if let EmployeeAction::Sleep = selected_employee.borrow().action {
-                    RED
-                } else {
-                    GREEN
-                },
-            );
-            draw_rectangle(
-                self.button_personnal_satisfaction.x,
-                self.button_personnal_satisfaction.y,
-                self.button_personnal_satisfaction.w,
-                self.button_personnal_satisfaction.h,
-                if let EmployeeAction::Break = selected_employee.borrow().action {
-                    RED
-                } else {
-                    GREEN
-                },
-            );
-            draw_rectangle(
-                self.button_personnal_hope.x,
-                self.button_personnal_hope.y,
-                self.button_personnal_hope.w,
-                self.button_personnal_hope.h,
-                if let EmployeeAction::FamilyCall = selected_employee.borrow().action {
-                    RED
-                } else {
-                    GREEN
-                },
-            );
+                    draw_rectangle(
+                        self.button_personnal_satiety.x,
+                        self.button_personnal_satiety.y,
+                        self.button_personnal_satiety.w,
+                        self.button_personnal_satiety.h,
+                        if let EmployeeAction::Eat = selected_employee.borrow().action {
+                            RED
+                        } else {
+                            GREEN
+                        },
+                    );
+                    draw_rectangle(
+                        self.button_personnal_energy.x,
+                        self.button_personnal_energy.y,
+                        self.button_personnal_energy.w,
+                        self.button_personnal_energy.h,
+                        if let EmployeeAction::Sleep = selected_employee.borrow().action {
+                            RED
+                        } else {
+                            GREEN
+                        },
+                    );
+                    draw_rectangle(
+                        self.button_personnal_satisfaction.x,
+                        self.button_personnal_satisfaction.y,
+                        self.button_personnal_satisfaction.w,
+                        self.button_personnal_satisfaction.h,
+                        if let EmployeeAction::Break = selected_employee.borrow().action {
+                            RED
+                        } else {
+                            GREEN
+                        },
+                    );
+                    draw_rectangle(
+                        self.button_personnal_hope.x,
+                        self.button_personnal_hope.y,
+                        self.button_personnal_hope.w,
+                        self.button_personnal_hope.h,
+                        if let EmployeeAction::FamilyCall = selected_employee.borrow().action {
+                            RED
+                        } else {
+                            GREEN
+                        },
+                    );
+                }
+                crate::employee::EmployeeState::Falling => {
+                    draw_text_ex(
+                        "Falling",
+                        100.,
+                        100.,
+                        TextParams {
+                            font: Some(&assets::FONT),
+                            font_size: 100 as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
+                crate::employee::EmployeeState::Remove => {
+                    draw_text_ex(
+                        "Removed",
+                        100.,
+                        100.,
+                        TextParams {
+                            font: Some(&assets::FONT),
+                            font_size: 100 as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
+                _ => (),
+            }
         }
     }
 

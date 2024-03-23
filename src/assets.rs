@@ -24,4 +24,8 @@ lazy_static! {
         include_bytes!("../assets/gui/z.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref X_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/gui/x.png"),
+        Some(ImageFormat::Png),
+    );
 }

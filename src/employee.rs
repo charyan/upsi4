@@ -143,7 +143,7 @@ impl Office {
     }
 }
 
-const BASE_DECAY_RATE: f32 = 0.0001;
+const BASE_DECAY_RATE: f32 = 0.01;
 const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
 pub const EMPLOYEE_RADIUS: f32 = 50.;
