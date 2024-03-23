@@ -431,7 +431,6 @@ impl Employee {
             EmployeeAction::None => (),
             EmployeeAction::Break => {
                 self.satisfaction += REPLENISH_RATE;
-                self.computer.borrow_mut().broken = true;
             }
             EmployeeAction::Eat => self.satiety += REPLENISH_RATE,
             EmployeeAction::Sleep => self.energy += REPLENISH_RATE,
@@ -456,6 +455,10 @@ impl Employee {
             if self.movment_step == 3 {
                 self.movment_step = 0;
             }
+        }
+
+        if self.satisfaction == 0. && self.movment_step == 3 {
+            self.computer.borrow_mut().broken = true;
         }
 
         if (self.satisfaction == 0. || self.hope == 1.) && self.movment_step == 3 {
