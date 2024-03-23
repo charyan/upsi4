@@ -1,4 +1,4 @@
-use std::default;
+use std::os::linux::raw::stat;
 
 use macroquad::prelude::*;
 
@@ -384,6 +384,62 @@ impl Drawing {
                     }
                 } else if self.button_personnal_satisfaction.contains(stat_pos) {
                     for (i, text) in DESCRIPTION_BUTTON_SATISFACTION.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                } else if self.bar_energy.contains(stat_pos) {
+                    for (i, text) in DESCRIPTION_ENERGY.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                } else if self.bar_hope.contains(stat_pos) {
+                    for (i, text) in DESCRIPTION_HOPE.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                } else if self.bar_satiety.contains(stat_pos) {
+                    for (i, text) in DESCRIPTION_SATIETY.split("\n").enumerate() {
+                        draw_text_ex(
+                            text,
+                            FONT_SIZE_INFO + 10.,
+                            100. + i as f32 * FONT_SIZE_INFO + 10.,
+                            TextParams {
+                                font: Some(&self.font),
+                                font_size: FONT_SIZE_INFO as u16,
+                                color: BLACK,
+                                ..Default::default()
+                            },
+                        );
+                    }
+                } else if self.bar_satisfaction.contains(stat_pos) {
+                    for (i, text) in DESCRIPTION_SATISFACTION.split("\n").enumerate() {
                         draw_text_ex(
                             text,
                             FONT_SIZE_INFO + 10.,
