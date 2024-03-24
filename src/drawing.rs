@@ -1375,7 +1375,7 @@ impl Drawing {
         }
     }
 
-    pub fn draw_game(&self) {
+    pub fn draw_game(&self, game: &Game) {
         set_camera(&self.main_camera);
         clear_background(LIGHTGRAY);
 
@@ -1424,11 +1424,12 @@ impl Drawing {
             },
         );
 
+        let night_value = game.get_night_value();
         draw_texture_ex(
             &self.render_target_office.texture,
             GAME_WINDOW_WIDTH as f32 * 0.3,
             GAME_WINDOW_HEIGHT as f32 * 0.3,
-            WHITE,
+            Color::new(night_value, night_value, night_value, night_value),
             DrawTextureParams {
                 dest_size: Some(vec2(
                     GAME_WINDOW_WIDTH as f32 * 0.69,
@@ -1460,7 +1461,7 @@ impl Drawing {
         self.draw_personnal_stat(game);
         self.draw_office(game);
         self.draw_info(game);
-        self.draw_game();
+        self.draw_game(game);
 
         set_default_camera();
         clear_background(BLACK);

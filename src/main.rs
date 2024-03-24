@@ -25,6 +25,9 @@ const DISPLAY_ANSWER_TIME: f32 = 2.5;
 pub const DOOR_CD: f64 = 0.5;
 pub const RH_CD: f64 = 3.;
 pub const METH_CD: f64 = 5.;
+const NIGHT_SPEED: f32 = 0.001;
+
+const DAY_TIME: f64 = 5.;
 
 #[derive(Clone, Copy)]
 pub enum GameState {
@@ -32,6 +35,13 @@ pub enum GameState {
     GameOver,
     MyLittleOfficeMenu,
     CrunchSimulatorMenu,
+}
+
+enum Day {
+    Day,
+    Night,
+    Dawn,
+    Evening,
 }
 
 struct Game {
@@ -49,6 +59,9 @@ struct Game {
     rh_start_cd: f64,
     meth_start_cd: f64,
     menu: Rc<RefCell<Menu>>,
+    night_value: f32,
+    day: Day,
+    start_timer_day: f64,
 }
 
 impl Game {
@@ -217,7 +230,7 @@ impl Game {
             starting_time_qte: 0.,
             waiting_time_qte: 0.,
             starting_time_answer: 0.,
-            next_time_qte: MAX_PERIOD_WITHOUT_QTE,
+            next_time_qte: 60.,
             answer: None,
             qtes,
             rh_start_cd: 0.,
@@ -225,6 +238,9 @@ impl Game {
             door_start_cd: 0.,
             game_state: GameState::MyLittleOfficeMenu, // TODO initial state should be Game menu
             menu: Rc::new(RefCell::new(Menu::new())),
+            night_value: 1.,
+            day: Day::Day,
+            start_timer_day: 0.,
         }
     }
 
@@ -362,6 +378,35 @@ impl Game {
             GameState::Running => {
                 self.office.tick();
 
+                match self.day {
+                    Day::Evening => {
+                        if self.night_value > 0.5 {
+                            self.night_value -= NIGHT_SPEED;
+                        } else {
+                            self.day = Day::Night;
+                            self.start_timer_day = get_time()
+                        }
+                    }
+                    Day::Dawn => {
+                        if self.night_value < 1. {
+                            self.night_value += NIGHT_SPEED;
+                        } else {
+                            self.day = Day::Day;
+                            self.start_timer_day = get_time()
+                        }
+                    }
+                    Day::Day => {
+                        if get_time() - self.start_timer_day > DAY_TIME {
+                            self.day = Day::Evening;
+                        }
+                    }
+                    Day::Night => {
+                        if get_time() - self.start_timer_day > DAY_TIME {
+                            self.day = Day::Dawn;
+                        }
+                    }
+                }
+
                 if get_time() - self.door_start_cd > DOOR_CD {
                     self.door_start_cd = 0.
                 }
@@ -429,6 +474,10 @@ impl Game {
 
     pub fn get_answer(&self) -> &Option<String> {
         &self.answer
+    }
+
+    pub fn get_night_value(&self) -> f32 {
+        self.night_value
     }
 
     pub fn launch_qte(&mut self) -> Option<QTE> {
