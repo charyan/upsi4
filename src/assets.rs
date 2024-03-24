@@ -112,4 +112,20 @@ lazy_static! {
         include_bytes!("../assets/office/heart.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref CLOUD_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/cloud.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref CLOUD2_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/cloud2.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref LOGO1_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/logo1.png"),
+        Some(ImageFormat::Png),
+    );
+    pub static ref LOGO2_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/logo2.png"),
+        Some(ImageFormat::Png),
+    );
 }

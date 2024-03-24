@@ -48,6 +48,7 @@ struct Game {
     door_start_cd: f64,
     rh_start_cd: f64,
     meth_start_cd: f64,
+    menu: Rc<RefCell<Menu>>,
 }
 
 impl Game {
@@ -219,10 +220,11 @@ impl Game {
             next_time_qte: MAX_PERIOD_WITHOUT_QTE,
             answer: None,
             qtes,
-            game_state: GameState::Running, // TODO initial state should be Game menu
             rh_start_cd: 0.,
             meth_start_cd: 0.,
             door_start_cd: 0.,
+            game_state: GameState::MyLittleOfficeMenu, // TODO initial state should be Game menu
+            menu: Rc::new(RefCell::new(Menu::new())),
         }
     }
 
@@ -378,7 +380,17 @@ impl Game {
                 }
             }
             GameState::GameOver => (),
-            GameState::MyLittleOfficeMenu => (),
+            GameState::MyLittleOfficeMenu => {
+                let menu_clone = self.menu.clone();
+                let mut menu = menu_clone.borrow_mut();
+
+                menu.draw(self);
+                menu.tick(self);
+
+                if menu.game_started {
+                    self.game_state = GameState::Running;
+                }
+            }
             GameState::CrunchSimulatorMenu => (),
         }
     }
@@ -453,5 +465,230 @@ async fn main() {
         if remaining_time > 0.0 {
             wait_seconds(remaining_time).await;
         }
+    }
+}
+
+enum MenuState {
+    Start,
+    CloudDispersing,
+    CloudArriving,
+    IntroStart,
+    IntroEmployeeEnter,
+    IntroManagerWalk,
+    IntroDoor,
+    IntroManagerLeave,
+    GameStart,
+}
+struct Menu {
+    cloud1_pos: Vec2,
+    cloud2_pos: Vec2,
+    cloud1_start_pos: Vec2,
+    cloud2_start_pos: Vec2,
+    cloud1_end_pos: Vec2,
+    cloud2_end_pos: Vec2,
+    state: MenuState,
+    spawning: bool,
+    game_started: bool,
+    tick_count: u64,
+    crunch_mode: bool,
+}
+
+impl Menu {
+    pub fn new() -> Self {
+        Self {
+            cloud1_pos: vec2(0., 0.),
+            cloud2_pos: vec2(0., 0.),
+            cloud1_start_pos: vec2(0., 0.),
+            cloud2_start_pos: vec2(0., 0.),
+            cloud1_end_pos: vec2(screen_width() * 8., 0.),
+            cloud2_end_pos: vec2(-screen_width() * 8., 0.),
+            state: MenuState::Start,
+            spawning: false,
+            game_started: false,
+            tick_count: 0,
+            crunch_mode: false,
+        }
+    }
+
+    pub fn tick(&mut self, game: &mut Game) {
+        self.tick_count += 1;
+
+        match self.state {
+            MenuState::Start => {
+                if is_mouse_button_pressed(MouseButton::Left) {
+                    let rect = Rect::new(0., 0., screen_width(), screen_height());
+                    let main_pos =
+                        Drawing::convert_screen_main(vec2(mouse_position().0, mouse_position().1));
+
+                    if rect.contains(main_pos) {
+                        self.state = MenuState::CloudDispersing;
+                    }
+                }
+            }
+            MenuState::CloudDispersing => {
+                if self.cloud1_pos.x <= self.cloud1_end_pos.x {
+                    self.cloud1_pos.x += 100.;
+                }
+
+                if self.cloud2_pos.x >= self.cloud2_end_pos.x {
+                    self.cloud2_pos.x -= 100.;
+                }
+
+                if self.cloud1_pos.x >= self.cloud1_end_pos.x
+                    && self.cloud2_pos.x <= self.cloud2_end_pos.x
+                {
+                    self.state = MenuState::IntroStart;
+                }
+
+                // Spawn employees
+                if !self.spawning {
+                    self.spawning = true;
+
+                    let n = 15;
+                    let n_employees = 3;
+
+                    (0..n_employees).for_each(|_| {
+                        game.office.add_employee_intro();
+                        (0..n).for_each(|_| {
+                            game.office.tick();
+                        });
+                    });
+                }
+
+                (0..4).for_each(|_| {
+                    game.office.tick();
+                });
+            }
+            MenuState::IntroStart => {
+                println!("start");
+
+                //
+
+                self.state = MenuState::IntroEmployeeEnter;
+            }
+            MenuState::IntroEmployeeEnter => {
+                (0..4).for_each(|_| {
+                    game.office.tick();
+                });
+
+                if self.tick_count > 60 * 7 {
+                    self.state = MenuState::IntroManagerWalk;
+                }
+            }
+            MenuState::IntroManagerWalk => {
+                (0..4).for_each(|_| {
+                    game.office.tick();
+                });
+
+                if self.tick_count > 60 * 10 {
+                    self.state = MenuState::IntroDoor;
+                }
+            }
+            MenuState::IntroDoor => {
+                (0..4).for_each(|_| {
+                    game.office.tick();
+                });
+
+                if self.tick_count > 60 * 12 {
+                    game.office.update_door();
+                    self.state = MenuState::IntroManagerLeave;
+                }
+            }
+            MenuState::IntroManagerLeave => {
+                (0..4).for_each(|_| {
+                    game.office.tick();
+                });
+
+                if self.tick_count > 60 * 15 {
+                    self.state = MenuState::GameStart;
+                }
+            }
+            MenuState::GameStart => {
+                game.office.iter_employees_mut().for_each(|mut e| {
+                    e.is_state_freezed = false;
+                });
+
+                self.game_started = true;
+            }
+            MenuState::CloudArriving => {
+                if self.cloud1_pos.x >= self.cloud1_start_pos.x {
+                    self.cloud1_pos.x -= 100.;
+                }
+
+                if self.cloud2_pos.x <= self.cloud2_start_pos.x {
+                    self.cloud2_pos.x += 100.;
+                }
+
+                if self.cloud1_pos.x <= self.cloud1_start_pos.x
+                    && self.cloud2_pos.x >= self.cloud2_start_pos.x
+                {
+                    self.state = MenuState::Start;
+                }
+            }
+        }
+    }
+
+    pub fn draw(&mut self, game: &mut Game) {
+        self.draw_clouds(game);
+        if self.crunch_mode {
+            self.draw_logo2();
+        } else {
+            self.draw_logo1();
+        }
+    }
+
+    pub fn draw_logo1(&mut self) {
+        draw_texture_ex(
+            &assets::LOGO1_TEXTURE,
+            screen_width() / 2. - 200.,
+            screen_height() / 2. - 80.,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(400., 160.)),
+                ..Default::default()
+            },
+        );
+    }
+
+    pub fn draw_logo2(&mut self) {
+        draw_texture_ex(
+            &assets::LOGO2_TEXTURE,
+            screen_width() / 2. - 200.,
+            screen_height() / 2. - 80.,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(400., 160.)),
+                ..Default::default()
+            },
+        );
+    }
+
+    pub fn draw_clouds(&mut self, game: &mut Game) {
+        let c = game.drawing.clone();
+        let mut d = c.borrow_mut();
+
+        d.draw_menu(game);
+
+        draw_texture_ex(
+            &assets::CLOUD_TEXTURE,
+            -(screen_width() * (0.5)) + self.cloud1_pos.x,
+            -(screen_height() * (1.8)) + self.cloud1_pos.y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width() * 2., screen_height() * 3.)),
+                ..Default::default()
+            },
+        );
+
+        draw_texture_ex(
+            &assets::CLOUD2_TEXTURE,
+            -(screen_width() * (0.7)) + self.cloud2_pos.x,
+            -(screen_height() * (1.)) + self.cloud2_pos.y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width() * 2., screen_height() * 3.)),
+                ..Default::default()
+            },
+        );
     }
 }

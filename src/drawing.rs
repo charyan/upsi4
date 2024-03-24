@@ -63,18 +63,18 @@ fn lerp(start: f32, end: f32, t: f32) -> f32 {
 
 pub struct Drawing {
     // Render_target
-    main_render_target: RenderTarget,
+    pub main_render_target: RenderTarget,
     render_target_office: RenderTarget,
     render_target_info: RenderTarget,
     render_target_global_stat: RenderTarget,
     render_target_personnal_stat: RenderTarget,
 
     // Camera
-    main_camera: Camera2D,
-    camera_office: Camera2D,
-    camera_info: Camera2D,
-    camera_global_stat: Camera2D,
-    camera_personnal_stat: Camera2D,
+    pub main_camera: Camera2D,
+    pub camera_office: Camera2D,
+    pub camera_info: Camera2D,
+    pub camera_global_stat: Camera2D,
+    pub camera_personnal_stat: Camera2D,
 
     // Displayed
     displayed_hope: f32,
@@ -293,7 +293,173 @@ impl Drawing {
         &self.button_choice_2
     }
 
-    fn draw_office(&mut self, game: &Game) {
+    pub fn draw_office_full(&mut self, game: &Game) {
+        set_camera(&self.main_camera);
+
+        clear_background(WHITE);
+        draw_texture_ex(
+            &assets::OFFICE_TEXTURE,
+            0.,
+            0.,
+            WHITE,
+            DrawTextureParams {
+                source: None,
+                rotation: 0.0,
+                dest_size: Some(Vec2::new(1280.0, 720.0)),
+                ..Default::default()
+            },
+        );
+
+        if let DoorState::Closed = game.get_office().get_door_state() {
+            if self.door_rotation < 0.0 {
+                self.door_rotation += DOOR_SPEED
+            } else {
+                self.door_rotation = 0.0
+            }
+        } else if let DoorState::Open = game.get_office().get_door_state() {
+            if self.door_rotation > -PI / 2. {
+                self.door_rotation -= DOOR_SPEED
+            } else {
+                self.door_rotation = -PI / 2.
+            }
+        }
+
+        draw_texture_ex(
+            &assets::DOOR_TEXTURE,
+            340.,
+            320.,
+            WHITE,
+            DrawTextureParams {
+                rotation: self.door_rotation,
+                dest_size: Some(vec2(16., 85.)),
+                pivot: Some(vec2(348., 400.)),
+                ..Default::default()
+            },
+        );
+
+        self.window_rotation = lerp(
+            self.window_rotation,
+            if !game.get_office().window_is_open() {
+                0.
+            } else {
+                PI / 2.
+            },
+            WINDOW_SPEED,
+        );
+
+        draw_texture_ex(
+            &assets::WINDOW_TEXTURE,
+            1070.,
+            290.,
+            WHITE,
+            DrawTextureParams {
+                rotation: -self.window_rotation,
+                dest_size: Some(vec2(13., 70.)),
+                pivot: Some(vec2(1076.5, 290.)),
+                ..Default::default()
+            },
+        );
+
+        draw_texture_ex(
+            &assets::WINDOW_TEXTURE,
+            1070.,
+            430.,
+            WHITE,
+            DrawTextureParams {
+                rotation: self.window_rotation + PI,
+                dest_size: Some(vec2(13., 70.)),
+                pivot: Some(vec2(1076.5, 430.)),
+                ..Default::default()
+            },
+        );
+
+        // Draw the computers
+        for c in game.get_office().iter_computers_mut() {
+            let computer = c.borrow();
+            let texture: &Texture2D = if computer.broken {
+                &assets::COMPUTER_BROKEN_TEXTURE
+            } else {
+                &assets::COMPUTER_TEXTURE
+            };
+
+            draw_texture_ex(
+                texture,
+                computer.position.x - 25.0,
+                computer.position.y - 25.0,
+                WHITE,
+                DrawTextureParams {
+                    rotation: computer.rotation,
+                    dest_size: Some(Vec2::new(50.0, 50.0)),
+                    ..Default::default()
+                },
+            );
+        }
+
+        // Draw employees
+        for mut e in game.get_office().iter_employees_mut() {
+            draw_texture_ex(
+                &assets::EMPLOYEE_TEXTURE,
+                e.get_pos().x - EMPLOYEE_RADIUS,
+                e.get_pos().y - EMPLOYEE_RADIUS,
+                WHITE,
+                DrawTextureParams {
+                    rotation: e.get_rotation(),
+                    dest_size: if let EmployeeState::Falling = e.get_state() {
+                        let scale = 100.0
+                            - (e.get_pos().y - MIDDLE_LANE) / (OFFICE_HEIGHT as f32 - MIDDLE_LANE)
+                                * 100.
+                            + 50.;
+                        Some(Vec2::new(scale, scale))
+                    } else {
+                        Some(Vec2::new(100.0, 100.0))
+                    },
+                    ..Default::default()
+                },
+            );
+
+            let x = e.get_pos().x;
+            let y = e.get_pos().y;
+
+            let pos = vec2(x, y);
+
+            if e.get_satiety() < 0.2 {
+                e.hungry_emitter.draw(pos);
+            } else if e.get_satiety() > 0.8 {
+                e.z_emitter.draw(pos);
+            }
+
+            if e.get_energy() < 0.2 {
+                e.z_emitter.draw(pos);
+            } else if e.get_energy() > 0.8 {
+                e.lightning_emitter.draw(pos);
+            }
+
+            if e.get_hope() < 0.2 {
+                e.cry_emitter.draw(pos);
+            } else if e.get_hope() > 0.8 {
+                e.heart_emitter.draw(pos);
+            }
+
+            if e.get_satisfaction() < 0.2 {
+                e.mad1_emitter.draw(pos);
+                e.mad2_emitter.draw(pos);
+            } else if e.get_satisfaction() > 0.8 {
+                e.happy_emitter.draw(pos);
+            }
+        }
+
+        // Draw fire on broken computers
+        game.get_office()
+            .iter_computers_mut()
+            .filter(|c| c.borrow().broken)
+            .for_each(|c| {
+                let mut computer = c.borrow_mut();
+                let pos = computer.position;
+                computer.emitter.draw(pos);
+            });
+    }
+
+    pub fn draw_office(&mut self, game: &Game) {
         set_camera(&self.camera_office);
         clear_background(WHITE);
         draw_texture_ex(
@@ -472,7 +638,7 @@ impl Drawing {
             });
     }
 
-    fn draw_frame(&self) {
+    pub fn draw_frame(&self) {
         draw_texture_ex(
             &assets::FRAME_TEXTURE,
             0.,
@@ -1123,7 +1289,7 @@ impl Drawing {
         }
     }
 
-    fn draw_game(&self) {
+    pub fn draw_game(&self) {
         set_camera(&self.main_camera);
         clear_background(LIGHTGRAY);
 
@@ -1188,6 +1354,21 @@ impl Drawing {
         );
     }
 
+    pub fn draw_game_menu(&self) {
+        set_camera(&self.main_camera);
+
+        draw_texture_ex(
+            &self.render_target_office.texture,
+            0.,
+            0.,
+            WHITE,
+            DrawTextureParams {
+                flip_y: true,
+                ..Default::default()
+            },
+        );
+    }
+
     pub fn draw(&mut self, game: &Game) {
         self.draw_global_stat(game);
         self.draw_personnal_stat(game);
@@ -1207,6 +1388,28 @@ impl Drawing {
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(screen_width(), height)),
+                flip_y: true,
+                ..Default::default()
+            },
+        );
+    }
+
+    pub fn draw_menu(&mut self, game: &Game) {
+        self.draw_office_full(game);
+        self.draw_game_menu();
+
+        set_default_camera();
+        clear_background(BLACK);
+
+        let height = screen_width() / 16. * 9.;
+
+        draw_texture_ex(
+            &self.main_render_target.texture,
+            0.,
+            0.,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
                 flip_y: true,
                 ..Default::default()
             },

@@ -115,6 +115,22 @@ impl Office {
         }
     }
 
+    pub fn add_employee_intro(&mut self) {
+        if self.available_computers.len() > 0 {
+            let spot_index = rand::gen_range(0, self.available_computers.len());
+
+            let employee_spot = self.available_computers.remove(spot_index);
+            let mut employee = Employee::new(employee_spot);
+            employee.is_state_freezed = true;
+            employee.energy = 0.5;
+            employee.satisfaction = 0.5;
+            employee.hope = 0.5;
+            employee.satisfaction = 0.5;
+
+            self.employees.push(Rc::new(RefCell::new(employee)));
+        }
+    }
+
     pub fn get_selected_employee(&self) -> &Option<Rc<RefCell<Employee>>> {
         &self.selected_employee
     }
@@ -162,10 +178,12 @@ impl Office {
         self.money += effect.money_delta;
 
         for mut e in self.iter_employees_mut() {
-            e.energy += effect.energy_delta;
-            e.satisfaction += effect.satisfaction_delta;
-            e.satiety += effect.satiety_delta;
-            e.hope += effect.hope_delta;
+            if !e.is_state_freezed {
+                e.energy += effect.energy_delta;
+                e.satisfaction += effect.satisfaction_delta;
+                e.satiety += effect.satiety_delta;
+                e.hope += effect.hope_delta;
+            }
         }
 
         if effect.employee_delta > 0 {
@@ -379,6 +397,7 @@ pub struct Employee {
     pub hungry_emitter: Emitter,
     pub lightning_emitter: Emitter,
     pub heart_emitter: Emitter,
+    pub is_state_freezed: bool,
 }
 
 fn sleep_particles() -> particles::EmitterConfig {
@@ -569,6 +588,7 @@ impl Employee {
             hungry_emitter,
             lightning_emitter,
             heart_emitter,
+            is_state_freezed: false,
         }
     }
 
@@ -577,22 +597,27 @@ impl Employee {
         if let EmployeeState::Clean = self.state {
             return 0.;
         }
-        self.satisfaction -= BASE_DECAY_RATE * self.satisfaction_factor;
-        if let DoorState::Closed = door_state {
-            self.hope -= BASE_DECAY_RATE * self.hope_factor * 4.;
-        } else {
-            self.hope += BASE_DECAY_RATE * self.hope_factor * 4.;
+
+        if !self.is_state_freezed {
+            self.satisfaction -= BASE_DECAY_RATE * self.satisfaction_factor;
+            if let DoorState::Closed = door_state {
+                self.hope -= BASE_DECAY_RATE * self.hope_factor * 4.;
+            } else {
+                self.hope += BASE_DECAY_RATE * self.hope_factor * 4.;
+            }
+            self.energy -= BASE_DECAY_RATE * self.energy_factor;
+            if self.satiety > 0.9 {
+                self.energy -= BASE_DECAY_RATE * self.energy_factor * 5.;
+            }
+            self.satiety -= BASE_DECAY_RATE * self.satiety_factor;
         }
-        self.energy -= BASE_DECAY_RATE * self.energy_factor;
-        if self.satiety > 0.9 {
-            self.energy -= BASE_DECAY_RATE * self.energy_factor * 5.;
-        }
-        self.satiety -= BASE_DECAY_RATE * self.satiety_factor;
 
         match self.action {
             EmployeeAction::None => (),
             EmployeeAction::Break => {
-                self.satisfaction += REPLENISH_RATE;
+                if !self.is_state_freezed {
+                    self.satisfaction += REPLENISH_RATE;
+                }
             }
             EmployeeAction::Eat => self.satiety += REPLENISH_RATE,
             EmployeeAction::Sleep => self.energy += REPLENISH_RATE,
