@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, ops::DerefMut};
+use std::f32::consts::PI;
 
 use macroquad::prelude::*;
 
@@ -350,7 +350,7 @@ impl Drawing {
                 texture: if rand::gen_range(0, 2) == 1 {
                     assets::EMPLOYEE_TEXTURE.clone()
                 } else {
-                    assets::MANAGER_TEXTURE.clone() //TODO add manager skin
+                    assets::MANAGER_TEXTURE.clone()
                 },
                 speed_factor: if bas == 1 { 1. } else { -1. },
             };
@@ -795,6 +795,23 @@ impl Drawing {
                 GREEN,
             );
 
+            draw_rectangle_lines(
+                self.button_choice_1.x,
+                self.button_choice_1.y,
+                self.button_choice_1.w,
+                self.button_choice_1.h,
+                35.,
+                BLACK,
+            );
+            draw_rectangle_lines(
+                self.button_choice_2.x,
+                self.button_choice_2.y,
+                self.button_choice_2.w,
+                self.button_choice_2.h,
+                35.,
+                BLACK,
+            );
+
             draw_text_ex(
                 qte.get_choice1(),
                 (self.button_choice_1.w - FONT_SIZE_INFO * qte.get_choice1().len() as f32) / 2.
@@ -843,7 +860,7 @@ impl Drawing {
 
             draw_rectangle_lines(300., 2200., 1350., 100., 50., BLACK);
         } else if let Some(answer) = game.get_answer() {
-            self.draw_frame();
+            self.draw_frame_qte();
             self.draw_info_text(answer.clone());
         } else {
             if self.rect_personnal_stat.contains(main_pos) {
