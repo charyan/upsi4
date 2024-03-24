@@ -501,7 +501,7 @@ impl Drawing {
                 e.lightning_emitter.draw(pos);
             }
 
-            if e.get_hope() < 0.2 {
+            if (e.get_hope() < 0.2) || matches!(e.state, EmployeeState::Suicide) {
                 e.cry_emitter.draw(pos);
             } else if e.get_hope() > 0.8 {
                 e.heart_emitter.draw(pos);

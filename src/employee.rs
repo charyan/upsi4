@@ -162,6 +162,20 @@ impl Office {
         }
     }
 
+    pub fn suicide_random_employee(&mut self) {
+        let alive_employees = self
+            .employees
+            .iter()
+            .filter(|&e| matches!(e.borrow().state, EmployeeState::Alive))
+            .cloned()
+            .collect::<Vec<Rc<RefCell<Employee>>>>();
+
+        if alive_employees.len() > 0 {
+            let mut e = alive_employees[rand::gen_range(0, alive_employees.len())].borrow_mut();
+            e.state = EmployeeState::Suicide;
+        }
+    }
+
     pub fn update_door(&mut self) {
         if let DoorState::Open = self.door_state {
             self.door_state = DoorState::Closed;
@@ -386,7 +400,7 @@ pub struct Employee {
     position: Vec2,
     computer: Rc<RefCell<Computer>>,
     rotation: f32,
-    state: EmployeeState,
+    pub state: EmployeeState,
     movment_step: usize,
     pub action: EmployeeAction,
     pub z_emitter: Emitter,
@@ -642,7 +656,9 @@ impl Employee {
             self.state = EmployeeState::Dead
         }
 
-        if self.hope == 0. && self.movment_step == 3 {
+        if ((self.hope == 0.) || matches!(self.state, EmployeeState::Suicide))
+            && (self.movment_step == 3)
+        {
             self.state = EmployeeState::Suicide;
             if self.movment_step == 3 {
                 self.movment_step = 0;

@@ -10,10 +10,10 @@ mod drawing;
 mod employee;
 mod qte;
 
-use std::{cell::RefCell, rc::Rc};
+use std::{borrow::Borrow, cell::RefCell, rc::Rc};
 
 use drawing::Drawing;
-use employee::{EmployeeAction, Office, BONUS_METH_COST, BONUS_RH_COST};
+use employee::{EmployeeAction, EmployeeState, Office, BONUS_METH_COST, BONUS_RH_COST};
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
 use qte::{QteEffect, QTE};
 
@@ -499,6 +499,8 @@ struct Menu {
     game_started: bool,
     tick_count: u64,
     crunch_mode: bool,
+    kill_rand: bool,
+    door_closed: bool,
 }
 
 impl Menu {
@@ -515,6 +517,8 @@ impl Menu {
             game_started: false,
             tick_count: 0,
             crunch_mode: false,
+            kill_rand: false,
+            door_closed: false,
         }
     }
 
@@ -564,51 +568,66 @@ impl Menu {
                     });
                 }
 
-                (0..4).for_each(|_| {
+                (0..2).for_each(|_| {
                     game.office.tick();
                 });
             }
             MenuState::IntroStart => {
                 println!("start");
 
-                //
+                game.office.iter_employees_mut().for_each(|mut e| {
+                    e.is_state_freezed = true;
+                });
 
                 self.state = MenuState::IntroEmployeeEnter;
             }
             MenuState::IntroEmployeeEnter => {
-                (0..4).for_each(|_| {
+                (0..2).for_each(|_| {
                     game.office.tick();
                 });
 
-                if self.tick_count > 60 * 7 {
+                if self.tick_count > 60 * 6 {
                     self.state = MenuState::IntroManagerWalk;
                 }
             }
             MenuState::IntroManagerWalk => {
-                (0..4).for_each(|_| {
+                (0..2).for_each(|_| {
                     game.office.tick();
                 });
 
-                if self.tick_count > 60 * 10 {
+                if self.tick_count > 60 * 8 {
                     self.state = MenuState::IntroDoor;
                 }
             }
             MenuState::IntroDoor => {
-                (0..4).for_each(|_| {
+                (0..2).for_each(|_| {
                     game.office.tick();
                 });
 
-                if self.tick_count > 60 * 12 {
+                if self.tick_count > 60 * 10 && !self.door_closed {
+                    self.door_closed = true;
                     game.office.update_door();
+                }
+
+                if self.tick_count > 60 * 11 {
+                    self.crunch_mode = true;
+                }
+
+                if self.tick_count > 60 * 12 {
                     self.state = MenuState::IntroManagerLeave;
                 }
             }
             MenuState::IntroManagerLeave => {
-                (0..4).for_each(|_| {
+                (0..2).for_each(|_| {
                     game.office.tick();
                 });
 
-                if self.tick_count > 60 * 15 {
+                if !self.kill_rand {
+                    self.kill_rand = true;
+                    game.office.suicide_random_employee();
+                }
+
+                if self.tick_count > 60 * 14 {
                     self.state = MenuState::GameStart;
                 }
             }
@@ -639,17 +658,25 @@ impl Menu {
 
     pub fn draw(&mut self, game: &mut Game) {
         self.draw_clouds(game);
-        match self.state {
-            MenuState::GameOver => {
-                // TODO Draw game over
-            }
-            _ => {
-                if self.crunch_mode {
-                    self.draw_logo2();
-                } else {
-                    self.draw_logo1();
-                }
-            }
+
+        if matches!(self.state, MenuState::Start) {
+            draw_text_ex(
+                "Click to start",
+                screen_width() / 2. - 250.,
+                screen_height() / 2. + 200.,
+                TextParams {
+                    font: Some(&assets::FONT),
+                    font_size: 100 as u16,
+                    color: BLACK,
+                    ..Default::default()
+                },
+            )
+        }
+
+        if self.crunch_mode {
+            self.draw_logo2();
+        } else {
+            self.draw_logo1();
         }
     }
 
