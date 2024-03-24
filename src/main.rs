@@ -10,17 +10,17 @@ mod drawing;
 mod employee;
 mod qte;
 
-use std::{borrow::Borrow, cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use drawing::Drawing;
-use employee::{EmployeeAction, EmployeeState, Office, BONUS_METH_COST, BONUS_RH_COST};
+use employee::{EmployeeAction, Office, BONUS_METH_COST, BONUS_RH_COST};
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
 use qte::{QteEffect, QTE};
 
-const MIN_PERIOD_WITHOUT_QTE: f32 = 4.;
-const MAX_PERIOD_WITHOUT_QTE: f32 = 6.;
+const MIN_PERIOD_WITHOUT_QTE: f32 = 15.;
+const MAX_PERIOD_WITHOUT_QTE: f32 = 20.;
 
-const DISPLAY_ANSWER_TIME: f32 = 2.5;
+const DISPLAY_ANSWER_TIME: f32 = 5.;
 
 pub const DOOR_CD: f64 = 0.5;
 pub const RH_CD: f64 = 3.;
