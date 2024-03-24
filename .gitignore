@@ -3,3 +3,4 @@
 Cargo.lock
 assets/
 raw_sounds
+/.cargo

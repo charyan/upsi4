@@ -1064,7 +1064,7 @@ impl Drawing {
                 }
                 EmployeeState::Falling => {
                     draw_text_ex(
-                        "Falling",
+                        "En chute libre",
                         100.,
                         300.,
                         TextParams {
@@ -1090,7 +1090,7 @@ impl Drawing {
                 }
                 EmployeeState::Suicide => {
                     draw_text_ex(
-                        "Killing himself",
+                        "Va se défenestrer",
                         100.,
                         300.,
                         TextParams {
