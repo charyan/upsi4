@@ -1,4 +1,4 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, ops::DerefMut};
 
 use macroquad::prelude::*;
 
@@ -16,10 +16,11 @@ struct RandomPassing {
     pub x: f32,
     pub y: f32,
     texture: Texture2D,
+    pub speed_factor: f32,
 }
 
-const MIN_PERIOD_WITHOUT_PASSING: f32 = 4.;
-const MAX_PERIOD_WITHOUT_PASSING: f32 = 6.;
+const MIN_PERIOD_WITHOUT_PASSING: f32 = 2.;
+const MAX_PERIOD_WITHOUT_PASSING: f32 = 3.;
 
 const _TRANSPARENT: Color = Color::new(255., 255., 255., 0.);
 const LIGHTGRAY_ALPHA: Color = Color::new(0.78, 0.78, 0.78, 0.4);
@@ -314,6 +315,51 @@ impl Drawing {
         &self.button_choice_2
     }
 
+    pub fn handle_passer(&mut self) {
+        if let Some(passing) = &mut self.random_passing {
+            draw_texture_ex(
+                &passing.texture,
+                passing.x - EMPLOYEE_RADIUS,
+                passing.y - EMPLOYEE_RADIUS,
+                WHITE,
+                DrawTextureParams {
+                    rotation: -PI / 2. * passing.speed_factor,
+                    dest_size: Some(Vec2::new(100.0, 100.0)),
+                    ..Default::default()
+                },
+            );
+            if passing.y < -15. || passing.y > 750. {
+                self.random_passing = None;
+                self.start_wainting_passing = get_time() as f32;
+                self.wainting_passing_time =
+                    rand::gen_range(MIN_PERIOD_WITHOUT_PASSING, MAX_PERIOD_WITHOUT_PASSING);
+            } else {
+                if passing.y < 424. && passing.y > 290. {
+                    passing.y -= EMPLOYEE_RUNNING_SPEED * passing.speed_factor;
+                } else {
+                    passing.y -= EMPLOYEE_SPEED * passing.speed_factor;
+                }
+            }
+        } else if get_time() as f32 - self.start_wainting_passing > self.wainting_passing_time
+            && self.start_wainting_passing != 0.
+        {
+            let bas = rand::gen_range(0, 2);
+            println!("{bas}");
+            let passer = RandomPassing {
+                x: 220.,
+                y: if bas == 1 { 750. } else { -15. },
+                texture: if rand::gen_range(0, 1) == 1 {
+                    assets::EMPLOYEE_TEXTURE.clone()
+                } else {
+                    assets::EMPLOYEE_TEXTURE.clone() //TODO add manager skin
+                },
+                speed_factor: if bas == 1 { 1. } else { -1. },
+            };
+            self.random_passing = Some(passer);
+            self.start_wainting_passing = 0.;
+        }
+    }
+
     pub fn draw_office_full(&mut self, game: &Game) {
         set_camera(&self.main_camera);
 
@@ -415,6 +461,7 @@ impl Drawing {
                 },
             );
         }
+        self.handle_passer();
 
         // Draw employees
         for mut e in game.get_office().iter_employees_mut() {
@@ -581,45 +628,7 @@ impl Drawing {
             );
         }
 
-        if let Some(passing) = &mut self.random_passing {
-            draw_texture_ex(
-                &passing.texture,
-                passing.x - EMPLOYEE_RADIUS,
-                passing.y - EMPLOYEE_RADIUS,
-                WHITE,
-                DrawTextureParams {
-                    rotation: -PI / 2.,
-                    dest_size: Some(Vec2::new(100.0, 100.0)),
-                    ..Default::default()
-                },
-            );
-            if passing.y > 0. {
-                if passing.y < 424. && passing.y > 290. {
-                    passing.y -= EMPLOYEE_RUNNING_SPEED;
-                } else {
-                    passing.y -= EMPLOYEE_SPEED;
-                }
-            } else {
-                self.random_passing = None;
-                self.start_wainting_passing = get_time() as f32;
-                self.wainting_passing_time =
-                    rand::gen_range(MIN_PERIOD_WITHOUT_PASSING, MAX_PERIOD_WITHOUT_PASSING);
-            }
-        } else if get_time() as f32 - self.start_wainting_passing > self.wainting_passing_time
-            && self.start_wainting_passing != 0.
-        {
-            let passer = RandomPassing {
-                x: 220.,
-                y: 750.,
-                texture: if rand::gen_range(0, 1) == 1 {
-                    assets::EMPLOYEE_TEXTURE.clone()
-                } else {
-                    assets::EMPLOYEE_TEXTURE.clone() //TODO add manager skin
-                },
-            };
-            self.random_passing = Some(passer);
-            self.start_wainting_passing = 0.;
-        }
+        self.handle_passer();
 
         // Draw employees
         for mut e in game.get_office().iter_employees_mut() {
