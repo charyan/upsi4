@@ -13,7 +13,7 @@ mod qte;
 use std::{cell::RefCell, rc::Rc};
 
 use drawing::Drawing;
-use employee::{EmployeeAction, Office};
+use employee::{EmployeeAction, Office, BONUS_METH_COST, BONUS_RH_COST};
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
 use qte::{QteEffect, QTE};
 
@@ -21,6 +21,10 @@ const MIN_PERIOD_WITHOUT_QTE: f32 = 4.;
 const MAX_PERIOD_WITHOUT_QTE: f32 = 6.;
 
 const DISPLAY_ANSWER_TIME: f32 = 2.5;
+
+pub const DOOR_CD: f64 = 0.5;
+pub const RH_CD: f64 = 3.;
+pub const METH_CD: f64 = 5.;
 
 #[derive(Clone, Copy)]
 pub enum GameState {
@@ -41,6 +45,9 @@ struct Game {
     starting_time_answer: f32,
     qtes: Vec<QTE>,
     game_state: GameState,
+    door_start_cd: f64,
+    rh_start_cd: f64,
+    meth_start_cd: f64,
 }
 
 impl Game {
@@ -213,6 +220,9 @@ impl Game {
             answer: None,
             qtes,
             game_state: GameState::Running, // TODO initial state should be Game menu
+            rh_start_cd: 0.,
+            meth_start_cd: 0.,
+            door_start_cd: 0.,
         }
     }
 
@@ -263,14 +273,27 @@ impl Game {
                 }
             } else if drawing.get_rect_global_stat().contains(main_pos) {
                 let pos = Drawing::convert_main_global_stat(main_pos);
-                println!("Drawing pos : {:?}", pos);
 
                 if drawing.get_button_door().contains(pos) {
-                    self.get_mut_office().update_door();
+                    if self.door_start_cd == 0. {
+                        self.get_mut_office().update_door();
+                        self.door_start_cd = get_time();
+                    }
                 } else if drawing.get_button_meth().contains(pos) {
-                    self.get_mut_office().bonus_meth();
+                    if self.meth_start_cd == 0. && self.office.get_money() >= BONUS_METH_COST {
+                        self.office
+                            .set_money(self.office.get_money() - BONUS_METH_COST);
+
+                        self.get_mut_office().bonus_meth();
+                        self.meth_start_cd = get_time();
+                    }
                 } else if drawing.get_button_rh().contains(pos) {
-                    self.get_mut_office().bonus_rh();
+                    if self.rh_start_cd == 0. && self.office.get_money() >= BONUS_RH_COST {
+                        self.office
+                            .set_money(self.office.get_money() - BONUS_RH_COST);
+                        self.get_mut_office().bonus_rh();
+                        self.rh_start_cd = get_time();
+                    }
                 }
             } else if drawing.get_rect_personnal_stat().contains(main_pos) {
                 let pos = Drawing::convert_main_personnal_stat(main_pos);
@@ -337,6 +360,15 @@ impl Game {
             GameState::Running => {
                 self.office.tick();
 
+                if get_time() - self.door_start_cd > DOOR_CD {
+                    self.door_start_cd = 0.
+                }
+                if get_time() - self.meth_start_cd > METH_CD {
+                    self.meth_start_cd = 0.
+                } else if get_time() - self.rh_start_cd > RH_CD {
+                    self.rh_start_cd = 0.
+                }
+
                 self.in_game_event_handling();
 
                 self.drawing.clone().borrow_mut().draw(&self);
@@ -349,6 +381,18 @@ impl Game {
             GameState::MyLittleOfficeMenu => (),
             GameState::CrunchSimulatorMenu => (),
         }
+    }
+
+    pub fn get_start_door_cd(&self) -> f64 {
+        self.door_start_cd
+    }
+
+    pub fn get_start_rh_cd(&self) -> f64 {
+        self.rh_start_cd
+    }
+
+    pub fn get_start_meth_cd(&self) -> f64 {
+        self.meth_start_cd
     }
 
     pub fn get_qte_ongoing(&self) -> &Option<QTE> {

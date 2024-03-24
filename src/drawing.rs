@@ -5,10 +5,11 @@ use macroquad::prelude::*;
 use crate::{
     assets,
     employee::{DoorState, EmployeeAction, EmployeeState, EMPLOYEE_RADIUS, MIDDLE_LANE},
-    Game,
+    Game, DOOR_CD, METH_CD,
 };
 
 const _TRANSPARENT: Color = Color::new(255., 255., 255., 0.);
+const LIGHTGRAY_ALPHA: Color = Color::new(0.78, 0.78, 0.78, 0.4);
 
 pub const OFFICE_WIDTH: u32 = 1280;
 pub const OFFICE_HEIGHT: u32 = 720;
@@ -1030,6 +1031,20 @@ impl Drawing {
             BLACK,
         );
 
+        if game.get_start_door_cd() != 0. {
+            let value = self.button_global_door.h as f64
+                - (get_time() - game.get_start_door_cd()) / DOOR_CD
+                    * self.button_global_door.h as f64;
+
+            draw_rectangle(
+                self.button_global_door.x,
+                self.button_global_door.y + self.button_global_door.h,
+                self.button_global_door.w,
+                -value as f32,
+                LIGHTGRAY_ALPHA,
+            );
+        }
+
         draw_rectangle(
             self.button_global_meth.x,
             self.button_global_meth.y,
@@ -1055,6 +1070,19 @@ impl Drawing {
             10.,
             BLACK,
         );
+        if game.get_start_meth_cd() != 0. {
+            let value = self.button_global_meth.h as f64
+                - (get_time() - game.get_start_meth_cd()) / METH_CD
+                    * self.button_global_meth.h as f64;
+
+            draw_rectangle(
+                self.button_global_meth.x,
+                self.button_global_meth.y + self.button_global_meth.h,
+                self.button_global_meth.w,
+                -value as f32,
+                LIGHTGRAY_ALPHA,
+            );
+        }
 
         draw_rectangle(
             self.button_global_rh.x,
@@ -1081,6 +1109,18 @@ impl Drawing {
             10.,
             BLACK,
         );
+        if game.get_start_rh_cd() != 0. {
+            let value = self.button_global_rh.h as f64
+                - (get_time() - game.get_start_rh_cd()) / METH_CD * self.button_global_rh.h as f64;
+
+            draw_rectangle(
+                self.button_global_rh.x,
+                self.button_global_rh.y + self.button_global_rh.h,
+                self.button_global_rh.w,
+                -value as f32,
+                LIGHTGRAY_ALPHA,
+            );
+        }
     }
 
     fn draw_game(&self) {

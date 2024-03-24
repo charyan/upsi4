@@ -12,7 +12,7 @@ const NAMES: &[&str] = &[
     "Edsger", "Stephano", "Olivier", "Mathieu", "Valérie", "Roland", "Tom",
 ];
 
-const BONUS_RH_COST: f32 = 200.;
+pub const BONUS_RH_COST: f32 = 200.;
 
 use macroquad::{
     math::Vec2,
@@ -32,6 +32,15 @@ const OPEN_WINDOW_X: f32 = 1000.;
 const DOOR_X_INSIDE: f32 = 370.;
 const DOOR_X_OUTSIDE: f32 = 300.;
 const SPEED_FALL: f32 = 10.;
+
+const BASE_DECAY_RATE: f32 = 0.0002;
+const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
+
+pub const EMPLOYEE_RADIUS: f32 = 50.;
+const EMPLOYEE_SPEED: f32 = 2.;
+const EMPLOYEE_RUNNING_SPEED: f32 = 5.;
+
+pub const BONUS_METH_COST: f32 = 1000.;
 
 #[derive(Clone, Copy, Debug)]
 pub enum DoorState {
@@ -58,7 +67,7 @@ impl Office {
             available_computers: Vec::new(),
             employees: Vec::new(),
             selected_employee: None,
-            money: 100.,
+            money: 4000.,
             door_state: DoorState::Open,
             window_open: false,
         };
@@ -90,7 +99,7 @@ impl Office {
 
         self.employees.clear();
         self.selected_employee = None;
-        self.money = 100.;
+        self.money = 4000.;
         self.door_state = DoorState::Open;
         self.window_open = false;
     }
@@ -200,11 +209,7 @@ impl Office {
     }
 
     pub fn bonus_meth(&mut self) {
-        if self.money >= BONUS_METH_COST {
-            self.money -= BONUS_METH_COST;
-
-            self.apply_qte_effect(&QteEffect::new(0.3, 0.3, 0.3, -0.3, 0., 0));
-        }
+        self.apply_qte_effect(&QteEffect::new(0.3, 0.3, 0.3, -0.3, 0., 0));
     }
 
     pub fn tick(&mut self) {
@@ -270,22 +275,14 @@ impl Office {
         self.money
     }
 
+    pub fn set_money(&mut self, value: f32) {
+        self.money = value;
+    }
+
     pub fn bonus_rh(&mut self) {
-        if self.money >= BONUS_RH_COST {
-            self.money -= BONUS_RH_COST;
-            self.add_employee();
-        }
+        self.add_employee();
     }
 }
-
-const BASE_DECAY_RATE: f32 = 0.0002;
-const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
-
-pub const EMPLOYEE_RADIUS: f32 = 50.;
-const EMPLOYEE_SPEED: f32 = 2.;
-const EMPLOYEE_RUNNING_SPEED: f32 = 5.;
-
-const BONUS_METH_COST: f32 = 1000.;
 
 fn feueur_particles() -> particles::EmitterConfig {
     particles::EmitterConfig {
