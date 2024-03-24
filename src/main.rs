@@ -673,7 +673,32 @@ impl Menu {
             )
         }
 
-        if !matches!(self.state, MenuState::GameOver) {
+        if matches!(self.state, MenuState::GameOver) {
+            if self.cloud1_pos.x < self.cloud1_start_pos.x {
+                draw_text_ex(
+                    "Vous avez perdu !",
+                    100.,
+                    200.,
+                    TextParams {
+                        font: Some(&assets::FONT),
+                        font_size: 100 as u16,
+                        color: BLACK,
+                        ..Default::default()
+                    },
+                );
+                draw_text_ex(
+                    "Vous n'aviez plus d'employés à exploiter !",
+                    100.,
+                    300.,
+                    TextParams {
+                        font: Some(&assets::FONT),
+                        font_size: 50 as u16,
+                        color: BLACK,
+                        ..Default::default()
+                    },
+                );
+            }
+        } else {
             if self.crunch_mode {
                 self.draw_logo2();
             } else {
