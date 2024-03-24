@@ -10,7 +10,7 @@ mod drawing;
 mod employee;
 mod qte;
 
-use std::{cell::RefCell, rc::Rc};
+use std::{borrow::Borrow, cell::RefCell, f32::consts::PI, rc::Rc};
 
 use drawing::Drawing;
 use employee::{EmployeeAction, Office, BONUS_METH_COST, BONUS_RH_COST};
@@ -542,6 +542,10 @@ struct Menu {
     crunch_mode: bool,
     kill_rand: bool,
     door_closed: bool,
+    manager_pos: Vec2,
+    manager_rot: f32,
+    manager_speed: f32,
+    manager_rotated: bool,
 }
 
 impl Menu {
@@ -560,6 +564,10 @@ impl Menu {
             crunch_mode: false,
             kill_rand: false,
             door_closed: false,
+            manager_pos: vec2(250., 0.),
+            manager_rot: PI / 2.,
+            manager_speed: 4.,
+            manager_rotated: false,
         }
     }
 
@@ -636,6 +644,8 @@ impl Menu {
                     game.office.tick();
                 });
 
+                self.manager_pos.y += self.manager_speed;
+
                 if self.tick_count > 60 * 8 {
                     self.state = MenuState::IntroDoor;
                 }
@@ -644,6 +654,11 @@ impl Menu {
                 (0..2).for_each(|_| {
                     game.office.tick();
                 });
+
+                if !self.manager_rotated {
+                    self.manager_rot -= PI / 2.;
+                    self.manager_rotated = true;
+                }
 
                 if self.tick_count > 60 * 10 && !self.door_closed {
                     self.door_closed = true;
@@ -662,6 +677,13 @@ impl Menu {
                 (0..2).for_each(|_| {
                     game.office.tick();
                 });
+
+                if self.manager_rotated {
+                    self.manager_rot += PI / 2.;
+                    self.manager_rotated = false;
+                }
+
+                self.manager_pos.y += self.manager_speed;
 
                 if !self.kill_rand {
                     self.kill_rand = true;
@@ -700,8 +722,19 @@ impl Menu {
     pub fn draw(&mut self, game: &mut Game) {
         self.draw_clouds(game);
 
-        if matches!(self.state, MenuState::Start) {
-            draw_text_ex(
+        match self.state {
+            MenuState::GameOver => (),
+            _ => {
+                if !self.crunch_mode {
+                    self.draw_logo1();
+                } else {
+                    self.draw_logo2();
+                }
+            }
+        }
+
+        match self.state {
+            MenuState::Start => draw_text_ex(
                 "Click to start",
                 screen_width() / 2. - 250.,
                 screen_height() / 2. + 200.,
@@ -711,40 +744,47 @@ impl Menu {
                     color: BLACK,
                     ..Default::default()
                 },
-            )
-        }
-
-        if matches!(self.state, MenuState::GameOver) {
-            if self.cloud1_pos.x < self.cloud1_start_pos.x {
-                draw_text_ex(
-                    "Vous avez perdu !",
-                    100.,
-                    200.,
-                    TextParams {
-                        font: Some(&assets::FONT),
-                        font_size: 100 as u16,
-                        color: BLACK,
-                        ..Default::default()
-                    },
-                );
-                draw_text_ex(
-                    "Vous n'aviez plus d'employés à exploiter !",
-                    100.,
-                    300.,
-                    TextParams {
-                        font: Some(&assets::FONT),
-                        font_size: 50 as u16,
-                        color: BLACK,
+            ),
+            MenuState::GameOver => {
+                if self.cloud1_pos.x < self.cloud1_start_pos.x {
+                    draw_text_ex(
+                        "Vous avez perdu !",
+                        100.,
+                        200.,
+                        TextParams {
+                            font: Some(&assets::FONT),
+                            font_size: 100 as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                    draw_text_ex(
+                        "Vous n'aviez plus d'employés à exploiter !",
+                        100.,
+                        300.,
+                        TextParams {
+                            font: Some(&assets::FONT),
+                            font_size: 50 as u16,
+                            color: BLACK,
+                            ..Default::default()
+                        },
+                    );
+                }
+            }
+            MenuState::IntroManagerWalk | MenuState::IntroManagerLeave | MenuState::IntroDoor => {
+                draw_texture_ex(
+                    &assets::MANAGER_TEXTURE,
+                    self.manager_pos.x,
+                    self.manager_pos.y,
+                    WHITE,
+                    DrawTextureParams {
+                        dest_size: Some(vec2(150., 150.)),
+                        rotation: self.manager_rot,
                         ..Default::default()
                     },
                 );
             }
-        } else {
-            if self.crunch_mode {
-                self.draw_logo2();
-            } else {
-                self.draw_logo1();
-            }
+            _ => (),
         }
     }
 
