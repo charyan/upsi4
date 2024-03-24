@@ -404,7 +404,8 @@ impl Game {
                 }
                 if get_time() - self.meth_start_cd > METH_CD {
                     self.meth_start_cd = 0.
-                } else if get_time() - self.rh_start_cd > RH_CD {
+                }
+                if get_time() - self.rh_start_cd > RH_CD {
                     self.rh_start_cd = 0.
                 }
 

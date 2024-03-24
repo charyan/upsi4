@@ -8,7 +8,7 @@ use crate::{
         DoorState, EmployeeAction, EmployeeState, EMPLOYEE_RADIUS, EMPLOYEE_RUNNING_SPEED,
         EMPLOYEE_SPEED, MIDDLE_LANE,
     },
-    Game, DOOR_CD, METH_CD,
+    Game, DOOR_CD, METH_CD, RH_CD,
 };
 
 #[derive(Debug)]
@@ -1363,7 +1363,7 @@ impl Drawing {
         );
         if game.get_start_rh_cd() != 0. {
             let value = self.button_global_rh.h as f64
-                - (get_time() - game.get_start_rh_cd()) / METH_CD * self.button_global_rh.h as f64;
+                - (get_time() - game.get_start_rh_cd()) / RH_CD * self.button_global_rh.h as f64;
 
             draw_rectangle(
                 self.button_global_rh.x,
