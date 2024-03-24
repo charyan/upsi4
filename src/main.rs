@@ -379,7 +379,15 @@ impl Game {
                     self.game_state = GameState::GameOver;
                 }
             }
-            GameState::GameOver => (),
+            GameState::GameOver => {
+                let menu_clone = self.menu.clone();
+                let mut menu = menu_clone.borrow_mut();
+
+                menu.state = MenuState::GameOver;
+
+                menu.draw(self);
+                menu.tick(self);
+            }
             GameState::MyLittleOfficeMenu => {
                 let menu_clone = self.menu.clone();
                 let mut menu = menu_clone.borrow_mut();
@@ -471,7 +479,7 @@ async fn main() {
 enum MenuState {
     Start,
     CloudDispersing,
-    CloudArriving,
+    GameOver,
     IntroStart,
     IntroEmployeeEnter,
     IntroManagerWalk,
@@ -486,7 +494,7 @@ struct Menu {
     cloud2_start_pos: Vec2,
     cloud1_end_pos: Vec2,
     cloud2_end_pos: Vec2,
-    state: MenuState,
+    pub state: MenuState,
     spawning: bool,
     game_started: bool,
     tick_count: u64,
@@ -525,6 +533,7 @@ impl Menu {
                     }
                 }
             }
+
             MenuState::CloudDispersing => {
                 if self.cloud1_pos.x <= self.cloud1_end_pos.x {
                     self.cloud1_pos.x += 100.;
@@ -610,7 +619,7 @@ impl Menu {
 
                 self.game_started = true;
             }
-            MenuState::CloudArriving => {
+            MenuState::GameOver => {
                 if self.cloud1_pos.x >= self.cloud1_start_pos.x {
                     self.cloud1_pos.x -= 100.;
                 }
@@ -630,10 +639,17 @@ impl Menu {
 
     pub fn draw(&mut self, game: &mut Game) {
         self.draw_clouds(game);
-        if self.crunch_mode {
-            self.draw_logo2();
-        } else {
-            self.draw_logo1();
+        match self.state {
+            MenuState::GameOver => {
+                // TODO Draw game over
+            }
+            _ => {
+                if self.crunch_mode {
+                    self.draw_logo2();
+                } else {
+                    self.draw_logo1();
+                }
+            }
         }
     }
 
@@ -685,6 +701,7 @@ impl Menu {
             -(screen_width() * (0.7)) + self.cloud2_pos.x,
             -(screen_height() * (1.)) + self.cloud2_pos.y,
             WHITE,
+            //
             DrawTextureParams {
                 dest_size: Some(vec2(screen_width() * 2., screen_height() * 3.)),
                 ..Default::default()
