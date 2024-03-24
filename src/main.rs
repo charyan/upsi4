@@ -363,14 +363,6 @@ impl Game {
                 }
             }
         }
-
-        if is_key_pressed(KeyCode::Space) {
-            self.get_mut_office().add_employee();
-        }
-
-        if is_key_pressed(KeyCode::W) {
-            self.get_mut_office().update_window();
-        }
     }
 
     pub fn tick(&mut self) {
