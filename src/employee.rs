@@ -278,12 +278,12 @@ impl Office {
     }
 }
 
-const BASE_DECAY_RATE: f32 = 0.0003;
+const BASE_DECAY_RATE: f32 = 0.0002;
 const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
 pub const EMPLOYEE_RADIUS: f32 = 50.;
-const EMPLOYEE_SPEED: f32 = 1.;
-const EMPLOYEE_RUNNING_SPEED: f32 = 3.;
+const EMPLOYEE_SPEED: f32 = 2.;
+const EMPLOYEE_RUNNING_SPEED: f32 = 5.;
 
 const BONUS_METH_COST: f32 = 1000.;
 
@@ -354,6 +354,8 @@ pub enum EmployeeAction {
     Sleep,
     /// Hope
     FamilyCall,
+    /// Forced Sleep,
+    ForcedSleep,
 }
 
 pub struct Employee {
@@ -579,8 +581,15 @@ impl Employee {
             return 0.;
         }
         self.satisfaction -= BASE_DECAY_RATE * self.satisfaction_factor;
-        self.hope -= BASE_DECAY_RATE * self.hope_factor * 2.;
+        if let DoorState::Closed = door_state {
+            self.hope -= BASE_DECAY_RATE * self.hope_factor * 4.;
+        } else {
+            self.hope += BASE_DECAY_RATE * self.hope_factor * 4.;
+        }
         self.energy -= BASE_DECAY_RATE * self.energy_factor;
+        if self.satiety > 0.9 {
+            self.energy -= BASE_DECAY_RATE * self.energy_factor * 5.;
+        }
         self.satiety -= BASE_DECAY_RATE * self.satiety_factor;
 
         match self.action {
@@ -591,6 +600,7 @@ impl Employee {
             EmployeeAction::Eat => self.satiety += REPLENISH_RATE,
             EmployeeAction::Sleep => self.energy += REPLENISH_RATE,
             EmployeeAction::FamilyCall => self.hope += REPLENISH_RATE,
+            EmployeeAction::ForcedSleep => self.energy += REPLENISH_RATE / 2.,
         }
 
         self.satisfaction = self.satisfaction.clamp(0., 1.);
@@ -599,7 +609,11 @@ impl Employee {
         self.satiety = self.satiety.clamp(0., 1.);
 
         if self.energy == 0. {
-            self.action = EmployeeAction::Sleep
+            self.action = EmployeeAction::ForcedSleep
+        }
+
+        if self.energy > 0.5 && matches!(self.action, EmployeeAction::ForcedSleep) {
+            self.action = EmployeeAction::None
         }
 
         if self.satiety == 0. {
@@ -883,13 +897,5 @@ impl Employee {
 
     pub fn get_state(&self) -> EmployeeState {
         self.state
-    }
-
-    pub fn is_happy(&self) -> bool {
-        self.satisfaction == 1.
-    }
-
-    pub fn is_mad(&self) -> bool {
-        self.satisfaction == 0.
     }
 }
