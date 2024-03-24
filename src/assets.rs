@@ -10,6 +10,10 @@ lazy_static! {
         include_bytes!("../assets/employees/employee0_normal.png"),
         Some(ImageFormat::Png),
     );
+    pub static ref MANAGER_TEXTURE: Texture2D = Texture2D::from_file_with_format(
+        include_bytes!("../assets/employees/manager.png"),
+        Some(ImageFormat::Png),
+    );
     pub static ref OFFICE_TEXTURE: Texture2D = Texture2D::from_file_with_format(
         include_bytes!("../assets/office/office.png"),
         Some(ImageFormat::Png),

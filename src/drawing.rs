@@ -344,14 +344,13 @@ impl Drawing {
             && self.start_wainting_passing != 0.
         {
             let bas = rand::gen_range(0, 2);
-            println!("{bas}");
             let passer = RandomPassing {
                 x: 220.,
                 y: if bas == 1 { 750. } else { -15. },
-                texture: if rand::gen_range(0, 1) == 1 {
+                texture: if rand::gen_range(0, 2) == 1 {
                     assets::EMPLOYEE_TEXTURE.clone()
                 } else {
-                    assets::EMPLOYEE_TEXTURE.clone() //TODO add manager skin
+                    assets::MANAGER_TEXTURE.clone() //TODO add manager skin
                 },
                 speed_factor: if bas == 1 { 1. } else { -1. },
             };
