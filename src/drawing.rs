@@ -4,9 +4,22 @@ use macroquad::prelude::*;
 
 use crate::{
     assets,
-    employee::{DoorState, EmployeeAction, EmployeeState, EMPLOYEE_RADIUS, MIDDLE_LANE},
+    employee::{
+        DoorState, EmployeeAction, EmployeeState, EMPLOYEE_RADIUS, EMPLOYEE_RUNNING_SPEED,
+        EMPLOYEE_SPEED, MIDDLE_LANE,
+    },
     Game, DOOR_CD, METH_CD,
 };
+
+#[derive(Debug)]
+struct RandomPassing {
+    pub x: f32,
+    pub y: f32,
+    texture: Texture2D,
+}
+
+const MIN_PERIOD_WITHOUT_PASSING: f32 = 4.;
+const MAX_PERIOD_WITHOUT_PASSING: f32 = 6.;
 
 const _TRANSPARENT: Color = Color::new(255., 255., 255., 0.);
 const LIGHTGRAY_ALPHA: Color = Color::new(0.78, 0.78, 0.78, 0.4);
@@ -51,7 +64,7 @@ const DESCRIPTION_BUTTON_METH: &str =
     "Donnez un coup de boost à vos employée en leur offrant un breuvage (arrangé par vos soin). Coût : 1000";
 const DESCRIPTION_BUTTON_RH: &str = "Le pôle RH se démenera afin de vous trouvez LE candidat pour remplir vos rang (probablement un stagiaire). Coût : 200";
 
-const DESCRIPTION_HOPE: &str = "L'espoir de vos employé reflète leurs pensé quand à leur avenir chez vous (pouvoir partir). Trop d'espoir pourrait conduire à une tentive de fuite, alors que pas assez pourrait être facheux";
+const DESCRIPTION_HOPE: &str = "L'espoir de vos employé reflète leurs pensé quand à leur avenir chez vous (pouvoir partir). Trop d'espoir pourrait conduire à une tentive de fuite, alors que pas assez pourrait être facheux. La porte ouverte augmente l'espoir et inversement.";
 const DESCRIPTION_SATISFACTION: &str =
     "La joie de vos employé reflète leur bonheur (inefficacité). Des employés trop heureust discutes avec des collègues, baissant drastiquement leur rendement, là où l'inverse pourrait conduire à un départ précipité";
 const DESCRIPTION_SATIETY: &str = "La sasiété de vos employé reflète leurs besoin en nourritue. Si vous ne les nourrisez pas, ils risquent de mourir, alors qu'une fois qu'ils ont trop mangé, leur énergie descent drastiquement.";
@@ -110,6 +123,10 @@ pub struct Drawing {
     bar_energy: Rect,
     bar_satiety: Rect,
     bar_hope: Rect,
+
+    random_passing: Option<RandomPassing>,
+    start_wainting_passing: f32,
+    wainting_passing_time: f32,
 }
 
 impl Drawing {
@@ -238,6 +255,10 @@ impl Drawing {
                 GAME_WINDOW_WIDTH as f32 * 0.69,
                 GAME_WINDOW_HEIGHT as f32 * 0.28,
             ),
+
+            random_passing: None,
+            start_wainting_passing: get_time() as f32,
+            wainting_passing_time: MIN_PERIOD_WITHOUT_PASSING,
         }
     }
 
@@ -558,6 +579,46 @@ impl Drawing {
                     ..Default::default()
                 },
             );
+        }
+
+        if let Some(passing) = &mut self.random_passing {
+            draw_texture_ex(
+                &passing.texture,
+                passing.x - EMPLOYEE_RADIUS,
+                passing.y - EMPLOYEE_RADIUS,
+                WHITE,
+                DrawTextureParams {
+                    rotation: -PI / 2.,
+                    dest_size: Some(Vec2::new(100.0, 100.0)),
+                    ..Default::default()
+                },
+            );
+            if passing.y > 0. {
+                if passing.y < 424. && passing.y > 290. {
+                    passing.y -= EMPLOYEE_RUNNING_SPEED;
+                } else {
+                    passing.y -= EMPLOYEE_SPEED;
+                }
+            } else {
+                self.random_passing = None;
+                self.start_wainting_passing = get_time() as f32;
+                self.wainting_passing_time =
+                    rand::gen_range(MIN_PERIOD_WITHOUT_PASSING, MAX_PERIOD_WITHOUT_PASSING);
+            }
+        } else if get_time() as f32 - self.start_wainting_passing > self.wainting_passing_time
+            && self.start_wainting_passing != 0.
+        {
+            let passer = RandomPassing {
+                x: 220.,
+                y: 750.,
+                texture: if rand::gen_range(0, 1) == 1 {
+                    assets::EMPLOYEE_TEXTURE.clone()
+                } else {
+                    assets::EMPLOYEE_TEXTURE.clone() //TODO add manager skin
+                },
+            };
+            self.random_passing = Some(passer);
+            self.start_wainting_passing = 0.;
         }
 
         // Draw employees

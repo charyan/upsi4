@@ -37,8 +37,8 @@ const BASE_DECAY_RATE: f32 = 0.0002;
 const REPLENISH_RATE: f32 = BASE_DECAY_RATE * 10.;
 
 pub const EMPLOYEE_RADIUS: f32 = 50.;
-const EMPLOYEE_SPEED: f32 = 2.;
-const EMPLOYEE_RUNNING_SPEED: f32 = 5.;
+pub const EMPLOYEE_SPEED: f32 = 2.;
+pub const EMPLOYEE_RUNNING_SPEED: f32 = 5.;
 
 pub const BONUS_METH_COST: f32 = 1000.;
 
