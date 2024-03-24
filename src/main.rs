@@ -10,7 +10,7 @@ mod drawing;
 mod employee;
 mod qte;
 
-use std::{borrow::Borrow, cell::RefCell, f32::consts::PI, rc::Rc};
+use std::{cell::RefCell, f32::consts::PI, rc::Rc};
 
 use drawing::Drawing;
 use employee::{EmployeeAction, Office, BONUS_METH_COST, BONUS_RH_COST};
