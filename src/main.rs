@@ -675,7 +675,7 @@ impl Menu {
                 }
             }
             MenuState::IntroManagerLeave => {
-                (0..2).for_each(|_| {
+                (0..1).for_each(|_| {
                     game.office.tick();
                 });
 
