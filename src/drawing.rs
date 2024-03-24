@@ -345,7 +345,7 @@ impl Drawing {
         {
             let bas = rand::gen_range(0, 2);
             let passer = RandomPassing {
-                x: 220.,
+                x: 150.,
                 y: if bas == 1 { 750. } else { -15. },
                 texture: if rand::gen_range(0, 2) == 1 {
                     assets::EMPLOYEE_TEXTURE.clone()

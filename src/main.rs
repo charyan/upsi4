@@ -673,10 +673,12 @@ impl Menu {
             )
         }
 
-        if self.crunch_mode {
-            self.draw_logo2();
-        } else {
-            self.draw_logo1();
+        if !matches!(self.state, MenuState::GameOver) {
+            if self.crunch_mode {
+                self.draw_logo2();
+            } else {
+                self.draw_logo1();
+            }
         }
     }
 
@@ -710,7 +712,11 @@ impl Menu {
         let c = game.drawing.clone();
         let mut d = c.borrow_mut();
 
-        d.draw_menu(game);
+        if matches!(game.game_state, GameState::GameOver) {
+            d.draw(game);
+        } else {
+            d.draw_menu(game);
+        }
 
         draw_texture_ex(
             &assets::CLOUD_TEXTURE,
