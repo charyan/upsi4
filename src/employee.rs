@@ -67,7 +67,7 @@ impl Office {
             available_computers: Vec::new(),
             employees: Vec::new(),
             selected_employee: None,
-            money: 4000.,
+            money: 2000.,
             door_state: DoorState::Open,
             window_open: false,
         };
@@ -99,7 +99,7 @@ impl Office {
 
         self.employees.clear();
         self.selected_employee = None;
-        self.money = 4000.;
+        self.money = 2000.;
         self.door_state = DoorState::Open;
         self.window_open = false;
     }
