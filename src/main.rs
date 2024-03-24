@@ -17,7 +17,7 @@ use employee::{EmployeeAction, Office, BONUS_METH_COST, BONUS_RH_COST};
 use macroquad::{experimental::coroutines::wait_seconds, prelude::*};
 use qte::{QteEffect, QTE};
 
-const MIN_PERIOD_WITHOUT_QTE: f32 = 15.;
+const MIN_PERIOD_WITHOUT_QTE: f32 = 10.;
 const MAX_PERIOD_WITHOUT_QTE: f32 = 20.;
 
 const DISPLAY_ANSWER_TIME: f32 = 5.;
@@ -230,7 +230,7 @@ impl Game {
             starting_time_qte: 0.,
             waiting_time_qte: 0.,
             starting_time_answer: 0.,
-            next_time_qte: 60.,
+            next_time_qte: 1.,
             answer: None,
             qtes,
             rh_start_cd: 0.,
@@ -372,7 +372,7 @@ impl Game {
 
                 match self.day {
                     Day::Evening => {
-                        if self.night_value > 0.5 {
+                        if self.night_value > 1. {
                             self.night_value -= NIGHT_SPEED;
                         } else {
                             self.day = Day::Night;
